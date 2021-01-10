@@ -13,6 +13,7 @@
 #IDE files
 .idea/
 *.iml
+*.yaml
 
 # Package Files #
 *.jar

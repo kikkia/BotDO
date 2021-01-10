@@ -2,6 +2,7 @@ package com.bot.configuration;
 
 import com.bot.DiscordListener;
 import com.bot.configuration.properties.DiscordProperties;
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.security.auth.login.LoginException;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static net.dv8tion.jda.api.requests.GatewayIntent.*;
@@ -26,6 +28,9 @@ public class DiscordConfiguration {
 
     @Autowired
     DiscordProperties discordProperties;
+
+    @Autowired
+    List<Command> commandList;
 
     @Bean
     public ShardManager shardManager(EventWaiter eventWaiter,
@@ -69,6 +74,7 @@ public class DiscordConfiguration {
         builder.setEmojis("\u2705", "\u2757", "\u274c");
         builder.setActivity(null);
         builder.setScheduleExecutor(executorService);
+        builder.addCommands(commandList.toArray(new Command[commandList.size()]));
         return builder.build();
     }
 }

@@ -6,10 +6,10 @@ import javax.persistence.*
 @Table(name = "scroll_inventory")
 data class ScrollInventory(
         @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Int,
         @OneToOne
-        @JoinColumn(name = "id")
+        @JoinColumn(name = "user_id")
         val user: User,
         val redNose: Int,
         val aRedNose: Int,

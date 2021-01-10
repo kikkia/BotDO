@@ -7,7 +7,7 @@ import javax.persistence.*
 @Table(name = "scroll_history")
 data class ScrollHistory(
         @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Int,
         @ManyToOne
         @JoinColumn(name = "user_id")

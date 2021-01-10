@@ -11,12 +11,12 @@ data class User(
         val familyName: String,
         @ManyToOne
         @JoinTable(name="user_scroll_group",
-                joinColumns = [JoinColumn(name = "id", referencedColumnName = "user_id" )],
-                inverseJoinColumns = [JoinColumn(name = "id", referencedColumnName = "group_id")])
-        val scrollGroup: ScrollGroup,
+                joinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id" )],
+                inverseJoinColumns = [JoinColumn(name = "group_id", referencedColumnName = "id")])
+        val scrollGroup: ScrollGroup?,
         @ManyToMany
         @JoinTable(name="guild_membership",
-                joinColumns = [JoinColumn(name = "id", referencedColumnName = "user_id")],
-                inverseJoinColumns = [JoinColumn(name = "id", referencedColumnName = "guild_id")])
-        val guilds: Set<Guild>
+                joinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")],
+                inverseJoinColumns = [JoinColumn(name = "guild_id", referencedColumnName = "id")])
+        val guilds: Set<Guild> = HashSet()
 )

@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `text_channel` (
     `guild` VARCHAR(255) NOT NULL,
     `name` VARCHAR(255) NOT NULL,
     `announcement` TINYINT(1) NULL DEFAULT 0,
-    `persistent` TINYINT(1) NULL DEFAULT 0,
+    `persistent_scrolls` TINYINT(1) NULL DEFAULT 0,
     PRIMARY KEY (`id`),
     CONSTRAINT `guild_id_fk`
         FOREIGN KEY (`guild`)
@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `scroll_inventory` (
     PRIMARY KEY (`id`),
     CONSTRAINT `user_inven_id_fk`
         FOREIGN KEY(`user_id`)
-        REFERENCES `users` (`id`),
+        REFERENCES `users` (`id`))
 ENGINE = InnoDB;
 
 
@@ -156,12 +156,12 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `user_scroll_group` (
     `id` INT(32) NOT NULL AUTO_INCREMENT,
     `user_id` VARCHAR(255),
-    `scroll_group_id` VARCHAR(255),
+    `group_id` INT(32),
     PRIMARY KEY (`id`),
     CONSTRAINT `scroll_group_user_id_fk`
         FOREIGN KEY(`user_id`)
         REFERENCES `users` (`id`),
     CONSTRAINT `scroll_group_id_fk`
-        FOREIGN KEY(`scroll_group_id`)
+        FOREIGN KEY(`group_id`)
         REFERENCES `scroll_group` (`id`))
 ENGINE = InnoDB;

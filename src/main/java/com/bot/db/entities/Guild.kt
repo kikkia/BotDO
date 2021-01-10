@@ -10,7 +10,7 @@ data class Guild(
         val name: String,
         @ManyToMany
         @JoinTable(name = "guild_membership",
-                joinColumns = [JoinColumn(name = "id", referencedColumnName = "guild_id")],
-                inverseJoinColumns = [JoinColumn(name = "id", referencedColumnName = "user_id")])
+                joinColumns = [JoinColumn(name = "guild_id", referencedColumnName = "id")],
+                inverseJoinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")])
         val users: Set<User>
 )

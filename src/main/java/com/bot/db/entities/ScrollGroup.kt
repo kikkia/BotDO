@@ -6,7 +6,7 @@ import javax.persistence.*
 @Table(name = "scroll_group")
 data class ScrollGroup(
         @Id
-        @GeneratedValue(strategy = GenerationType.AUTO)
+        @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Int,
         @ManyToOne
         @JoinColumn(name = "guild_id")
@@ -14,7 +14,7 @@ data class ScrollGroup(
         val name: String,
         @OneToMany
         @JoinTable(name = "user_scroll_group",
-                joinColumns = [JoinColumn(name = "id", referencedColumnName = "scroll_group_id")],
-                inverseJoinColumns = [JoinColumn(name = "id", referencedColumnName = "user_id")])
+                joinColumns = [JoinColumn(name = "group_id", referencedColumnName = "id")],
+                inverseJoinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")])
         val users: Set<User>
 )
