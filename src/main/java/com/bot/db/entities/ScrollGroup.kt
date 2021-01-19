@@ -12,7 +12,10 @@ data class ScrollGroup(
         @JoinColumn(name = "guild_id")
         val guild: Guild,
         val name: String,
-        @OneToMany
+        @OneToMany(cascade = [
+                CascadeType.PERSIST,
+                CascadeType.MERGE
+        ])
         @JoinTable(name = "user_scroll_group",
                 joinColumns = [JoinColumn(name = "group_id", referencedColumnName = "id")],
                 inverseJoinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")])

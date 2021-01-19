@@ -27,7 +27,7 @@ class TestCommand(val guildRepository: GuildRepository,
         p0!!.guild.members.forEach {
             userRepository.save(map(it))
         }
-        guildRepository.save(Guild(p0!!.guild.id, p0.guild.name, p0.guild.members.stream().map { map(it) }.collect(Collectors.toSet())))
+        guildRepository.save(Guild(p0.guild.id, p0.guild.name, p0.guild.members.stream().map { map(it) }.collect(Collectors.toSet())))
     }
 
 }

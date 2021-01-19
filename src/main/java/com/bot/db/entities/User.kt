@@ -6,17 +6,10 @@ import javax.persistence.*
 @Table(name = "users")
 data class User(
         @Id
-        val id: String,
-        val name: String,
-        val familyName: String,
-        @ManyToOne
-        @JoinTable(name="user_scroll_group",
-                joinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id" )],
-                inverseJoinColumns = [JoinColumn(name = "group_id", referencedColumnName = "id")])
-        val scrollGroup: ScrollGroup?,
-        @ManyToMany
-        @JoinTable(name="guild_membership",
-                joinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")],
-                inverseJoinColumns = [JoinColumn(name = "guild_id", referencedColumnName = "id")])
-        val guilds: Set<Guild> = HashSet()
+        var id: String,
+        @Column(nullable = false)
+        var name: String,
+        @Column(name = "family_name",
+                nullable = true)
+        var familyName: String
 )

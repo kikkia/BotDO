@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.Member
 class UserMapper {
     companion object {
         fun map(member: Member) : User {
-            return User(member.user.id, member.user.name, member.user.name, null);
+            return User(member.user.id, member.user.name, member.user.name)
         }
     }
 }

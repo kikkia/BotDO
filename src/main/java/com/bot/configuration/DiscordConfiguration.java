@@ -6,7 +6,6 @@ import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
@@ -47,7 +46,7 @@ public class DiscordConfiguration {
                         DIRECT_MESSAGES
                 )
                 .setShardsTotal(discordProperties.getShards())
-                .setChunkingFilter(ChunkingFilter.NONE)
+                .setChunkingFilter(ChunkingFilter.ALL)
                 .setShards(discordProperties.getStartShard(), discordProperties.getEndShard())
                 .setCompression(Compression.NONE)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)

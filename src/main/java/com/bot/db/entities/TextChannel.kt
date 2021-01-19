@@ -10,6 +10,7 @@ data class TextChannel(
         @ManyToOne
         @JoinColumn(name = "guild")
         val guild: Guild,
-        val name: String,
-        val announcement: Boolean,
-        val persistentScrolls: Boolean)
+        var name: String,
+        var announcement: Boolean,
+        @Column(name="persistent_scrolls")
+        var persistentScrolls: Boolean)
