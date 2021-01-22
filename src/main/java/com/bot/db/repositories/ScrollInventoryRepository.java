@@ -1,8 +1,12 @@
 package com.bot.db.repositories;
 
-import com.bot.db.entities.ScrollInventory;
+import com.bot.db.entities.ScrollInventoryEntity;
 import org.springframework.data.repository.CrudRepository;
 
-public interface ScrollInventoryRepository extends CrudRepository<ScrollInventory, Integer> {
-    ScrollInventory findByUserId(String userId);
+import java.util.List;
+
+public interface ScrollInventoryRepository extends CrudRepository<ScrollInventoryEntity, Integer> {
+    ScrollInventoryEntity findByUserId(String userId);
+    List<ScrollInventoryEntity> findByUserIds(List<String> userIds);
+    boolean existsByUserId(String userId);
 }

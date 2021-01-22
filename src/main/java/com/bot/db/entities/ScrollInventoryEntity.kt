@@ -4,7 +4,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "scroll_inventory")
-data class ScrollInventory(
+data class ScrollInventoryEntity(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Int,

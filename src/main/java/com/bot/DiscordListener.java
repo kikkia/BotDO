@@ -70,7 +70,7 @@ public class DiscordListener extends ListenerAdapter {
             return;
         }
         guildService.removeUser(guild, user);
-
+        //test
         super.onGuildMemberRemove(event);
     }
 

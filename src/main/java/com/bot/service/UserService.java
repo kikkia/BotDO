@@ -2,6 +2,7 @@ package com.bot.service;
 
 import com.bot.db.entities.User;
 import com.bot.db.repositories.UserRepository;
+import com.bot.models.ScrollInventory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,9 @@ public class UserService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    ScrollInventoryService inventoryService;
 
     public User getById(String userId) {
         Optional<User> user = userRepository.findById(userId);
@@ -32,7 +36,11 @@ public class UserService {
     }
 
     public User addUser(String id, String name) {
-        User user = new User(id, name, name);
-        return userRepository.save(user);
+        var user = userRepository.save(new User(id, name, name));
+        // Save default inventory
+        if (!inventoryService.getInventoryExistsForUser(id)) {
+            inventoryService.save(new ScrollInventory(user));
+        }
+        return user;
     }
 }
