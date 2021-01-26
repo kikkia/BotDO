@@ -58,11 +58,6 @@ public class DiscordConfiguration {
     }
 
     @Bean
-    public EventWaiter eventWaiter() {
-        return new EventWaiter();
-    }
-
-    @Bean
     public CommandClient commandClient(DiscordProperties properties,
                                        ScheduledExecutorService executorService) {
         CommandClientBuilder builder = new CommandClientBuilder();

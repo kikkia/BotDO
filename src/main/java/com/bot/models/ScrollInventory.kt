@@ -1,6 +1,7 @@
 package com.bot.models
 
 import com.bot.db.entities.User
+import java.lang.IllegalArgumentException
 import java.util.*
 import java.util.stream.Collectors
 
@@ -31,6 +32,22 @@ class ScrollInventory {
     fun addScroll(scroll: Scroll, count: Int) {
         val current = getScrollCount(scroll)
         scrolls[scroll] = current + count
+    }
+
+    /**
+     * Remove scrolls from the existing scroll counts
+     *
+     * @param scroll - The type of scroll
+     * @param count -  The count of scrolls to remove
+     */
+    fun removeScroll(scroll: Scroll, count: Int) {
+        val current = getScrollCount(scroll)
+
+        if (current < count) {
+            throw IllegalArgumentException("You cannot remove more scrolls than you have.")
+        }
+
+        scrolls[scroll] = current - count
     }
 
     /**
