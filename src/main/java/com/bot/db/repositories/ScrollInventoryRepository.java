@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface ScrollInventoryRepository extends CrudRepository<ScrollInventoryEntity, Integer> {
     ScrollInventoryEntity findByUserId(String userId);
-    List<ScrollInventoryEntity> findByUserIds(List<String> userIds);
+    List<ScrollInventoryEntity> findByUserIdIn(List<String> userIds);
     boolean existsByUserId(String userId);
 }

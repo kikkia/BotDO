@@ -29,7 +29,7 @@ public class ScrollInventoryService {
     }
 
     public List<ScrollInventory> getByUserIds(List<String> userIds) {
-        return inventoryRepository.findByUserIds(userIds).stream()
+        return inventoryRepository.findByUserIdIn(userIds).stream()
                 .map(ScrollInventoryMapper.Companion::map)
                 .collect(Collectors.toList());
     }

@@ -9,7 +9,7 @@ import java.util.List;
 public class CommandParsingUtils {
 
     public static List<Pair<Scroll, Integer>> parseScrollUpdates(String input) throws IllegalArgumentException {
-        var scrolls = input.split(",");
+        var scrolls = input.split(", ");
 
         // Scroll pair denotes a pair of scroll/number
         List<Pair<Scroll, Integer>> scrollPairs = new ArrayList<>();

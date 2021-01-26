@@ -14,7 +14,7 @@ public class DoScrollsCommand extends Command {
 
     public DoScrollsCommand(ScrollHistoryService historyService, ScrollInventoryService inventoryService) {
         this.name = "doscrolls";
-        this.aliases = new String[] {"doscroll"};
+        this.aliases = new String[] {"doscroll", "ds", "complete"};
         this.help = "Marks all or given scrolls as done and logs them in your scroll history";
         this.arguments = "<nothing for all, scroll_name # for specific, comma separated>";
         this.historyService = historyService;
@@ -23,6 +23,14 @@ public class DoScrollsCommand extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
+        if (commandEvent.getArgs().isBlank()) {
+            commandEvent.replyWarning("You need to specify what scroll you completed. " +
+                    "(You can say `all` to complete all of them)");
+            return;
+        }
+        var all = commandEvent.getArgs().trim().toLowerCase().equals("all");
+        if (!all) {
 
+        }
     }
 }

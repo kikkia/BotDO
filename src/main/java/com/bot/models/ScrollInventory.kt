@@ -60,7 +60,7 @@ class ScrollInventory {
         }
         var message = "`Scroll inventory for ${user.familyName}`\n```"
         for (scroll in obtainedScrolls) {
-            message += "${scroll.key.name}: ${scroll.value}\n"
+            message += "${scroll.key.displayName}: ${scroll.value}\n"
         }
         return "$message```"
     }

@@ -19,7 +19,7 @@ public class UpdateScrollsCommand extends Command {
 
     public UpdateScrollsCommand(ScrollInventoryService inventoryService) {
         this.name = "updatescrolls";
-        this.aliases = new String[] {"as"};
+        this.aliases = new String[] {"us"};
         this.help = "Update scroll quantities in your inventory";
         this.arguments = "<Scroll name and count to update, comma separate " +
                 "multiple scroll types>";

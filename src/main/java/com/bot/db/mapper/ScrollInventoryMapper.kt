@@ -33,7 +33,7 @@ class ScrollInventoryMapper {
             map[Scroll.AWK_HEXE] = entity.aHexe
             map[Scroll.URUGON] = entity.urugon
             map[Scroll.AWK_URUGON] = entity.aUrugon
-            map[Scroll.PUTURUM] = entity.putrum
+            map[Scroll.PUTURUM] = entity.puturum
             map[Scroll.TITIUM] = entity.titium
             map[Scroll.AWK_TITIUM] = entity.aTitium
             map[Scroll.ARC] = entity.arc

@@ -7,16 +7,14 @@ import com.bot.db.repositories.GuildRepository
 import com.bot.db.repositories.ScrollInventoryRepository
 import com.bot.db.repositories.TextChannelRepository
 import com.bot.db.repositories.UserRepository
+import com.bot.service.GuildService
 import com.jagrosh.jdautilities.command.Command
 import com.jagrosh.jdautilities.command.CommandEvent
 import org.springframework.stereotype.Component
 import java.util.stream.Collectors
 
 @Component
-class TestCommand(val guildRepository: GuildRepository,
-                  val scrollInventoryRepository: ScrollInventoryRepository,
-                  val textChannelRepository: TextChannelRepository,
-                  val userRepository: UserRepository) : Command() {
+class TestCommand(val guildService: GuildService) : Command() {
 
     init {
         name = "test"
@@ -24,10 +22,8 @@ class TestCommand(val guildRepository: GuildRepository,
     }
 
     override fun execute(p0: CommandEvent?) {
-        p0!!.guild.members.forEach {
-            userRepository.save(map(it))
-        }
-        guildRepository.save(Guild(p0.guild.id, p0.guild.name, p0.guild.members.stream().map { map(it) }.collect(Collectors.toSet())))
+        guildService.addFreshGuild(p0!!.guild)
+        p0.reactSuccess()
     }
 
 }
