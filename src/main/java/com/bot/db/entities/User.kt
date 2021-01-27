@@ -12,4 +12,13 @@ data class User(
         @Column(name = "family_name",
                 nullable = true)
         var familyName: String
-)
+) {
+
+        @OneToOne(mappedBy = "user",
+                fetch = FetchType.LAZY)
+        var inventory: ScrollInventoryEntity?
+
+        init {
+                inventory = null;
+        }
+}

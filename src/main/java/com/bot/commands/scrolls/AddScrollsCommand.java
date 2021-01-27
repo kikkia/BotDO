@@ -28,7 +28,7 @@ public class AddScrollsCommand extends Command {
 
     @Override
     protected void execute(CommandEvent commandEvent) {
-        if (commandEvent.getArgs().isEmpty()) {
+        if (commandEvent.getArgs().isBlank()) {
             commandEvent.replyWarning("You need to specify what scrolls to add.");
             return;
         }

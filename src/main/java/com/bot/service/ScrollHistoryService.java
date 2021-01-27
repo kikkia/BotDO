@@ -2,7 +2,6 @@ package com.bot.service;
 
 import com.bot.db.entities.User;
 import com.bot.db.mapper.ScrollHistoryMapper;
-import com.bot.db.mapper.ScrollInventoryMapper;
 import com.bot.db.repositories.ScrollHistoryRepository;
 import com.bot.models.Scroll;
 import com.bot.models.ScrollHistory;
