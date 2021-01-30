@@ -3,14 +3,10 @@ package com.bot.commands.scrolls;
 import com.bot.models.Scroll;
 import com.bot.service.ScrollInventoryService;
 import com.bot.utils.CommandParsingUtils;
-import com.bot.utils.StringUtils;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import kotlin.Pair;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class AddScrollsCommand extends Command {
@@ -19,7 +15,7 @@ public class AddScrollsCommand extends Command {
 
     public AddScrollsCommand(ScrollInventoryService inventoryService) {
         this.name = "addscrolls";
-        this.aliases = new String[] {"as"};
+        this.aliases = new String[] {"as", "addscroll"};
         this.help = "Add scrolls to your inventory";
         this.arguments = "<Scroll name and count to add, comma separate " +
                 "multiple scroll types>";

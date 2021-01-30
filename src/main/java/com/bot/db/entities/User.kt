@@ -16,9 +16,6 @@ data class User(
 
         @OneToOne(mappedBy = "user",
                 fetch = FetchType.LAZY)
-        var inventory: ScrollInventoryEntity?
+        var inventory: ScrollInventoryEntity? = null
 
-        init {
-                inventory = null;
-        }
 }
