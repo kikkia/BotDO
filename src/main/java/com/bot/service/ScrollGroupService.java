@@ -12,8 +12,6 @@ import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -27,7 +25,7 @@ public class ScrollGroupService {
 
     public ScrollGroup create(Guild guild, String name) {
         var group = new ScrollGroup();
-        group.setGuild(new com.bot.db.entities.Guild(guild.getId(), guild.getName(), Collections.emptySet()));
+        group.setGuild(new com.bot.db.entities.Guild(guild.getId(), guild.getName(), false, Collections.emptySet()));
         group.setName(name);
         group.setUsers(Collections.emptySet());
         return scrollGroupRepository.save(group);
@@ -43,5 +41,9 @@ public class ScrollGroupService {
 
     public List<ScrollGroup> getForGuildId(String guildId) {
         return scrollGroupRepository.findByGuildId(guildId);
+    }
+
+    public void removeById(int id) {
+        scrollGroupRepository.deleteById(id);
     }
 }

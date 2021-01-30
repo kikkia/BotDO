@@ -1,4 +1,4 @@
-package com.bot.commands.scrolls;
+package com.bot.commands.scrolls.groups;
 
 import com.bot.db.entities.ScrollGroup;
 import com.bot.service.ScrollGroupService;
@@ -27,7 +27,7 @@ public class JoinGroupCommand extends Command {
     @Override
     protected void execute(CommandEvent commandEvent) {
         if (commandEvent.getArgs().isBlank()) {
-            commandEvent.replyWarning("You need to specify a group name to join");
+            commandEvent.replyWarning("You need to specify a group name to join.");
             return;
         }
 
@@ -39,6 +39,10 @@ public class JoinGroupCommand extends Command {
 
         var group = existingGroup.get();
         var users = group.getUsers();
+        if (users.size() >= 5) {
+            commandEvent.replyWarning("Cannot join scroll group, this group is already full.");
+            return;
+        }
         users.add(userService.getById(commandEvent.getAuthor().getId()));
         group.setUsers(users);
         groupService.save(group);

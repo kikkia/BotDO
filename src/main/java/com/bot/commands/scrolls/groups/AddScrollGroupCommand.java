@@ -1,4 +1,4 @@
-package com.bot.commands.scrolls;
+package com.bot.commands.scrolls.groups;
 
 import com.bot.db.entities.ScrollGroup;
 import com.bot.service.ScrollGroupService;

@@ -51,6 +51,7 @@ public class GuildService {
 
         Guild guild1 = new Guild(guild.getId(),
                 guild.getName(),
+                false,
                 guild.getMembers().stream()
                         .map(UserMapper.Companion::map)
                         .collect(Collectors.toSet()));
@@ -63,8 +64,13 @@ public class GuildService {
         return internalGuild;
     }
 
-    public Guild rename(Guild guild, String newName) {
+    public void rename(Guild guild, String newName) {
         guild.setName(newName);
+        guildRepository.save(guild);
+    }
+
+    public Guild setSyncNames(Guild guild, boolean enabled) {
+        guild.setSyncNames(enabled);
         return guildRepository.save(guild);
     }
 }

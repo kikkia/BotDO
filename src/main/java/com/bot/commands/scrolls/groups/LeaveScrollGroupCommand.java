@@ -1,4 +1,4 @@
-package com.bot.commands.scrolls;
+package com.bot.commands.scrolls.groups;
 
 import com.bot.db.entities.ScrollGroup;
 import com.bot.service.ScrollGroupService;
@@ -8,24 +8,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
-public class ScrollGroupInfoCommand extends Command {
+public class LeaveScrollGroupCommand extends Command {
 
     @Autowired
     private ScrollGroupService groupService;
 
-    public ScrollGroupInfoCommand() {
-        this.name = "scrollgroup";
-        this.aliases = new String[] {"groupinfo", "scrollgroupinfo"};
-        this.arguments = "<name of the group>";
-        this.help = "Gets information about a given scroll group";
+    public LeaveScrollGroupCommand() {
+        this.name = "leavegroup";
+        this.arguments = "<group name>";
+        this.help = "Leaves a given scroll group";
     }
 
     @Override
     protected void execute(CommandEvent commandEvent) {
         if (commandEvent.getArgs().isBlank()) {
-            commandEvent.replyWarning("You need to specify a name to lookup");
+            commandEvent.replyWarning("You need to specify a group name to leave.");
             return;
         }
 
@@ -36,6 +36,17 @@ public class ScrollGroupInfoCommand extends Command {
         }
 
         var group = existingGroup.get();
-        commandEvent.reply(group.toMessage());
+        var cleanedUsers = group.getUsers().stream()
+                .filter(it -> !it.getId().equals(commandEvent.getAuthor().getId()))
+                .collect(Collectors.toSet());
+
+        if (group.getUsers().size() == cleanedUsers.size()) {
+            commandEvent.replyWarning("You are not in that group.");
+            return;
+        }
+
+        group.setUsers(cleanedUsers);
+        groupService.save(group);
+        commandEvent.reactSuccess();
     }
 }

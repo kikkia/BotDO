@@ -9,6 +9,8 @@ data class Guild(
         var id: String,
         @Column(nullable = false)
         var name: String,
+        @Column(name = "sync_names")
+        var syncNames: Boolean,
         @ManyToMany(cascade = [
                 CascadeType.PERSIST,
                 CascadeType.MERGE
