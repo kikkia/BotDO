@@ -6,6 +6,7 @@ import com.bot.db.entities.User;
 import com.bot.service.GuildService;
 import com.bot.service.TextChannelService;
 import com.bot.service.UserService;
+import com.bot.tasks.SyncUserFamilyNameTask;
 import net.dv8tion.jda.api.events.channel.text.TextChannelCreateEvent;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.channel.text.update.TextChannelUpdateNameEvent;
@@ -13,14 +14,18 @@ import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
+import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateNameEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
+import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
+import java.util.concurrent.ScheduledExecutorService;
 
 @Component
 public class DiscordListener extends ListenerAdapter {
@@ -31,6 +36,8 @@ public class DiscordListener extends ListenerAdapter {
     private UserService userService;
     @Autowired
     private TextChannelService textChannelService;
+    @Autowired
+    private ScheduledExecutorService executorService;
 
     @Override
     public void onGuildJoin(@Nonnull GuildJoinEvent event) {
@@ -110,7 +117,7 @@ public class DiscordListener extends ListenerAdapter {
 
     @Override
     public void onGuildLeave(@Nonnull GuildLeaveEvent event) {
-        // Cleanup all stuff
+        // TODO: Cleanup all stuff
 
         super.onGuildLeave(event);
     }
@@ -137,5 +144,20 @@ public class DiscordListener extends ListenerAdapter {
     public void onGuildMessageReactionRemove(@Nonnull GuildMessageReactionRemoveEvent event) {
         // TODO: For use in reaction roles
         super.onGuildMessageReactionRemove(event);
+    }
+
+    @Override
+    public void onUserUpdateName(@NotNull UserUpdateNameEvent event) {
+        userService.setUserName(event.getUser().getId(), event.getNewName());
+        super.onUserUpdateName(event);
+    }
+
+    @Override
+    public void onGuildMemberUpdateNickname(@NotNull GuildMemberUpdateNicknameEvent event) {
+        var guild = guildService.getById(event.getGuild().getId());
+        if (guild.getSyncNames()) {
+            executorService.submit(new SyncUserFamilyNameTask(event.getMember(), userService));
+        }
+        super.onGuildMemberUpdateNickname(event);
     }
 }

@@ -30,15 +30,15 @@ data class ScrollGroup(
                 if (users.isNotEmpty()) {
                         message += "`Users in group`\n```"
                         message += users.stream()
-                                .map { it.familyName }
+                                .map { it.getEffectiveName() }
                                 .collect(Collectors.toList()).toString()
                 } else {
                         return "${message}This group has no members."
                 }
 
                 message += "```\n"
-                // Construct a composite scrollinventory for the group
-                val compositeInventory = ScrollInventory(User(name, name, name))
+                // Construct a composite scroll inventory for the group
+                val compositeInventory = ScrollInventory(User(name, name))
 
                 users.stream().map { ScrollInventoryMapper.map(it.inventory!!).getScrolls() }
                         .collect(Collectors.toList()).forEach { map ->

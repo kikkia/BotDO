@@ -2,7 +2,7 @@ package com.bot.commands.server;
 
 import com.bot.service.GuildService;
 import com.bot.service.UserService;
-import com.bot.tasks.SyncUserFamilyNameTask;
+import com.bot.tasks.SyncGuildFamilyNamesTask;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.Permission;
@@ -44,13 +44,13 @@ public class SyncFamilyNamesCommand extends Command {
             if (!guild.getSyncNames()) {
                 guildService.setSyncNames(guild, true);
                 // Send off async task to rename users
-                executorService.submit(new SyncUserFamilyNameTask(commandEvent.getGuild(), userService));
+                executorService.submit(new SyncGuildFamilyNamesTask(commandEvent.getGuild(), userService));
             }
         } else if (commandEvent.getArgs().equalsIgnoreCase("off")) {
             guildService.setSyncNames(guild, false);
         } else if (commandEvent.getArgs().equalsIgnoreCase("once")) {
             // Sync names once but not persistently
-            executorService.submit(new SyncUserFamilyNameTask(commandEvent.getGuild(), userService));
+            executorService.submit(new SyncGuildFamilyNamesTask(commandEvent.getGuild(), userService));
         } else {
             commandEvent.replyWarning("Unrecognized input, please only use `on` or `off`.");
             return;

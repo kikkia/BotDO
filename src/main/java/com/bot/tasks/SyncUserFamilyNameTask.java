@@ -2,28 +2,28 @@ package com.bot.tasks;
 
 import com.bot.service.UserService;
 import com.bot.utils.FamilyNameUtils;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 
 public class SyncUserFamilyNameTask extends Thread {
 
-    private Guild guild;
+    private Member member;
     private UserService userService;
 
-    public SyncUserFamilyNameTask(Guild guild, UserService userService) {
-        this.guild = guild;
+    public SyncUserFamilyNameTask(Member member, UserService userService) {
+        this.member = member;
         this.userService = userService;
     }
 
     @Override
     public void run() {
-        for (Member m : guild.getMembers()) {
-            var user = userService.getById(m.getUser().getId());
-            if (!user.getFamilyName().equalsIgnoreCase(user.getName())) {
-                if (FamilyNameUtils.INSTANCE.shouldChangeName(m.getEffectiveName(), user.getFamilyName()) &&
-                        guild.getSelfMember().canInteract(m)) {
-                    m.modifyNickname(FamilyNameUtils.INSTANCE.getFamilyInjectedName(m.getEffectiveName(), user.getFamilyName())).queue();
-                }
+        var user = userService.getById(member.getUser().getId());
+        if (user.getFamilyName() != null) {
+            if (FamilyNameUtils.INSTANCE.shouldChangeName(member.getEffectiveName(), user.getFamilyName()) &&
+                    member.getGuild().getSelfMember().canInteract(member)) {
+                member.modifyNickname(
+                        FamilyNameUtils.INSTANCE.getFamilyInjectedName(
+                                member.getEffectiveName(), user.getFamilyName()))
+                        .queue();
             }
         }
     }

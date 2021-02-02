@@ -26,18 +26,28 @@ public class UserService {
         return user.orElse(null);
     }
 
-    public User setFamilyName(String userId, String familyName) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
+    public User setUserName(String id, String newName) {
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isEmpty()) {
             throw new EntityNotFoundException("User not found");
         }
-        User user1 = user.get();
-        user1.setFamilyName(familyName);
-        return userRepository.save(user1);
+        User user = userOpt.get();
+        user.setName(newName);
+        return userRepository.save(user);
+    }
+
+    public User setFamilyName(String userId, String familyName) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty()) {
+            throw new EntityNotFoundException("User not found");
+        }
+        User user = userOpt.get();
+        user.setFamilyName(familyName);
+        return userRepository.save(user);
     }
 
     public User addUser(String id, String name) {
-        var user = userRepository.save(new User(id, name, name));
+        var user = userRepository.save(new User(id, name));
         // Save default inventory
         if (!inventoryService.getInventoryExistsForUser(id)) {
             inventoryService.save(new ScrollInventory(user));
