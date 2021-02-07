@@ -14,7 +14,7 @@
 .idea/
 *.iml
 *.yaml
-*.yml
+application.yml
 
 # Package Files #
 *.jar
