@@ -96,6 +96,11 @@
             <artifactId>JDA</artifactId>
             <version>4.2.0_198</version>
         </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-maven-noarg</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -150,6 +155,9 @@
                 </executions>
                 <configuration>
                     <compilerPlugins>
+                        <plugin>all-open</plugin>
+                        <plugin>spring</plugin>
+                        <plugin>no-arg</plugin>
                         <plugin>jpa</plugin>
                     </compilerPlugins>
                     <jvmTarget>11</jvmTarget>
