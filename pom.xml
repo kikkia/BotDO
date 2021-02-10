@@ -87,6 +87,16 @@
             <version>3.0.4</version>
         </dependency>
         <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-all</artifactId>
+            <version>0.62.2</version>
+        </dependency>
+        <dependency>
+            <groupId>gui.ava</groupId>
+            <artifactId>html2image</artifactId>
+            <version>0.9</version>
+        </dependency>
+        <dependency>
             <groupId>com.jagrosh</groupId>
             <artifactId>jda-utilities-menu</artifactId>
             <version>3.0.4</version>
@@ -204,6 +214,11 @@
             <id>jcenter</id>
             <name>jcenter-bintray</name>
             <url>https://jcenter.bintray.com</url>
+        </repository>
+        <repository>
+            <id>yoava</id>
+            <name>AOL yoava</name>
+            <url>http://yoava.artifactoryonline.com/yoava/repo</url>
         </repository>
     </repositories>
 </project>

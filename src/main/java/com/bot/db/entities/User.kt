@@ -8,8 +8,7 @@ data class User(
         @Id
         var id: String,
         @Column(nullable = false)
-        var name: String
-) {
+        var name: String) {
 
         @OneToOne(mappedBy = "user",
                 fetch = FetchType.LAZY)

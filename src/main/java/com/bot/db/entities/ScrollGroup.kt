@@ -22,8 +22,7 @@ data class ScrollGroup(
         @JoinTable(name = "user_scroll_group",
                 joinColumns = [JoinColumn(name = "group_id", referencedColumnName = "id")],
                 inverseJoinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")])
-        var users: Set<User>
-) {
+        var users: Set<User>) {
 
         fun toMessage() : String {
                 var message = "Overview for `$name`\n"

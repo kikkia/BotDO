@@ -2,11 +2,15 @@ package com.bot.commands.scrolls.groups;
 
 import com.bot.db.entities.ScrollGroup;
 import com.bot.service.ScrollGroupService;
+import com.bot.utils.FormattingUtils;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.IOException;
+import java.time.Instant;
 import java.util.Optional;
 
 @Component
@@ -36,6 +40,16 @@ public class ScrollGroupInfoCommand extends Command {
         }
 
         var group = existingGroup.get();
-        commandEvent.reply(group.toMessage());
+
+        if (group.getUsers().size() == 0) {
+            commandEvent.replyWarning("No one is in this group.");
+            return;
+        }
+        try {
+            File image = FormattingUtils.scrollGroupToImage(group);
+            commandEvent.reply(image, image.getName());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
