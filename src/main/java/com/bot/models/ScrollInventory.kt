@@ -75,7 +75,7 @@ class ScrollInventory {
         if (obtainedScrolls.size < 1) {
             return "`${user.familyName} does not have any scrolls`"
         }
-        var message = "`Scroll inventory for ${user.familyName}`\n```"
+        var message = "`Scroll inventory for ${user.getEffectiveName()}`\n```"
         for (scroll in obtainedScrolls) {
             message += "${scroll.key.displayName}: ${scroll.value}\n"
         }

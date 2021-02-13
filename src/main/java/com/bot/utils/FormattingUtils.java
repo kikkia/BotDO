@@ -60,7 +60,7 @@ public class FormattingUtils {
         // Map users to scroll inventories
         Map<String, ScrollInventory> inventories = scrollGroup.getUsers().stream()
                 .collect(Collectors.toMap(
-                        User::getFamilyName,
+                        User::getEffectiveName,
                         u -> ScrollInventoryMapper.Companion.map(u.getInventory())));
 
         Map<Scroll, Integer> totals = new HashMap<>();
