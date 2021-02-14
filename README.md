@@ -5,7 +5,8 @@ Currently under development
 
 ## Features
 - User Scroll inventory (Complete)
-- Scroll groups (In progress)
+- Scroll groups (Pretty much done)
+- Events (In progress)
 - Family name -> discord sync (In progress)
 - Boss notifications (planned)
 - Member Time zone tracking (planned)
