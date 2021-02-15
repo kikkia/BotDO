@@ -1,7 +1,7 @@
 package com.bot.service;
 
-import com.bot.db.entities.Guild;
-import com.bot.db.entities.User;
+import com.bot.db.entities.GuildEntity;
+import com.bot.db.entities.UserEntity;
 import com.bot.db.mapper.UserMapper;
 import com.bot.db.repositories.GuildRepository;
 import net.dv8tion.jda.api.entities.Member;
@@ -26,22 +26,22 @@ public class GuildService {
     @Autowired
     TextChannelService textChannelService;
 
-    public Guild getById(String id) {
-        Optional<Guild> guild = guildRepository.findById(id);
+    public GuildEntity getById(String id) {
+        Optional<GuildEntity> guild = guildRepository.findById(id);
         return guild.orElse(null);
     }
 
-    public Guild addUser(Guild guild, User user) {
+    public GuildEntity addUser(GuildEntity guild, UserEntity user) {
         guild.getUsers().add(user);
         return guildRepository.save(guild);
     }
 
-    public Guild removeUser(Guild guild, User user) {
+    public GuildEntity removeUser(GuildEntity guild, UserEntity user) {
         guild.getUsers().remove(user);
         return guildRepository.save(guild);
     }
 
-    public Guild addFreshGuild(net.dv8tion.jda.api.entities.Guild guild) {
+    public GuildEntity addFreshGuild(net.dv8tion.jda.api.entities.Guild guild) {
         for (Member m : guild.getMembers()) {
             if (userService.getById(m.getUser().getId()) == null) {
                 userService.addUser(m.getUser().getId(),
@@ -49,13 +49,13 @@ public class GuildService {
             }
         }
 
-        Guild guild1 = new Guild(guild.getId(),
+        GuildEntity guild1 = new GuildEntity(guild.getId(),
                 guild.getName(),
                 false,
                 guild.getMembers().stream()
                         .map(UserMapper.Companion::map)
                         .collect(Collectors.toSet()));
-        Guild internalGuild = guildRepository.save(guild1);
+        GuildEntity internalGuild = guildRepository.save(guild1);
 
         for (TextChannel t : guild.getTextChannels()) {
             textChannelService.add(t, internalGuild);
@@ -64,12 +64,12 @@ public class GuildService {
         return internalGuild;
     }
 
-    public void rename(Guild guild, String newName) {
+    public void rename(GuildEntity guild, String newName) {
         guild.setName(newName);
         guildRepository.save(guild);
     }
 
-    public Guild setSyncNames(Guild guild, boolean enabled) {
+    public GuildEntity setSyncNames(GuildEntity guild, boolean enabled) {
         guild.setSyncNames(enabled);
         return guildRepository.save(guild);
     }

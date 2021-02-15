@@ -11,7 +11,7 @@ data class ScrollHistory(
         val id: Int,
         @ManyToOne
         @JoinColumn(name = "user_id")
-        val user: User,
+        val user: UserEntity,
         val created: Instant,
         val redNose: Int,
         val aRedNose: Int,

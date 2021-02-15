@@ -1,10 +1,11 @@
 package com.bot.db.entities
 
+import net.dv8tion.jda.api.entities.Guild
 import javax.persistence.*
 
 @Entity
 @Table(name = "guild")
-data class Guild(
+data class GuildEntity(
         @Id
         var id: String,
         @Column(nullable = false)
@@ -18,5 +19,13 @@ data class Guild(
         @JoinTable(name = "guild_membership",
                 joinColumns = [JoinColumn(name = "guild_id", referencedColumnName = "id")],
                 inverseJoinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")])
-        var users: Set<User>
-)
+        var users: Set<UserEntity>
+) {
+        companion object {
+
+                // Helper to get a partial from a discord guild entity
+                fun partialFrom(guild: Guild) : com.bot.db.entities.GuildEntity {
+                        return GuildEntity(guild.id, guild.name, false, emptySet())
+                }
+        }
+}

@@ -1,7 +1,7 @@
 package com.bot.utils;
 
 import com.bot.db.entities.ScrollGroup;
-import com.bot.db.entities.User;
+import com.bot.db.entities.UserEntity;
 import com.bot.db.mapper.ScrollInventoryMapper;
 import com.bot.models.Scroll;
 import com.bot.models.ScrollInventory;
@@ -12,7 +12,6 @@ import gui.ava.html.image.generator.HtmlImageGenerator;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
-import org.apache.commons.collections4.map.HashedMap;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -60,7 +59,7 @@ public class FormattingUtils {
         // Map users to scroll inventories
         Map<String, ScrollInventory> inventories = scrollGroup.getUsers().stream()
                 .collect(Collectors.toMap(
-                        User::getEffectiveName,
+                        UserEntity::getEffectiveName,
                         u -> ScrollInventoryMapper.Companion.map(u.getInventory())));
 
         Map<Scroll, Integer> totals = new HashMap<>();

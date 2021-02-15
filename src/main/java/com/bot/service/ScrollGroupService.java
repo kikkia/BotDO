@@ -1,10 +1,8 @@
 package com.bot.service;
 
 import com.bot.db.entities.ScrollGroup;
-import com.bot.db.mapper.UserMapper;
 import com.bot.db.repositories.ScrollGroupRepository;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +23,7 @@ public class ScrollGroupService {
 
     public ScrollGroup create(Guild guild, String name) {
         var group = new ScrollGroup();
-        group.setGuild(new com.bot.db.entities.Guild(guild.getId(), guild.getName(), false, Collections.emptySet()));
+        group.setGuild(new com.bot.db.entities.GuildEntity(guild.getId(), guild.getName(), false, Collections.emptySet()));
         group.setName(name);
         group.setUsers(Collections.emptySet());
         return scrollGroupRepository.save(group);

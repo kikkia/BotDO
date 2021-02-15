@@ -1,8 +1,8 @@
 package com.bot;
 
-import com.bot.db.entities.Guild;
+import com.bot.db.entities.GuildEntity;
 import com.bot.db.entities.TextChannel;
-import com.bot.db.entities.User;
+import com.bot.db.entities.UserEntity;
 import com.bot.service.GuildService;
 import com.bot.service.TextChannelService;
 import com.bot.service.UserService;
@@ -53,7 +53,7 @@ public class DiscordListener extends ListenerAdapter {
             guild = guildService.addFreshGuild(event.getGuild());
         }
 
-        User user = userService.getById(event.getUser().getId());
+        UserEntity user = userService.getById(event.getUser().getId());
         if(user == null) {
             user = userService.addUser(event.getUser().getId(),
                     event.getUser().getName());
@@ -91,7 +91,7 @@ public class DiscordListener extends ListenerAdapter {
     @Override
     public void onTextChannelUpdateName(@Nonnull TextChannelUpdateNameEvent event) {
         TextChannel channel = textChannelService.getById(event.getChannel().getId());
-        Guild guild = guildService.getById(event.getGuild().getId());
+        GuildEntity guild = guildService.getById(event.getGuild().getId());
         if (guild == null) {
             guildService.addFreshGuild(event.getGuild());
             return;
@@ -104,7 +104,7 @@ public class DiscordListener extends ListenerAdapter {
 
     @Override
     public void onTextChannelCreate(@Nonnull TextChannelCreateEvent event) {
-        Guild guild = guildService.getById(event.getGuild().getId());
+        GuildEntity guild = guildService.getById(event.getGuild().getId());
         if (guild == null) {
             guildService.addFreshGuild(event.getGuild());
             return;
@@ -124,7 +124,7 @@ public class DiscordListener extends ListenerAdapter {
 
     @Override
     public void onGuildUpdateName(@Nonnull GuildUpdateNameEvent event) {
-        Guild guild = guildService.getById(event.getGuild().getId());
+        GuildEntity guild = guildService.getById(event.getGuild().getId());
         if (guild == null) {
             guildService.addFreshGuild(event.getGuild());
             return;

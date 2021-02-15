@@ -1,8 +1,6 @@
 package com.bot.db.repositories;
 
 import com.bot.db.entities.ScrollGroup;
-import com.bot.db.entities.User;
-import com.bot.models.Scroll;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

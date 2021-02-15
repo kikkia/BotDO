@@ -11,7 +11,7 @@ data class ScrollHistoryEntity(
         val id: Int,
         @OneToOne
         @JoinColumn(name = "user_id")
-        val user: User,
+        val user: UserEntity,
         val created: Timestamp,
         @Column(name = "red_nose")
         val redNose: Int,

@@ -6,20 +6,25 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "event")
-data class Event(
+data class EventEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int,
     @ManyToOne
     @JoinColumn(name = "guild_id")
-    val guild: Guild,
+    val guild: GuildEntity,
     @ManyToOne
     @JoinColumn(name = "author")
-    val author: User,
+    val author: UserEntity,
     @Column(name = "next_time")
+    @Temporal(TemporalType.TIMESTAMP)
     val nextTime: Timestamp,
     @Column(name = "event_type")
-    val eventType: Int) {
+    val eventType: Int,
+    @Column(name = "name")
+    val name: String,
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "event")
+    var roles: List<EventRoleEntity>) {
 
     fun getEventType() : EventType? {
         return EventType.fromInt(eventType)
