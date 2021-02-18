@@ -6,7 +6,7 @@ import com.bot.db.entities.EventRoleEntity
 class EventRoleMapper {
     companion object {
         fun map(event: EventEntity, roleId: String): EventRoleEntity {
-            return EventRoleEntity(event, roleId)
+            return EventRoleEntity(0, event, roleId)
         }
     }
 }

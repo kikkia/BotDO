@@ -10,7 +10,7 @@ import java.util.List;
 public interface EventRepository extends CrudRepository<EventEntity, Integer> {
     List<EventEntity> findAllByGuildId(String guildId);
     // Get past events by guild id
-    List<EventEntity> findAllByGuildIdAndWithNextTimeBefore(String guildId, @Param("nextTime") Timestamp time);
+    List<EventEntity> findAllByGuildIdAndNextTimeBefore(String guildId, @Param("nextTime") Timestamp time);
     // Get future events by guild id
-    List<EventEntity> findAllByGuildIdAndWithNextTimeAfter(String guildId, @Param("nextTime") Timestamp time);
+    List<EventEntity> findAllByGuildIdAndNextTimeAfter(String guildId, @Param("nextTime") Timestamp time);
 }

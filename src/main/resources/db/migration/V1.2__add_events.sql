@@ -15,9 +15,10 @@ CREATE TABLE IF NOT EXISTS `event` (
 ENGINE = InnoDB;
 
 CREATE TABLE IF NOT EXISTS `event_roles` (
+    `id` INT(32) NOT NULL AUTO_INCREMENT,
     `event_id` INT(32) NOT NULL,
     `role_id` VARCHAR(255) NOT NULL,
-    PRIMARY KEY(`event_id`, `role_id`),
+    PRIMARY KEY(`id`),
     CONSTRAINT `event_role_fk`
         FOREIGN KEY (`event_id`)
         REFERENCES `event` (`id`))

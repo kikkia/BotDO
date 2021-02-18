@@ -124,4 +124,13 @@ public class FormattingUtils {
     private static BufferedImage removeCssImmuneBorder(BufferedImage src) {
         return src.getSubimage(5, 5, src.getWidth()-10, src.getHeight()-10);
     }
+
+    public static String getFormattedTimestamp(String input) {
+        // Split into parts from spaces
+        String[] parts = input.split(" ");
+        if (parts.length != 3) {
+            throw new IllegalArgumentException();
+        }
+        return parts[0] + "'T'" + parts[1] + parts[2];
+    }
 }

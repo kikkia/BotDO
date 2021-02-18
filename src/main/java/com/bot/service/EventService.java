@@ -30,11 +30,11 @@ public class EventService {
     }
 
     public List<EventEntity> getAllUpcomingByGuildId(String guildId) {
-        return eventRepository.findAllByGuildIdAndWithNextTimeAfter(guildId, Timestamp.from(Instant.now()));
+        return eventRepository.findAllByGuildIdAndNextTimeAfter(guildId, Timestamp.from(Instant.now()));
     }
 
     public List<EventEntity> getAllPastByGuildId(String guildId) {
-        return eventRepository.findAllByGuildIdAndWithNextTimeBefore(guildId, Timestamp.from(Instant.now()));
+        return eventRepository.findAllByGuildIdAndNextTimeBefore(guildId, Timestamp.from(Instant.now()));
     }
 
     public EventEntity addNewCustomEvent(Guild guild, User author, String name, Instant time) {
@@ -46,6 +46,15 @@ public class EventService {
                 name,
                 Collections.emptyList());
 
+        return eventRepository.save(eventEntity);
+    }
+
+    public EventEntity addNewCustomEvent(EventEntity eventEntity) {
+        eventEntity.setEventType(EventType.CUSTOM.getId());
+        return eventRepository.save(eventEntity);
+    }
+
+    public EventEntity save(EventEntity eventEntity) {
         return eventRepository.save(eventEntity);
     }
 

@@ -12,18 +12,18 @@ data class EventEntity(
     val id: Int,
     @ManyToOne
     @JoinColumn(name = "guild_id")
-    val guild: GuildEntity,
+    var guild: GuildEntity,
     @ManyToOne
     @JoinColumn(name = "author")
-    val author: UserEntity,
+    var author: UserEntity,
     @Column(name = "next_time")
-    @Temporal(TemporalType.TIMESTAMP)
-    val nextTime: Timestamp,
+    var nextTime: Timestamp,
     @Column(name = "event_type")
-    val eventType: Int,
+    var eventType: Int,
     @Column(name = "name")
-    val name: String,
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "event")
+    var name: String,
+    @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "event_id")
     var roles: List<EventRoleEntity>) {
 
     fun getEventType() : EventType? {
