@@ -9,7 +9,6 @@ import com.bot.service.EventService;
 import com.bot.service.GuildService;
 import com.bot.service.UserService;
 import com.bot.utils.Constants;
-import com.bot.utils.FormattingUtils;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;

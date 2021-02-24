@@ -1,7 +1,9 @@
 package com.bot.db.entities
 
 import com.bot.models.EventType
+import org.joda.time.Duration
 import java.sql.Timestamp
+import java.time.Instant
 import javax.persistence.*
 
 @Entity
@@ -28,5 +30,9 @@ data class EventEntity(
 
     fun getEventType() : EventType? {
         return EventType.fromInt(eventType)
+    }
+
+    fun getDurationUntilEvent() : Duration {
+        return Duration(nextTime.toInstant().toEpochMilli() - Instant.now().toEpochMilli());
     }
 }

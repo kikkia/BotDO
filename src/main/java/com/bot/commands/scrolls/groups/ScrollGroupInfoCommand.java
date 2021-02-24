@@ -48,7 +48,7 @@ public class ScrollGroupInfoCommand extends Command {
         try {
             File image = FormattingUtils.scrollGroupToImage(group);
             commandEvent.reply(image, image.getName());
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
