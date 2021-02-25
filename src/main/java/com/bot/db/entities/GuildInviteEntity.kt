@@ -12,5 +12,8 @@ data class GuildInviteEntity(
         @JoinColumn(name = "guild_id")
         var guild: GuildEntity,
         @Column
-        var uses: Int
+        var uses: Int,
+        @OneToOne
+        @JoinColumn(name = "guild_invite_id")
+        var role: EventRoleEntity
 )
