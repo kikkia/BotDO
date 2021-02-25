@@ -13,7 +13,7 @@ data class ScrollGroup(
         val id: Int,
         @ManyToOne
         @JoinColumn(name = "guild_id")
-        var guild: Guild,
+        var guild: GuildEntity,
         var name: String,
         @OneToMany(cascade = [
                 CascadeType.PERSIST,
@@ -22,7 +22,7 @@ data class ScrollGroup(
         @JoinTable(name = "user_scroll_group",
                 joinColumns = [JoinColumn(name = "group_id", referencedColumnName = "id")],
                 inverseJoinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")])
-        var users: Set<User>) {
+        var users: Set<UserEntity>) {
 
         fun toMessage() : String {
                 var message = "Overview for `$name`\n"
@@ -37,7 +37,7 @@ data class ScrollGroup(
 
                 message += "```\n"
                 // Construct a composite scroll inventory for the group
-                val compositeInventory = ScrollInventory(User(name, name))
+                val compositeInventory = ScrollInventory(UserEntity(name, name))
 
                 users.stream().map { ScrollInventoryMapper.map(it.inventory!!).getScrolls() }
                         .collect(Collectors.toList()).forEach { map ->

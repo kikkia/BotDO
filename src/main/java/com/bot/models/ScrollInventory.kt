@@ -1,23 +1,23 @@
 package com.bot.models
 
-import com.bot.db.entities.User
+import com.bot.db.entities.UserEntity
 import java.lang.IllegalArgumentException
 import java.util.*
 import java.util.stream.Collectors
 
 class ScrollInventory {
     val id: Int
-    var user: User
+    var user: UserEntity
         private set
     private var scrolls: MutableMap<Scroll, Int>
 
-    constructor(user: User) {
+    constructor(user: UserEntity) {
         this.id = 0
         this.user = user
         scrolls = EnumMap(Scroll::class.java)
     }
 
-    constructor(id: Int, user: User, map: MutableMap<Scroll, Int>) {
+    constructor(id: Int, user: UserEntity, map: MutableMap<Scroll, Int>) {
         this.id = id
         this.user = user
         scrolls = map

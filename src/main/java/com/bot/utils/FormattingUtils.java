@@ -1,30 +1,37 @@
 package com.bot.utils;
 
+import com.bot.db.entities.EventEntity;
 import com.bot.db.entities.ScrollGroup;
-import com.bot.db.entities.User;
+import com.bot.db.entities.UserEntity;
 import com.bot.db.mapper.ScrollInventoryMapper;
 import com.bot.models.Scroll;
 import com.bot.models.ScrollInventory;
 import com.vladsch.flexmark.profile.pegdown.Extensions;
 import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter;
 import com.vladsch.flexmark.util.data.DataHolder;
-import gui.ava.html.image.generator.HtmlImageGenerator;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
-import org.apache.commons.collections4.map.HashedMap;
+import org.joda.time.Duration;
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
+import org.w3c.dom.Document;
+import org.xhtmlrenderer.simple.Graphics2DRenderer;
+import org.xml.sax.SAXException;
 
 import javax.imageio.ImageIO;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -39,18 +46,46 @@ public class FormattingUtils {
     private static Parser parser = Parser.builder(OPTIONS).build();
     private static HtmlRenderer htmlRenderer = HtmlRenderer.builder(OPTIONS).build();
 
-    public static File scrollGroupToImage(ScrollGroup scrollGroup) throws IOException {
+    public static File scrollGroupToImage(ScrollGroup scrollGroup) throws Exception {
         var markdown = scrollGroupToMarkdown(scrollGroup);
+        return markdownToFile(markdown, "css/scrollgroup.css");
+    }
+
+    public static File eventsToImage(List<EventEntity> eventEntities) throws Exception {
+        var markdown = eventsToMarkdown(eventEntities);
+        return markdownToFile(markdown, "css/scrollgroup.css");
+    }
+
+    private static File markdownToFile(String markdown, String cssPath) throws Exception {
         var html = markdownToHtml(markdown);
-        // Append a link to CSS for the html
-        html = injectCss(html, "css/scrollgroup.css");
-        var image = removeCssImmuneBorder(htmlToImage(html));
-        var file = new File(getNewImageFileName(scrollGroup));
+        html = injectCss(html, cssPath);
+        html = injectBoilerplate(html);
+        var image = cropToFit(htmlToImage(html));
+        var file = new File(getNewImageFileName());
         // Save image to disk
         ImageIO.write(image, "png", file);
         // Delete image after 10
         cleanupExecutor.schedule(file::delete, 10, TimeUnit.SECONDS);
         return file;
+    }
+
+    private static String injectBoilerplate(String html) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<html lang=\"en\">");
+        sb.append(html);
+        sb.append("</html>");
+        return sb.toString();
+    }
+
+    // Tables have dynamic height and image is fixed, find the first alpha pixel and crop to height
+    private static BufferedImage cropToFit(BufferedImage image) {
+        for (int i = 0; i < image.getHeight(); i++) {
+            Color c = new Color(image.getRGB(image.getWidth()/2, i), true);
+            if (c.getAlpha() < 255) {
+                return image.getSubimage(0, 0, image.getWidth(), i);
+            }
+        }
+        return image;
     }
 
     private static String scrollGroupToMarkdown(ScrollGroup scrollGroup) {
@@ -60,7 +95,7 @@ public class FormattingUtils {
         // Map users to scroll inventories
         Map<String, ScrollInventory> inventories = scrollGroup.getUsers().stream()
                 .collect(Collectors.toMap(
-                        User::getEffectiveName,
+                        UserEntity::getEffectiveName,
                         u -> ScrollInventoryMapper.Companion.map(u.getInventory())));
 
         Map<Scroll, Integer> totals = new HashMap<>();
@@ -102,27 +137,72 @@ public class FormattingUtils {
         return sb.toString();
     }
 
+    private static String eventsToMarkdown(List<EventEntity> eventEntities) {
+        var sb = new StringBuilder();
+        sb.append("| Event name | Time till event |\n").append("| ---- | ---- |\n| ");
+
+        for (EventEntity e : eventEntities) {
+            sb.append(e.getName())
+                    .append(" | ")
+                    .append(FormattingUtils.prettyPrintDuration(e.getDurationUntilEvent())).append(" |\n");
+        }
+        return sb.toString();
+    }
+
     private static String markdownToHtml(String markdown) {
         Node doc = parser.parse(markdown);
         return htmlRenderer.render(doc);
     }
 
-    private static BufferedImage htmlToImage(String html) {
-        HtmlImageGenerator generator = new HtmlImageGenerator();
-        generator.loadHtml(html);
-        return generator.getBufferedImage();
+    private static BufferedImage htmlToImage(String html) throws ParserConfigurationException, IOException, SAXException {
+        // Convert html to doc for rendering
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+        Document htmlDoc = documentBuilder.parse(new ByteArrayInputStream(html.getBytes()));
+        Graphics2DRenderer g2r = new Graphics2DRenderer();
+        g2r.setDocument(htmlDoc, "http://localhost:42069/");
+        Dimension dim = new Dimension(1920, 1080);
+        BufferedImage buff = new BufferedImage((int)dim.getWidth(), (int)dim.getHeight(), 2);
+        Graphics2D g = (Graphics2D)buff.getGraphics();
+        g2r.layout(g, dim);
+        g2r.render(g);
+        g.dispose();
+        return buff;
     }
 
     private static String injectCss(String html, String CSSPath) throws IOException {
-        String css = Files.readString(Path.of(CSSPath));
-        return "<style>" + css + "</style>" + html;
+        return "<head><link rel=\"stylesheet\" href=\"" + CSSPath + "\"></link></head>" + html;
     }
 
     private static String getNewImageFileName(ScrollGroup scrollGroup) {
         return scrollGroup.getName() + Instant.now().toEpochMilli() + ".png";
     }
 
+    private static String getNewImageFileName() {
+        return "events" + Instant.now().toEpochMilli() + ".png";
+    }
+
     private static BufferedImage removeCssImmuneBorder(BufferedImage src) {
         return src.getSubimage(5, 5, src.getWidth()-10, src.getHeight()-10);
+    }
+
+    public static String prettyPrintDuration(Duration d) {
+        String daySuffix = d.getStandardDays() == 1 ? " day " : " days ";
+        String hourSuffix = d.getStandardHours() % 24 == 1 ? " hour " : " hours ";
+        String minSuffix = d.getStandardMinutes() % 60 == 1 ? " minute " : " minutes ";
+        PeriodFormatter formatter = new PeriodFormatterBuilder()
+                .appendDays()
+                .appendSuffix(daySuffix)
+                .appendHours()
+                .appendSuffix(hourSuffix)
+                .appendMinutes()
+                .appendSuffix(minSuffix)
+                .toFormatter();
+        Period p = new Period();
+        // Can't get it to format correctly with the d.toPeriod
+        p = p.plusDays(d.toStandardDays().getDays());
+        p = p.plusHours(d.toStandardHours().getHours() % 24);
+        p = p.plusMinutes(d.toStandardMinutes().getMinutes() % 60);
+        return formatter.print(p);
     }
 }

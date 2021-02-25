@@ -1,6 +1,6 @@
 package com.bot.service;
 
-import com.bot.db.entities.User;
+import com.bot.db.entities.UserEntity;
 import com.bot.db.repositories.UserRepository;
 import com.bot.models.ScrollInventory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,33 +21,33 @@ public class UserService {
     @Autowired
     ScrollInventoryService inventoryService;
 
-    public User getById(String userId) {
-        Optional<User> user = userRepository.findById(userId);
+    public UserEntity getById(String userId) {
+        Optional<UserEntity> user = userRepository.findById(userId);
         return user.orElse(null);
     }
 
-    public User setUserName(String id, String newName) {
-        Optional<User> userOpt = userRepository.findById(id);
+    public UserEntity setUserName(String id, String newName) {
+        Optional<UserEntity> userOpt = userRepository.findById(id);
         if (userOpt.isEmpty()) {
             throw new EntityNotFoundException("User not found");
         }
-        User user = userOpt.get();
+        UserEntity user = userOpt.get();
         user.setName(newName);
         return userRepository.save(user);
     }
 
-    public User setFamilyName(String userId, String familyName) {
-        Optional<User> userOpt = userRepository.findById(userId);
+    public UserEntity setFamilyName(String userId, String familyName) {
+        Optional<UserEntity> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
             throw new EntityNotFoundException("User not found");
         }
-        User user = userOpt.get();
+        UserEntity user = userOpt.get();
         user.setFamilyName(familyName);
         return userRepository.save(user);
     }
 
-    public User addUser(String id, String name) {
-        var user = userRepository.save(new User(id, name));
+    public UserEntity addUser(String id, String name) {
+        var user = userRepository.save(new UserEntity(id, name));
         // Save default inventory
         if (!inventoryService.getInventoryExistsForUser(id)) {
             inventoryService.save(new ScrollInventory(user));
@@ -55,7 +55,7 @@ public class UserService {
         return user;
     }
 
-    public List<User> getByIds(List<String> ids) {
+    public List<UserEntity> getByIds(List<String> ids) {
         return userRepository.findAllById(ids);
     }
 }

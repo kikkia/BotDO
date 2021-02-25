@@ -10,7 +10,7 @@ data class ScrollInventoryEntity(
         val id: Int,
         @OneToOne
         @JoinColumn(name = "user_id")
-        val user: User,
+        val user: UserEntity,
         @Column(name = "red_nose")
         val redNose: Int,
         @Column(name = "a_red_nose")

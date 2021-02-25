@@ -1,10 +1,11 @@
 package com.bot.db.entities
 
+import net.dv8tion.jda.api.entities.User
 import javax.persistence.*
 
 @Entity
 @Table(name = "users")
-data class User(
+data class UserEntity(
         @Id
         var id: String,
         @Column(nullable = false)
@@ -20,5 +21,11 @@ data class User(
 
         fun getEffectiveName() : String {
                 return familyName ?: name
+        }
+
+        companion object {
+                fun from(user: User) : UserEntity {
+                        return UserEntity(user.id, user.name)
+                }
         }
 }
