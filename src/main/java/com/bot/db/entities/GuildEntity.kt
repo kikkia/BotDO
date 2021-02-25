@@ -19,13 +19,17 @@ data class GuildEntity(
         @JoinTable(name = "guild_membership",
                 joinColumns = [JoinColumn(name = "guild_id", referencedColumnName = "id")],
                 inverseJoinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")])
-        var users: Set<UserEntity>
+        var users: Set<UserEntity>,
+        @Column(name = "external_role")
+        var externalRole: String?,
+        @Column(name = "recruit_role")
+        var recruitRole: String?
 ) {
         companion object {
 
                 // Helper to get a partial from a discord guild entity
                 fun partialFrom(guild: Guild) : com.bot.db.entities.GuildEntity {
-                        return GuildEntity(guild.id, guild.name, false, emptySet())
+                        return GuildEntity(guild.id, guild.name, false, emptySet(), null, null)
                 }
         }
 }

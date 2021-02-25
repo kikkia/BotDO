@@ -54,7 +54,9 @@ public class GuildService {
                 false,
                 guild.getMembers().stream()
                         .map(UserMapper.Companion::map)
-                        .collect(Collectors.toSet()));
+                        .collect(Collectors.toSet()),
+                null,
+                null);
         GuildEntity internalGuild = guildRepository.save(guild1);
 
         for (TextChannel t : guild.getTextChannels()) {
