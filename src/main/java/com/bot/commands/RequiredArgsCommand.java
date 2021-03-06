@@ -13,6 +13,7 @@ public abstract class RequiredArgsCommand extends Command {
             } catch(Exception e) {
                 commandEvent.replyError("Something went wrong executing the command. Please try again and if this issue " +
                         "continues please reach out for support.");
+                e.printStackTrace();
             }
         }
     }
