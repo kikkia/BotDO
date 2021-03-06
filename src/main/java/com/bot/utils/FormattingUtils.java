@@ -12,6 +12,7 @@ import com.vladsch.flexmark.util.data.DataHolder;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
@@ -204,5 +205,9 @@ public class FormattingUtils {
         p = p.plusHours(d.toStandardHours().getHours() % 24);
         p = p.plusMinutes(d.toStandardMinutes().getMinutes() % 60);
         return formatter.print(p);
+    }
+
+    public static String generateWelcomeMessage(GuildMemberJoinEvent event, String message) {
+        return message.replaceAll("%name%", event.getMember().getEffectiveName());
     }
 }

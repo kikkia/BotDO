@@ -24,7 +24,7 @@ public class ScrollGroupService {
     public ScrollGroup create(Guild guild, String name) {
         var group = new ScrollGroup();
         group.setGuild(new com.bot.db.entities.GuildEntity(guild.getId(), guild.getName(),
-                false, Collections.emptySet(), null, null));
+                false, Collections.emptySet()));
         group.setName(name);
         group.setUsers(Collections.emptySet());
         return scrollGroupRepository.save(group);

@@ -19,17 +19,38 @@ data class GuildEntity(
         @JoinTable(name = "guild_membership",
                 joinColumns = [JoinColumn(name = "guild_id", referencedColumnName = "id")],
                 inverseJoinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")])
-        var users: Set<UserEntity>,
-        @Column(name = "external_role")
-        var externalRole: String?,
-        @Column(name = "recruit_role")
-        var recruitRole: String?
+        var users: Set<UserEntity>
 ) {
+        @Column(name = "recruit_message")
+        var recruitMessage: String? = null
+        @Column(name = "welcome_channel")
+        var welcomeChannel: String? = null
+        @Column(name = "rules_channel")
+        var entryChannel: String? = null
+        @Column(name = "recruit_role")
+        var recruitRole: String? = null
+
+        fun hasDefaultInviteChannel() : Boolean {
+                return entryChannel != null
+        }
+
+        fun hasDefaultRecruitRole() : Boolean {
+                return recruitRole != null
+        }
+
+        fun hasDefaultRecruitMessage() : Boolean {
+                return recruitMessage != null
+        }
+
+        fun hasWelcomeMessageChannel() : Boolean {
+                return welcomeChannel != null
+        }
+
         companion object {
 
                 // Helper to get a partial from a discord guild entity
                 fun partialFrom(guild: Guild) : com.bot.db.entities.GuildEntity {
-                        return GuildEntity(guild.id, guild.name, false, emptySet(), null, null)
+                        return GuildEntity(guild.id, guild.name, false, emptySet())
                 }
         }
 }

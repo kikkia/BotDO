@@ -8,12 +8,20 @@ data class GuildInviteEntity(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         val id: Int,
+        @Column(name = "code")
+        var code: String,
         @ManyToOne
         @JoinColumn(name = "guild_id")
         var guild: GuildEntity,
         @Column
         var uses: Int,
-        @OneToOne
+        @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = [CascadeType.ALL])
         @JoinColumn(name = "guild_invite_id")
-        var role: EventRoleEntity
-)
+        var roles: List<InviteRoleEntity>) {
+
+        @Column(name = "welcome_message")
+        var welcomeMessage: String? = null
+
+        @Column(name = "guild_prefix")
+        var guildPrefix: String? = null
+}
