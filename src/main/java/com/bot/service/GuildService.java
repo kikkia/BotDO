@@ -4,6 +4,7 @@ import com.bot.db.entities.GuildEntity;
 import com.bot.db.entities.UserEntity;
 import com.bot.db.mapper.UserMapper;
 import com.bot.db.repositories.GuildRepository;
+import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,5 +73,20 @@ public class GuildService {
     public GuildEntity setSyncNames(GuildEntity guild, boolean enabled) {
         guild.setSyncNames(enabled);
         return guildRepository.save(guild);
+    }
+
+    public GuildEntity setRecruitRole(GuildEntity guildEntity, String roleId) {
+        guildEntity.setRecruitRole(roleId);
+        return guildRepository.save(guildEntity);
+    }
+
+    public GuildEntity setWelcomeChannel(GuildEntity guildEntity, String channelId) {
+        guildEntity.setWelcomeChannel(channelId);
+        return guildRepository.save(guildEntity);
+    }
+
+    public GuildEntity setEntryChannel(GuildEntity guildEntity, String channelId) {
+        guildEntity.setEntryChannel(channelId);
+        return guildRepository.save(guildEntity);
     }
 }

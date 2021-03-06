@@ -21,6 +21,31 @@ data class GuildEntity(
                 inverseJoinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")])
         var users: Set<UserEntity>
 ) {
+        @Column(name = "recruit_message")
+        var recruitMessage: String? = null
+        @Column(name = "welcome_channel")
+        var welcomeChannel: String? = null
+        @Column(name = "rules_channel")
+        var entryChannel: String? = null
+        @Column(name = "recruit_role")
+        var recruitRole: String? = null
+
+        fun hasDefaultInviteChannel() : Boolean {
+                return entryChannel != null
+        }
+
+        fun hasDefaultRecruitRole() : Boolean {
+                return recruitRole != null
+        }
+
+        fun hasDefaultRecruitMessage() : Boolean {
+                return recruitMessage != null
+        }
+
+        fun hasWelcomeMessageChannel() : Boolean {
+                return welcomeChannel != null
+        }
+
         companion object {
 
                 // Helper to get a partial from a discord guild entity

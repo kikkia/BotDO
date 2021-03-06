@@ -4,9 +4,12 @@ import com.bot.db.entities.GuildEntity;
 import com.bot.db.entities.TextChannel;
 import com.bot.db.entities.UserEntity;
 import com.bot.service.GuildService;
+import com.bot.service.InviteService;
 import com.bot.service.TextChannelService;
 import com.bot.service.UserService;
+import com.bot.tasks.InvitedMemberTask;
 import com.bot.tasks.SyncUserFamilyNameTask;
+import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.events.channel.text.TextChannelCreateEvent;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.channel.text.update.TextChannelUpdateNameEvent;
@@ -18,6 +21,7 @@ import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameE
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateNameEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
+import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Component
@@ -36,6 +41,8 @@ public class DiscordListener extends ListenerAdapter {
     private UserService userService;
     @Autowired
     private TextChannelService textChannelService;
+    @Autowired
+    private InviteService inviteService;
     @Autowired
     private ScheduledExecutorService executorService;
 
@@ -52,6 +59,9 @@ public class DiscordListener extends ListenerAdapter {
         if (guild == null) {
             guild = guildService.addFreshGuild(event.getGuild());
         }
+
+        // Check invite member joined with and act accordingly
+        executorService.submit(new InvitedMemberTask(event, inviteService, guild));
 
         UserEntity user = userService.getById(event.getUser().getId());
         if(user == null) {
@@ -84,6 +94,15 @@ public class DiscordListener extends ListenerAdapter {
     @Override
     public void onTextChannelDelete(@Nonnull TextChannelDeleteEvent event) {
         textChannelService.removeById(event.getChannel().getId());
+
+        // Check for default channels removed
+        var guild = guildService.getById(event.getGuild().getId());
+        if (event.getChannel().getId().equals(guild.getEntryChannel())) {
+            guildService.setEntryChannel(guild, null);
+        }
+        if (event.getChannel().getId().equals(guild.getWelcomeChannel())) {
+            guildService.setWelcomeChannel(guild, null);
+        }
 
         super.onTextChannelDelete(event);
     }
@@ -159,5 +178,14 @@ public class DiscordListener extends ListenerAdapter {
             executorService.submit(new SyncUserFamilyNameTask(event.getMember(), userService));
         }
         super.onGuildMemberUpdateNickname(event);
+    }
+
+    @Override
+    public void onRoleDelete(@NotNull RoleDeleteEvent event) {
+        var guild = guildService.getById(event.getGuild().getId());
+        if (event.getRole().getId().equals(guild.getRecruitRole())) {
+            guildService.setRecruitRole(guild, null);
+        }
+        super.onRoleDelete(event);
     }
 }
