@@ -56,4 +56,8 @@ public class InviteService {
         var all = guildInviteRepository.getAllByGuildId(guildId);
         return all.stream().collect(Collectors.toMap(GuildInviteEntity::getCode, Function.identity()));
     }
+
+    public void removeByCode(String code) {
+        guildInviteRepository.deleteByCode(code);
+    }
 }

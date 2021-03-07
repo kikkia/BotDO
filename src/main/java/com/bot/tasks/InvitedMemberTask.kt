@@ -1,8 +1,10 @@
 package com.bot.tasks
 
 import com.bot.db.entities.GuildEntity
+import com.bot.db.entities.GuildInviteEntity
 import com.bot.service.InviteService
 import com.bot.utils.FormattingUtils.generateWelcomeMessage
+import net.dv8tion.jda.api.entities.Invite
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import java.util.stream.Collectors
 
@@ -14,6 +16,7 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
         // Check incoming user for invite
         val invites = event.guild.retrieveInvites().complete();
         val inviteEntities = inviteService.getMapForGuildId(event.guild.id);
+        val possibleInvites = ArrayList<GuildInviteEntity>()
 
         for (invite in invites) {
             val entity = inviteEntities[invite.code];
@@ -28,26 +31,61 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
                 entity.uses = invite.uses
                 inviteService.save(entity)
 
-                // Add role if one exists to add
-                val roleIdsToAdd = entity.roles.stream().map { it.roleId }.collect(Collectors.toList())
-                for (roleId in roleIdsToAdd) {
-                    val roleToAdd = event.guild.getRoleById(roleId) ?: continue
-                    event.guild.addRoleToMember(event.member, roleToAdd).complete()
-                }
-
-                // Add guild name if exists
-                if (entity.guildPrefix != null) {
-                    event.member.modifyNickname("(${entity.guildPrefix}) ${event.member.effectiveName}").queue()
-                }
-
-                // Post welcome message if exists
-                if (entity.welcomeMessage != null &&
-                        guild.welcomeChannel != null) {
-                    val welcomeChannel = event.guild.getTextChannelById(guild.welcomeChannel!!)
-                    welcomeChannel!!.sendMessage(generateWelcomeMessage(event, entity.welcomeMessage)).queue()
-                }
-                return
+                possibleInvites.add(entity)
             }
         }
+
+        if (possibleInvites.size != 1) {
+            if (guild.logChannel != null) {
+                logErrorState(possibleInvites, event)
+            }
+        } else {
+            val entity = possibleInvites[0]
+            // Its only 1 invite possible
+            // Add role if one exists to add
+            val roleIdsToAdd = entity.roles.stream().map { it.roleId }.collect(Collectors.toList())
+            for (roleId in roleIdsToAdd) {
+                val roleToAdd = event.guild.getRoleById(roleId) ?: continue
+                event.guild.addRoleToMember(event.member, roleToAdd).complete()
+            }
+
+            // Add guild name if exists
+            if (entity.guildPrefix != null) {
+                event.member.modifyNickname("(${entity.guildPrefix}) ${event.member.effectiveName}").queue()
+            }
+
+            // Post welcome message if exists
+            if (entity.welcomeMessage != null &&
+                    guild.welcomeChannel != null) {
+                val welcomeChannel = event.guild.getTextChannelById(guild.welcomeChannel!!)
+                welcomeChannel!!.sendMessage(generateWelcomeMessage(event, entity.welcomeMessage)).queue()
+            }
+
+            // Post log of joining member
+            if (guild.logChannel != null) {
+                val logChannel = event.guild.getTextChannelById(guild.logChannel!!)
+                logChannel!!.sendMessage("New member ${event.member.effectiveName} joined with invite ${entity.code}.\n" +
+                        "```${entity}```").queue()
+            }
+        }
+    }
+
+    private fun logErrorState(possibleInvites: List<GuildInviteEntity>, event: GuildMemberJoinEvent) {
+        /*
+         We were unable to determine what invite was used for sure. This has a few common causes:
+         1. Invite was not created with bot and was not in db.
+         2. Our use counts were out of sync with reality. (Possible from down time or missed/errored join event)
+         */
+        val logChannel = event.guild.getTextChannelById(guild.logChannel!!)
+        var message = "New member ${event.member.effectiveName} joined. However I was unable to determine the invite used. "
+        if (possibleInvites.isEmpty()) {
+            message += "This could be due to them using an invite I did not create."
+        } else {
+            message += "I identified multiple invites they could have used: " +
+                    "```${possibleInvites.stream().map { it.code }.collect(Collectors.toList())}``` " +
+                    "This can happen due to members joining during bot downtime. It should resolve itself. If not, please" +
+                    " contact Kikkia."
+        }
+        logChannel!!.sendMessage(message).queue()
     }
 }

@@ -89,4 +89,9 @@ public class GuildService {
         guildEntity.setEntryChannel(channelId);
         return guildRepository.save(guildEntity);
     }
+
+    public GuildEntity setLogChannel(GuildEntity guildEntity, String channelId) {
+        guildEntity.setLogChannel(channelId);
+        return guildRepository.save(guildEntity);
+    }
 }

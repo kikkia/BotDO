@@ -1,0 +1,2 @@
+ALTER TABLE `guild`
+ADD `log_channel` VARCHAR(255) NULL DEFAULT NULL;
