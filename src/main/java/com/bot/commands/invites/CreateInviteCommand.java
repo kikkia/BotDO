@@ -6,6 +6,8 @@ import com.bot.service.GuildService;
 import com.bot.service.InviteService;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Invite;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -66,9 +68,14 @@ public class CreateInviteCommand extends RequiredArgsCommand {
             roleIds.add(role.get(0).getId());
         }
 
-        var invite = channel.createInvite().setUnique(true)
-                .setMaxAge(7L, TimeUnit.DAYS)
-                .setMaxUses(maxUses).complete();
+        Invite invite;
+        try {
+            invite = channel.createInvite().setUnique(true)
+                    .setMaxUses(maxUses).complete();
+        } catch (InsufficientPermissionException e) {
+            commandEvent.replyWarning("Please make sure I have permission to make create an invite in " + channel.getAsMention());
+            return;
+        }
 
         inviteService.add(commandEvent.getGuild(), invite, roleIds, welcome, guildName);
         commandEvent.replySuccess("Generated Invite: " + invite.getUrl());
