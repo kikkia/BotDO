@@ -4,7 +4,6 @@ import com.bot.db.entities.GuildEntity
 import com.bot.db.entities.GuildInviteEntity
 import com.bot.service.InviteService
 import com.bot.utils.FormattingUtils.generateWelcomeMessage
-import net.dv8tion.jda.api.entities.Invite
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import java.util.stream.Collectors
 
@@ -70,6 +69,9 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
         }
     }
 
+    /**
+     * Logs an error message to users when we cant determine which invite was used.
+     */
     private fun logErrorState(possibleInvites: List<GuildInviteEntity>, event: GuildMemberJoinEvent) {
         /*
          We were unable to determine what invite was used for sure. This has a few common causes:
@@ -78,10 +80,10 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
          */
         val logChannel = event.guild.getTextChannelById(guild.logChannel!!)
         var message = "New member ${event.member.effectiveName} joined. However I was unable to determine the invite used. "
-        if (possibleInvites.isEmpty()) {
-            message += "This could be due to them using an invite I did not create."
+        message += if (possibleInvites.isEmpty()) {
+            "This could be due to them using an invite I did not create."
         } else {
-            message += "I identified multiple invites they could have used: " +
+            "I identified multiple invites they could have used: " +
                     "```${possibleInvites.stream().map { it.code }.collect(Collectors.toList())}``` " +
                     "This can happen due to members joining during bot downtime. It should resolve itself. If not, please" +
                     " contact Kikkia."
