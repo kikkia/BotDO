@@ -65,7 +65,7 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
             if (guild.logChannel != null) {
                 val logChannel = event.guild.getTextChannelById(guild.logChannel!!)
                 logChannel!!.sendMessage("New member ${event.member.effectiveName} joined with invite ${entity.code}.\n" +
-                        "```${entity}```").queue()
+                        "```${guildInviteEntityToString(entity, event)}```").queue()
             }
         }
     }
@@ -87,5 +87,27 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
                     " contact Kikkia."
         }
         logChannel!!.sendMessage(message).queue()
+    }
+
+    /**
+     * Converts a guild invite entity to an easily readable object
+     */
+    fun guildInviteEntityToString(entity: GuildInviteEntity, event: GuildMemberJoinEvent) : String {
+        var out = "code: ${entity.code}\nUses: &${entity.uses}\n"
+        if (entity.guildPrefix != null) {
+            out += "Guild: ${entity.guildPrefix}\n"
+        }
+        if (entity.welcomeMessage != null) {
+            out += "Welcome message: ${entity.welcomeMessage}\n"
+        }
+        if (entity.roles.isNotEmpty()) {
+            // Map our role Ids from the entity to role names and filter out not found roles
+            val assignedRoles = entity.roles.stream().map { event.guild.getRoleById(it.roleId) }
+                    .filter{ it != null}
+                    .map { it?.name }
+                    .collect(Collectors.toList())
+            out += "Assigned Roles: $assignedRoles"
+        }
+        return out
     }
 }
