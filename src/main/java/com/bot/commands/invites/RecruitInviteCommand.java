@@ -3,16 +3,19 @@ package com.bot.commands.invites;
 import com.bot.commands.RequiredArgsCommand;
 import com.bot.service.GuildService;
 import com.bot.service.InviteService;
+import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 import net.dv8tion.jda.api.Permission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class RecruitInviteCommand extends RequiredArgsCommand {
+public class RecruitInviteCommand extends Command {
 
     @Autowired
     private InviteService inviteService;
@@ -32,16 +35,12 @@ public class RecruitInviteCommand extends RequiredArgsCommand {
     }
 
     @Override
-    protected void executeCommand(CommandEvent commandEvent) {
+    protected void execute(CommandEvent commandEvent) {
         var guild = guildService.getById(commandEvent.getGuild().getId());
-        if (guild.getRecruitRole() == null) {
-            commandEvent.replyWarning("You need to set a role to give recruits with the `setrecruitrole` command");
-            return;
-        }
 
         var channels = commandEvent.getMessage().getMentionedChannels();
         if (channels.size() == 0) {
-            if (guild.hasDefaultInviteChannel()) {
+            if (!guild.hasDefaultInviteChannel()) {
                 commandEvent.replyWarning("You need to mention a channel or set a rules channel for the guild to send the " +
                         "invited user to.");
                 return;
@@ -55,9 +54,11 @@ public class RecruitInviteCommand extends RequiredArgsCommand {
             commandEvent.replyWarning("Channel not found, please check that the specified or rules channel are correct.");
             return;
         }
-
+        List<String> roles = guild.hasDefaultRecruitRole() ?
+                Collections.singletonList(guild.getRecruitRole())
+                : Collections.emptyList();
         var invite = channel.createInvite().setUnique(true).setMaxAge(12L, TimeUnit.HOURS).setMaxUses(1).complete();
-        inviteService.add(commandEvent.getGuild(), invite, Collections.singletonList(guild.getRecruitRole()));
+        inviteService.add(commandEvent.getGuild(), invite, roles);
         commandEvent.replySuccess("Generated invite: " + invite.getUrl());
     }
 }

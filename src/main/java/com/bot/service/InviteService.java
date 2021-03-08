@@ -44,7 +44,6 @@ public class InviteService {
                 new ArrayList<>());
         inviteEntity.setGuildPrefix(guildName);
         inviteEntity.setWelcomeMessage(welcomeMessage);
-
         final var guildInvite = guildInviteRepository.save(inviteEntity);
         guildInvite.setRoles(roleIds.stream().map(
                 it -> new InviteRoleEntity(0, it, guildInvite.getId()))
