@@ -5,6 +5,7 @@ import com.bot.db.entities.GuildInviteEntity
 import com.bot.service.InviteService
 import com.bot.utils.FormattingUtils.generateWelcomeMessage
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
 import java.util.stream.Collectors
 
 class InvitedMemberTask(private val event: GuildMemberJoinEvent,
@@ -50,7 +51,14 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
 
             // Add guild name if exists
             if (entity.guildPrefix != null) {
-                event.member.modifyNickname("(${entity.guildPrefix}) ${event.member.effectiveName}").queue()
+                try {
+                    event.member.modifyNickname("(${entity.guildPrefix}) ${event.member.effectiveName}").queue()
+                } catch (e: InsufficientPermissionException) {
+                    if (guild.logChannel != null) {
+                        val logChannel = event.guild.getTextChannelById(guild.logChannel!!)
+                        logChannel!!.sendMessage("Failed to change nickname of new user due to lacking permissions.").queue()
+                    }
+                }
             }
 
             // Post welcome message if exists
