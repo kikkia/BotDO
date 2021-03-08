@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.channel.text.update.TextChannelUpdateNameEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
+import net.dv8tion.jda.api.events.guild.invite.GuildInviteCreateEvent;
+import net.dv8tion.jda.api.events.guild.invite.GuildInviteDeleteEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
@@ -187,5 +189,11 @@ public class DiscordListener extends ListenerAdapter {
             guildService.setRecruitRole(guild, null);
         }
         super.onRoleDelete(event);
+    }
+
+    @Override
+    public void onGuildInviteDelete(@NotNull GuildInviteDeleteEvent event) {
+        inviteService.removeByCode(event.getCode());
+        super.onGuildInviteDelete(event);
     }
 }

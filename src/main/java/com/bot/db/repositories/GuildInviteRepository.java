@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface GuildInviteRepository extends CrudRepository<GuildInviteEntity, Integer> {
     public List<GuildInviteEntity> getAllByGuildId(String guildId);
+    public void deleteByCode(String code);
 }

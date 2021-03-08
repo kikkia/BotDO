@@ -29,6 +29,8 @@ data class GuildEntity(
         var entryChannel: String? = null
         @Column(name = "recruit_role")
         var recruitRole: String? = null
+        @Column(name = "log_channel")
+        var logChannel: String? = null
 
         fun hasDefaultInviteChannel() : Boolean {
                 return entryChannel != null
