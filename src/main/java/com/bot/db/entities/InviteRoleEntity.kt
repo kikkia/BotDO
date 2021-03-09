@@ -10,6 +10,7 @@ data class InviteRoleEntity(
         val id: Int,
         @Column(name = "role_id")
         var roleId: String,
-        @Column(name = "guild_invite_id")
-        var guildInviteId: Int
+        @JoinColumn(name = "guild_invite_id", referencedColumnName = "id")
+        @ManyToOne(fetch = FetchType.LAZY, optional = false)
+        var guildInvite: GuildInviteEntity
 )

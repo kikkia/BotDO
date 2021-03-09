@@ -15,8 +15,9 @@ data class GuildInviteEntity(
         var guild: GuildEntity,
         @Column
         var uses: Int,
-        @OneToMany(fetch = FetchType.EAGER, orphanRemoval = true, cascade = [CascadeType.ALL])
-        @JoinColumn(name = "guild_invite_id")
+        @Column(name = "max_uses")
+        var maxUses: Int?,
+        @OneToMany(fetch = FetchType.EAGER, mappedBy = "guildInvite", cascade=[CascadeType.ALL])
         var roles: List<InviteRoleEntity>) {
 
         @Column(name = "welcome_message")

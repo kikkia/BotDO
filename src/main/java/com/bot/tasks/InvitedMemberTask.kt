@@ -19,7 +19,7 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
         val possibleInvites = ArrayList<GuildInviteEntity>()
 
         for (invite in invites) {
-            val entity = inviteEntities[invite.code];
+            val entity = inviteEntities.remove(invite.code);
             if (entity == null) {
                 // We dont have this invite in our system, we cannot determine if this one was used
                 inviteService.addExisting(invite);
@@ -32,6 +32,22 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
                 inviteService.save(entity)
 
                 possibleInvites.add(entity)
+            }
+        }
+
+        // Could be due to an invite that hit limit and disappeared when they used it
+        // Check the invites that are only in our db and not in discord
+        // If we find one that is 1 away from max, then choose that one
+        // Remove all defunct entities
+        if (possibleInvites.size == 0) {
+            for (entity in inviteEntities.values) {
+                if (entity.maxUses != null) {
+                    if (entity.maxUses!! - entity.uses == 1) {
+                        entity.uses++
+                        possibleInvites.add(entity)
+                    }
+                }
+                inviteService.remove(entity)
             }
         }
 
@@ -103,7 +119,7 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
      * Converts a guild invite entity to an easily readable object
      */
     fun guildInviteEntityToString(entity: GuildInviteEntity, event: GuildMemberJoinEvent) : String {
-        var out = "code: ${entity.code}\nUses: &${entity.uses}\n"
+        var out = "code: ${entity.code}\nUses: ${entity.uses}/${entity.maxUses}\n"
         if (entity.guildPrefix != null) {
             out += "Guild: ${entity.guildPrefix}\n"
         }

@@ -28,6 +28,7 @@ public class InviteService {
                 GuildEntity.Companion.partialFrom(
                     Objects.requireNonNull(invite.getJDA().getGuildById(invite.getGuild().getId()))),
                 invite.getUses(),
+                invite.getMaxUses(),
                 Collections.emptyList());
         guildInviteRepository.save(guildInvite);
     }
@@ -41,12 +42,13 @@ public class InviteService {
                 invite.getCode(),
                 GuildEntity.Companion.partialFrom(guild),
                 invite.getUses(),
+                invite.getMaxUses(),
                 new ArrayList<>());
         inviteEntity.setGuildPrefix(guildName);
         inviteEntity.setWelcomeMessage(welcomeMessage);
         final var guildInvite = guildInviteRepository.save(inviteEntity);
         guildInvite.setRoles(roleIds.stream().map(
-                it -> new InviteRoleEntity(0, it, guildInvite.getId()))
+                it -> new InviteRoleEntity(0, it, guildInvite))
                 .collect(Collectors.toList()));
         return guildInviteRepository.save(guildInvite);
     }
@@ -58,5 +60,9 @@ public class InviteService {
 
     public void removeByCode(String code) {
         guildInviteRepository.deleteByCode(code);
+    }
+
+    public void remove(GuildInviteEntity guildInviteEntity) {
+        guildInviteRepository.delete(guildInviteEntity);
     }
 }
