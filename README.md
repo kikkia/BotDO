@@ -1,15 +1,15 @@
 # BotDO
 A BDO Centric discord bot.
 
-#### Disclaimer: This bot is under active development and is subject to change. Use at your own risk.
+### Disclaimer: This bot is under active development and is subject to change. Use at your own risk.
 
-Currently under development
 
 ## [Get Started here](docs/getting_started.md)
 
 ## Features
 - User Scroll inventory (Complete)
 - Scroll groups (Pretty much done)
+- Invite behaviors (close to done)
 - Events (In progress)
 - Family name -> discord sync (In progress)
 - Boss notifications (planned)
