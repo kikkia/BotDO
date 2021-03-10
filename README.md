@@ -1,7 +1,11 @@
 # BotDO
-A BDO Centric discord bot
+A BDO Centric discord bot.
+
+#### Disclaimer: This bot is under active development and is subject to change. Use at your own risk.
 
 Currently under development
+
+## [Get Started here](docs/getting_started.md)
 
 ## Features
 - User Scroll inventory (Complete)
