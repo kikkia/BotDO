@@ -63,7 +63,7 @@ public class DiscordListener extends ListenerAdapter {
         }
 
         // Check invite member joined with and act accordingly
-        executorService.submit(new InvitedMemberTask(event, inviteService, guild));
+        executorService.submit(new InvitedMemberTask(event, inviteService, userService, guild));
 
         UserEntity user = userService.getById(event.getUser().getId());
         if(user == null) {

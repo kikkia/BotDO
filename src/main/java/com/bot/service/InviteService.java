@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.Invite;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -29,21 +30,25 @@ public class InviteService {
                     Objects.requireNonNull(invite.getJDA().getGuildById(invite.getGuild().getId()))),
                 invite.getUses(),
                 invite.getMaxUses(),
-                Collections.emptyList());
+                Collections.emptyList(),
+                invite.getInviter().getId(),
+                Timestamp.from(invite.getTimeCreated().toInstant()));
         guildInviteRepository.save(guildInvite);
     }
 
-    public GuildInviteEntity add(Guild guild, Invite invite, List<String> roleIds) {
-        return add(guild, invite, roleIds, null, null);
+    public GuildInviteEntity add(Guild guild, Invite invite, List<String> roleIds, String author) {
+        return add(guild, invite, roleIds, null, null, author);
     }
 
-    public GuildInviteEntity add(Guild guild, Invite invite, List<String> roleIds, String welcomeMessage, String guildName) {
+    public GuildInviteEntity add(Guild guild, Invite invite, List<String> roleIds, String welcomeMessage, String guildName, String author) {
         var inviteEntity = new GuildInviteEntity(0,
                 invite.getCode(),
                 GuildEntity.Companion.partialFrom(guild),
                 invite.getUses(),
                 invite.getMaxUses(),
-                new ArrayList<>());
+                new ArrayList<>(),
+                author,
+                Timestamp.from(invite.getTimeCreated().toInstant()));
         inviteEntity.setGuildPrefix(guildName);
         inviteEntity.setWelcomeMessage(welcomeMessage);
         final var guildInvite = guildInviteRepository.save(inviteEntity);

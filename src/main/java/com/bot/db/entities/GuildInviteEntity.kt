@@ -1,5 +1,6 @@
 package com.bot.db.entities
 
+import java.sql.Timestamp
 import javax.persistence.*
 
 @Entity
@@ -18,7 +19,11 @@ data class GuildInviteEntity(
         @Column(name = "max_uses")
         var maxUses: Int?,
         @OneToMany(fetch = FetchType.EAGER, mappedBy = "guildInvite", cascade=[CascadeType.ALL])
-        var roles: List<InviteRoleEntity>) {
+        var roles: List<InviteRoleEntity>,
+        @Column(name = "author")
+        var author: String?,
+        @Column(name = "created")
+        var created: Timestamp?) {
 
         @Column(name = "welcome_message")
         var welcomeMessage: String? = null

@@ -58,7 +58,7 @@ public class RecruitInviteCommand extends Command {
                 Collections.singletonList(guild.getRecruitRole())
                 : Collections.emptyList();
         var invite = channel.createInvite().setUnique(true).setMaxAge(12L, TimeUnit.HOURS).setMaxUses(1).complete();
-        inviteService.add(commandEvent.getGuild(), invite, roles);
+        inviteService.add(commandEvent.getGuild(), invite, roles, commandEvent.getAuthor().getId());
         commandEvent.replySuccess("Generated invite: " + invite.getUrl());
     }
 }

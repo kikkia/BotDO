@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.entities.Invite;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
+
 @Component
 public class SyncInvitesCommand extends Command {
 
@@ -37,6 +39,14 @@ public class SyncInvitesCommand extends Command {
                 // update count
                 entity.setUses(invite.getUses());
                 entity.setMaxUses(invite.getMaxUses());
+
+                // These fields are static so only set if the values are null
+                if (entity.getAuthor() == null) {
+                    entity.setAuthor(invite.getInviter().getId());
+                }
+                if (entity.getCreated() == null) {
+                    entity.setCreated(Timestamp.from(invite.getTimeCreated().toInstant()));
+                }
                 inviteService.save(entity);
             }
         }

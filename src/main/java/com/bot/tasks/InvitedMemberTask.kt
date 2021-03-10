@@ -3,6 +3,7 @@ package com.bot.tasks
 import com.bot.db.entities.GuildEntity
 import com.bot.db.entities.GuildInviteEntity
 import com.bot.service.InviteService
+import com.bot.service.UserService
 import com.bot.utils.FormattingUtils.generateWelcomeMessage
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
@@ -10,6 +11,7 @@ import java.util.stream.Collectors
 
 class InvitedMemberTask(private val event: GuildMemberJoinEvent,
                         private val inviteService: InviteService,
+                        private val userService: UserService,
                         private val guild: GuildEntity) : Thread() {
 
     override fun run() {
@@ -118,8 +120,18 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
     /**
      * Converts a guild invite entity to an easily readable object
      */
-    fun guildInviteEntityToString(entity: GuildInviteEntity, event: GuildMemberJoinEvent) : String {
+    private fun guildInviteEntityToString(entity: GuildInviteEntity, event: GuildMemberJoinEvent) : String {
         var out = "code: ${entity.code}\nUses: ${entity.uses}/${entity.maxUses}\n"
+        if (entity.created != null) {
+            out += "Created: ${entity.created}\n"
+        }
+        if (entity.author != null) {
+            val author = userService.getById(entity.author)
+            // Check if that user is in our db
+            if (author != null) {
+                out += "Inviter: ${author.getEffectiveName()}\n";
+            }
+        }
         if (entity.guildPrefix != null) {
             out += "Guild: ${entity.guildPrefix}\n"
         }

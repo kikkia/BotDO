@@ -77,7 +77,7 @@ public class CreateInviteCommand extends RequiredArgsCommand {
             return;
         }
 
-        inviteService.add(commandEvent.getGuild(), invite, roleIds, welcome, guildName);
+        inviteService.add(commandEvent.getGuild(), invite, roleIds, welcome, guildName, commandEvent.getAuthor().getId());
         commandEvent.replySuccess("Generated Invite: " + invite.getUrl());
     }
 }
