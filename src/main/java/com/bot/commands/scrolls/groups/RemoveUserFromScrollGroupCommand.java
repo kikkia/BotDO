@@ -40,7 +40,7 @@ public class RemoveUserFromScrollGroupCommand extends Command {
 
         var group = existingGroup.get();
         var cleanedUsers = group.getUsers().stream()
-                .filter(it -> !it.getFamilyName().equalsIgnoreCase(args[1]))
+                .filter(it -> !it.getEffectiveName().equalsIgnoreCase(args[1]))
                 .collect(Collectors.toSet());
 
         if (group.getUsers().size() == cleanedUsers.size()) {
