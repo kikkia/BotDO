@@ -15,7 +15,7 @@ class RecruitPostCommand(val recruitmentPostService: RecruitmentPostService) : R
         arguments = "Server name or world"
     }
 
-    val possibleVals = asList("season", "olvia", "world",
+    val possibleVals = asList("season", "olvia", "world", "discord", "reddit",
             "serendia", "balenos", "valencia", "mediah", "velia", "calpheon")
 
     override fun executeCommand(event: CommandEvent?) {
