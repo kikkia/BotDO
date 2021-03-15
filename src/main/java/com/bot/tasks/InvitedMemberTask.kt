@@ -7,6 +7,7 @@ import com.bot.service.UserService
 import com.bot.utils.FormattingUtils.generateWelcomeMessage
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
+import java.time.Instant
 import java.util.stream.Collectors
 
 class InvitedMemberTask(private val event: GuildMemberJoinEvent,
@@ -43,7 +44,8 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
         // Remove all defunct entities
         if (possibleInvites.size == 0) {
             for (entity in inviteEntities.values) {
-                if (entity.maxUses != null) {
+
+                if (entity.maxUses != null && !entity.isExpired()) {
                     if (entity.maxUses!! - entity.uses == 1) {
                         entity.uses++
                         possibleInvites.add(entity)

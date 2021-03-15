@@ -47,6 +47,9 @@ public class SyncInvitesCommand extends Command {
                 if (entity.getCreated() == null) {
                     entity.setCreated(Timestamp.from(invite.getTimeCreated().toInstant()));
                 }
+                if (entity.getMaxAge() == null) {
+                    entity.setMaxAge(invite.getMaxAge());
+                }
                 inviteService.save(entity);
             }
         }

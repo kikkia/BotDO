@@ -196,4 +196,10 @@ public class DiscordListener extends ListenerAdapter {
         inviteService.removeByCode(event.getCode());
         super.onGuildInviteDelete(event);
     }
+
+    @Override
+    public void onGuildInviteCreate(@NotNull GuildInviteCreateEvent event) {
+        inviteService.addExisting(event.getInvite());
+        super.onGuildInviteCreate(event);
+    }
 }

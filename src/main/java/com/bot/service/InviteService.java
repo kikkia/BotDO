@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.Invite;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Function;
@@ -30,6 +31,7 @@ public class InviteService {
                     Objects.requireNonNull(invite.getJDA().getGuildById(invite.getGuild().getId()))),
                 invite.getUses(),
                 invite.getMaxUses(),
+                invite.getMaxAge(),
                 Collections.emptyList(),
                 invite.getInviter().getId(),
                 Timestamp.from(invite.getTimeCreated().toInstant()));
@@ -46,6 +48,7 @@ public class InviteService {
                 GuildEntity.Companion.partialFrom(guild),
                 invite.getUses(),
                 invite.getMaxUses(),
+                invite.getMaxAge(),
                 new ArrayList<>(),
                 author,
                 Timestamp.from(invite.getTimeCreated().toInstant()));
@@ -63,6 +66,7 @@ public class InviteService {
         return all.stream().collect(Collectors.toMap(GuildInviteEntity::getCode, Function.identity()));
     }
 
+    @Transactional
     public void removeByCode(String code) {
         guildInviteRepository.deleteByCode(code);
     }

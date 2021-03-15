@@ -41,6 +41,7 @@ public class DiscordConfiguration {
                         GUILD_MEMBERS,
                         GUILD_MESSAGES,
                         GUILD_EMOJIS,
+                        GUILD_INVITES,
                         GUILD_MESSAGE_REACTIONS,
                         GUILD_VOICE_STATES,
                         DIRECT_MESSAGES

@@ -1,6 +1,7 @@
 package com.bot.db.entities
 
 import java.sql.Timestamp
+import java.time.Instant
 import javax.persistence.*
 
 @Entity
@@ -18,6 +19,8 @@ data class GuildInviteEntity(
         var uses: Int,
         @Column(name = "max_uses")
         var maxUses: Int?,
+        @Column(name = "max_age")
+        var maxAge : Int?,
         @OneToMany(fetch = FetchType.EAGER, mappedBy = "guildInvite", cascade=[CascadeType.ALL])
         var roles: List<InviteRoleEntity>,
         @Column(name = "author")
@@ -30,4 +33,18 @@ data class GuildInviteEntity(
 
         @Column(name = "guild_prefix")
         var guildPrefix: String? = null
+
+        // Max age is overridden to be more null safe
+        private val safeMaxAge: Int
+                get() = if (maxAge == null) {
+                        0
+                } else {
+                        maxAge!!
+                }
+
+        fun isExpired() : Boolean {
+                return safeMaxAge > 0 && Instant.now().isAfter(
+                        Instant.ofEpochSecond(((created?.time?.div(1000) ?: 0)
+                                + safeMaxAge)))
+        }
 }
