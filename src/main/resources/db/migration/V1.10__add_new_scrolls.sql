@@ -1,0 +1,7 @@
+ALTER TABLE `scroll_inventory`
+ADD leebur INT(32) NOT NULL DEFAULT 0,
+ADD rift_echo INT(32) NOT NULL DEFAULT 0;
+
+ALTER TABLE `scroll_history`
+ADD leebur INT(32) NOT NULL DEFAULT 0,
+ADD rift_echo INT(32) NOT NULL DEFAULT 0;

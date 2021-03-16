@@ -35,7 +35,9 @@ public enum Scroll {
     ARC(Arrays.asList("arc", "ancientrelic", "ancientreliccrystal", "reliccrystal", "disco"), "Arc"),
     CARTIAN(Arrays.asList("cartian", "cartianspell"), "Cartian Spell"),
     PILA_FE(Arrays.asList("pila", "pilafe", "groundbeef", "meatman"), "Pila Fe"),
-    VOODOO(Collections.singletonList("voodoo"), "Voodoo");
+    VOODOO(Collections.singletonList("voodoo"), "Voodoo"),
+    LEEBUR(Collections.singletonList("leebur"), "Leebur"),
+    RIFT_ECHO(Arrays.asList("rift_echo", "re", "rift", "rifts", "echo"), "Rift Echo");
 
     private List<String> aliases;
     private String displayName;

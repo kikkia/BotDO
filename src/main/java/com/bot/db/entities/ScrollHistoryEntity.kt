@@ -54,4 +54,7 @@ data class ScrollHistoryEntity(
         val cartian: Int,
         @Column(name = "pila_fe")
         val pilaFe: Int,
-        val voodoo: Int)
+        val voodoo: Int,
+        val leebur: Int,
+        @Column(name = "rift_echo")
+        val riftEcho: Int)

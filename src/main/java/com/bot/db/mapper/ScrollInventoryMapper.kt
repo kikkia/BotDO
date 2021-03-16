@@ -40,6 +40,8 @@ class ScrollInventoryMapper {
             map[Scroll.CARTIAN] = entity.cartian
             map[Scroll.PILA_FE] = entity.pilaFe
             map[Scroll.VOODOO] = entity.voodoo
+            map[Scroll.LEEBUR] = entity.leebur
+            map[Scroll.RIFT_ECHO] = entity.riftEcho
             return ScrollInventory(entity.id, entity.user, map)
         }
 
@@ -75,7 +77,9 @@ class ScrollInventoryMapper {
                     inventory.getScrollCount(Scroll.ARC),
                     inventory.getScrollCount(Scroll.CARTIAN),
                     inventory.getScrollCount(Scroll.PILA_FE),
-                    inventory.getScrollCount(Scroll.VOODOO)
+                    inventory.getScrollCount(Scroll.VOODOO),
+                    inventory.getScrollCount(Scroll.LEEBUR),
+                    inventory.getScrollCount(Scroll.RIFT_ECHO)
             )
         }
     }

@@ -40,6 +40,8 @@ class ScrollHistoryMapper {
             map[Scroll.CARTIAN] = entity.cartian
             map[Scroll.PILA_FE] = entity.pilaFe
             map[Scroll.VOODOO] = entity.voodoo
+            map[Scroll.LEEBUR] = entity.leebur
+            map[Scroll.RIFT_ECHO] = entity.riftEcho
             return ScrollHistory(entity.id, entity.user, map, entity.created)
         }
 
@@ -76,7 +78,9 @@ class ScrollHistoryMapper {
                     history.getScrollCount(Scroll.ARC),
                     history.getScrollCount(Scroll.CARTIAN),
                     history.getScrollCount(Scroll.PILA_FE),
-                    history.getScrollCount(Scroll.VOODOO)
+                    history.getScrollCount(Scroll.VOODOO),
+                    history.getScrollCount(Scroll.LEEBUR),
+                    history.getScrollCount(Scroll.RIFT_ECHO)
             )
         }
     }
