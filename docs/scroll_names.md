@@ -60,6 +60,9 @@
 - titium
 - fogan
 
+### Leebur
+- leebur
+
 ### Ancient relic crystal
 - arc
 - ancientrelic
@@ -78,3 +81,9 @@
 
 ### Voodoo
 - voodoo
+
+### Rift echo
+- re
+- rift
+- echo
+- rift_echo
