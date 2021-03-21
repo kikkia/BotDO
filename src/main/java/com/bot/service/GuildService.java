@@ -94,4 +94,9 @@ public class GuildService {
         guildEntity.setLogChannel(channelId);
         return guildRepository.save(guildEntity);
     }
+
+    public GuildEntity setRecruitMessage(GuildEntity guildEntity, String recruitMessage) {
+        guildEntity.setRecruitMessage(recruitMessage);
+        return guildRepository.save(guildEntity);
+    }
 }

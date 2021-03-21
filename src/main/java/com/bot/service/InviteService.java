@@ -34,15 +34,16 @@ public class InviteService {
                 invite.getMaxAge(),
                 Collections.emptyList(),
                 invite.getInviter().getId(),
-                Timestamp.from(invite.getTimeCreated().toInstant()));
+                Timestamp.from(invite.getTimeCreated().toInstant()),
+                false);
         guildInviteRepository.save(guildInvite);
     }
 
-    public GuildInviteEntity add(Guild guild, Invite invite, List<String> roleIds, String author) {
-        return add(guild, invite, roleIds, null, null, author);
+    public GuildInviteEntity add(Guild guild, Invite invite, List<String> roleIds, String author, Boolean recruit) {
+        return add(guild, invite, roleIds, null, null, author, recruit);
     }
 
-    public GuildInviteEntity add(Guild guild, Invite invite, List<String> roleIds, String welcomeMessage, String guildName, String author) {
+    public GuildInviteEntity add(Guild guild, Invite invite, List<String> roleIds, String welcomeMessage, String guildName, String author, Boolean recruit) {
         var inviteEntity = new GuildInviteEntity(0,
                 invite.getCode(),
                 GuildEntity.Companion.partialFrom(guild),
@@ -51,7 +52,8 @@ public class InviteService {
                 invite.getMaxAge(),
                 new ArrayList<>(),
                 author,
-                Timestamp.from(invite.getTimeCreated().toInstant()));
+                Timestamp.from(invite.getTimeCreated().toInstant()),
+                recruit);
         inviteEntity.setGuildPrefix(guildName);
         inviteEntity.setWelcomeMessage(welcomeMessage);
         final var guildInvite = guildInviteRepository.save(inviteEntity);

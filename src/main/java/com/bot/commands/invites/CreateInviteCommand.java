@@ -57,6 +57,7 @@ public class CreateInviteCommand extends RequiredArgsCommand {
         var welcome = InviteArgumentTag.Companion.getWelcomeMessage(args);
         var guildName = InviteArgumentTag.Companion.getGuildPrefix(args);
         var maxUses = InviteArgumentTag.Companion.getUses(args);
+        var recruit = InviteArgumentTag.Companion.getRecruit(args);
 
         List<String> roleIds = new ArrayList<>();
         for (String name : roles) {
@@ -77,7 +78,7 @@ public class CreateInviteCommand extends RequiredArgsCommand {
             return;
         }
 
-        inviteService.add(commandEvent.getGuild(), invite, roleIds, welcome, guildName, commandEvent.getAuthor().getId());
+        inviteService.add(commandEvent.getGuild(), invite, roleIds, welcome, guildName, commandEvent.getAuthor().getId(), recruit);
         commandEvent.replySuccess("Generated Invite: " + invite.getUrl());
     }
 }

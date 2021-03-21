@@ -1,6 +1,5 @@
 package com.bot.commands.server;
 
-import com.bot.commands.RequiredArgsCommand;
 import com.bot.db.entities.GuildEntity;
 import com.bot.service.GuildService;
 import com.jagrosh.jdautilities.command.Command;

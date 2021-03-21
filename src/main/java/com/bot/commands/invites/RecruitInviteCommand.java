@@ -1,6 +1,5 @@
 package com.bot.commands.invites;
 
-import com.bot.commands.RequiredArgsCommand;
 import com.bot.service.GuildService;
 import com.bot.service.InviteService;
 import com.jagrosh.jdautilities.command.Command;
@@ -9,7 +8,6 @@ import net.dv8tion.jda.api.Permission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -58,7 +56,7 @@ public class RecruitInviteCommand extends Command {
                 Collections.singletonList(guild.getRecruitRole())
                 : Collections.emptyList();
         var invite = channel.createInvite().setUnique(true).setMaxAge(12L, TimeUnit.HOURS).setMaxUses(1).complete();
-        inviteService.add(commandEvent.getGuild(), invite, roles, commandEvent.getAuthor().getId());
+        inviteService.add(commandEvent.getGuild(), invite, roles, commandEvent.getAuthor().getId(), true);
         commandEvent.replySuccess("Generated invite: " + invite.getUrl());
     }
 }

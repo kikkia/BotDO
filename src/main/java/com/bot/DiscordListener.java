@@ -199,7 +199,10 @@ public class DiscordListener extends ListenerAdapter {
 
     @Override
     public void onGuildInviteCreate(@NotNull GuildInviteCreateEvent event) {
-        inviteService.addExisting(event.getInvite());
+        if (!event.getInvite().getInviter().getId().equals(event.getJDA().getSelfUser().getId())) {
+            inviteService.addExisting(event.getInvite());
+        }
         super.onGuildInviteCreate(event);
+
     }
 }

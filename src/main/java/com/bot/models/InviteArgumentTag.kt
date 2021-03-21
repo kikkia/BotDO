@@ -7,7 +7,8 @@ enum class InviteArgumentTag(val tag: String) {
     WELCOME("-w "),
     GUILD("-g "),
     USES("-u "),
-    CHANNEL("-c ");
+    CHANNEL("-c "),
+    RECRUIT("-rec ");
 
     companion object {
         fun getRoleNames(input: String) : List<String> {
@@ -37,6 +38,10 @@ enum class InviteArgumentTag(val tag: String) {
                 return null
             }
             return cleanToFirstArg(input.split(GUILD.tag)[1])
+        }
+
+        fun getRecruit(input: String) : Boolean {
+            return input.contains(RECRUIT.tag)
         }
 
         /**

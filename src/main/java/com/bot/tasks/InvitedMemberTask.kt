@@ -94,6 +94,20 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
                 logChannel!!.sendMessage("New member ${event.member.effectiveName} joined with invite ${entity.code}.\n" +
                         "```${guildInviteEntityToString(entity, event)}```").queue()
             }
+
+            if (entity.isRecruit) {
+                if (guild.recruitMessage != null) {
+                    try {
+                        event.member.user.openPrivateChannel().complete().sendMessage(guild.recruitMessage!!).queue()
+                    } catch (e : Exception) {
+                        if (guild.logChannel != null) {
+                            val logChannel = event.guild.getTextChannelById(guild.logChannel!!)
+                            logChannel!!.sendMessage("Failed to send recruit DM to new recruit!! They may not accept " +
+                                    "DMs from bots").queue()
+                        }
+                    }
+                }
+            }
         }
     }
 

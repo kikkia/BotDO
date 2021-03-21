@@ -26,7 +26,9 @@ data class GuildInviteEntity(
         @Column(name = "author")
         var author: String?,
         @Column(name = "created")
-        var created: Timestamp?) {
+        var created: Timestamp?,
+        @Column(name = "recruit")
+        var isRecruit: Boolean) {
 
         @Column(name = "welcome_message")
         var welcomeMessage: String? = null

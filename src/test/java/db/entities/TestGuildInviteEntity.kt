@@ -23,7 +23,8 @@ class TestGuildInviteEntity {
                 500,
                 emptyList(),
                 "1234",
-                Timestamp.from(Instant.ofEpochSecond(1)))
+                Timestamp.from(Instant.ofEpochSecond(1)),
+                false)
         assertTrue(invite.isExpired())
     }
 
@@ -37,7 +38,8 @@ class TestGuildInviteEntity {
                 500,
                 emptyList(),
                 "1234",
-                Timestamp.from(Instant.now()))
+                Timestamp.from(Instant.now()),
+                false)
         assertFalse(invite.isExpired())
     }
 }

@@ -1,0 +1,2 @@
+ALTER TABLE `guild_invite`
+ADD recruit TINYINT(1) NOT NULL DEFAULT 0;
