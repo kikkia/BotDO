@@ -60,53 +60,58 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
                 logErrorState(possibleInvites, event)
             }
         } else {
-            val entity = possibleInvites[0]
-            // Its only 1 invite possible
-            // Add role if one exists to add
-            val roleIdsToAdd = entity.roles.stream().map { it.roleId }.collect(Collectors.toList())
-            for (roleId in roleIdsToAdd) {
-                val roleToAdd = event.guild.getRoleById(roleId) ?: continue
-                event.guild.addRoleToMember(event.member, roleToAdd).complete()
-            }
-
-            // Add guild name if exists
-            if (entity.guildPrefix != null) {
-                try {
-                    event.member.modifyNickname("(${entity.guildPrefix}) ${event.member.effectiveName}").queue()
-                } catch (e: InsufficientPermissionException) {
-                    if (guild.logChannel != null) {
-                        val logChannel = event.guild.getTextChannelById(guild.logChannel!!)
-                        logChannel!!.sendMessage("Failed to change nickname of new user due to lacking permissions.").queue()
-                    }
+            try {
+                val entity = possibleInvites[0]
+                // Its only 1 invite possible
+                // Add role if one exists to add
+                val roleIdsToAdd = entity.roles.stream().map { it.roleId }.collect(Collectors.toList())
+                for (roleId in roleIdsToAdd) {
+                    val roleToAdd = event.guild.getRoleById(roleId) ?: continue
+                    event.guild.addRoleToMember(event.member, roleToAdd).complete()
                 }
-            }
 
-            // Post welcome message if exists
-            if (entity.welcomeMessage != null &&
-                    guild.welcomeChannel != null) {
-                val welcomeChannel = event.guild.getTextChannelById(guild.welcomeChannel!!)
-                welcomeChannel!!.sendMessage(generateWelcomeMessage(event, entity.welcomeMessage)).queue()
-            }
-
-            // Post log of joining member
-            if (guild.logChannel != null) {
-                val logChannel = event.guild.getTextChannelById(guild.logChannel!!)
-                logChannel!!.sendMessage("New member ${event.member.effectiveName} joined with invite ${entity.code}.\n" +
-                        "```${guildInviteEntityToString(entity, event)}```").queue()
-            }
-
-            if (entity.isRecruit) {
-                if (guild.recruitMessage != null) {
+                // Add guild name if exists
+                if (entity.guildPrefix != null) {
                     try {
-                        event.member.user.openPrivateChannel().complete().sendMessage(guild.recruitMessage!!).queue()
-                    } catch (e : Exception) {
+                        event.member.modifyNickname("(${entity.guildPrefix}) ${event.member.effectiveName}").queue()
+                    } catch (e: InsufficientPermissionException) {
                         if (guild.logChannel != null) {
                             val logChannel = event.guild.getTextChannelById(guild.logChannel!!)
-                            logChannel!!.sendMessage("Failed to send recruit DM to new recruit!! They may not accept " +
-                                    "DMs from bots").queue()
+                            logChannel!!.sendMessage("Failed to change nickname of new user due to lacking permissions.").queue()
                         }
                     }
                 }
+
+                // Post welcome message if exists
+                if (entity.welcomeMessage != null &&
+                        guild.welcomeChannel != null) {
+                    val welcomeChannel = event.guild.getTextChannelById(guild.welcomeChannel!!)
+                    welcomeChannel!!.sendMessage(generateWelcomeMessage(event, entity.welcomeMessage)).queue()
+                }
+
+                // Post log of joining member
+                if (guild.logChannel != null) {
+                    val logChannel = event.guild.getTextChannelById(guild.logChannel!!)
+                    logChannel!!.sendMessage("New member ${event.member.effectiveName} joined with invite ${entity.code}.\n" +
+                            "```${guildInviteEntityToString(entity, event)}```").queue()
+                }
+
+                if (entity.isRecruit) {
+                    if (guild.recruitMessage != null) {
+                        try {
+                            event.member.user.openPrivateChannel().complete().sendMessage(guild.recruitMessage!!).queue()
+                        } catch (e: Exception) {
+                            if (guild.logChannel != null) {
+                                val logChannel = event.guild.getTextChannelById(guild.logChannel!!)
+                                logChannel!!.sendMessage("Failed to send recruit DM to new recruit!! They may not accept " +
+                                        "DMs from bots").queue()
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                logApplicationError(possibleInvites[0], event, e)
             }
         }
     }
@@ -130,6 +135,14 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
                     "This can happen due to members joining during bot downtime. It should resolve itself. If not, please" +
                     " contact Kikkia."
         }
+        logChannel!!.sendMessage(message).queue()
+    }
+
+    private fun logApplicationError(invite: GuildInviteEntity, event: GuildMemberJoinEvent, e: Exception) {
+        val logChannel = event.guild.getTextChannelById(guild.logChannel!!)
+        var message = "New member ${event.member.effectiveName} joined using invite ```${guildInviteEntityToString(invite, event)}```"
+        message += "Error occured while setting up the user, please manually check that they have the roles and guild tags. \nError message:" +
+                "`${e.message}`\nIf this issue persists, please contact Kikkia."
         logChannel!!.sendMessage(message).queue()
     }
 
