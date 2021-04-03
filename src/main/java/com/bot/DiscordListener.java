@@ -57,21 +57,25 @@ public class DiscordListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
-        var guild = guildService.getById(event.getGuild().getId());
-        if (guild == null) {
-            guild = guildService.addFreshGuild(event.getGuild());
+        System.out.println("Member joined: " + event.getMember().getEffectiveName());
+        try {
+            var guild = guildService.getById(event.getGuild().getId());
+            if (guild == null) {
+                guild = guildService.addFreshGuild(event.getGuild());
+            }
+
+            // Check invite member joined with and act accordingly
+            executorService.submit(new InvitedMemberTask(event, inviteService, userService, guild));
+
+            UserEntity user = userService.getById(event.getUser().getId());
+            if (user == null) {
+                user = userService.addUser(event.getUser().getId(),
+                        event.getUser().getName());
+            }
+            guildService.addUser(guild, user);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        // Check invite member joined with and act accordingly
-        executorService.submit(new InvitedMemberTask(event, inviteService, userService, guild));
-
-        UserEntity user = userService.getById(event.getUser().getId());
-        if(user == null) {
-            user = userService.addUser(event.getUser().getId(),
-                    event.getUser().getName());
-        }
-        guildService.addUser(guild, user);
-
         super.onGuildMemberJoin(event);
     }
 
