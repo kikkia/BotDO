@@ -15,6 +15,8 @@ class BDOGuildEntity(
     val region: String,
     @Column(name = "last_scan")
     var last_scan: Timestamp,
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "guild", cascade = [CascadeType.ALL])
+    var members: List<GuildMembershipEntity>,
     @OneToOne
     @JoinColumn(name = "master_family")
-    var master: FamilyEntity)
+    var master: FamilyEntity?)

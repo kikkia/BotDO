@@ -10,12 +10,11 @@ class FamilyEntity(
     val id: Int,
     @Column(name = "external_id")
     val externalId: String,
-    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    @JoinColumn(name = "guild")
-    var guild: BDOGuildEntity,
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "family", cascade = [CascadeType.ALL])
+    var memberships: List<GuildMembershipEntity>,
     @Column(name = "family_name")
     var name: String,
     @Column(name = "region")
     val region: String,
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     var characters: List<CharacterEntity>)
