@@ -7,13 +7,15 @@ import com.bot.service.UserService
 import com.bot.utils.FormattingUtils.generateWelcomeMessage
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException
-import java.time.Instant
+import org.slf4j.LoggerFactory
 import java.util.stream.Collectors
 
 class InvitedMemberTask(private val event: GuildMemberJoinEvent,
                         private val inviteService: InviteService,
                         private val userService: UserService,
                         private val guild: GuildEntity) : Thread() {
+
+    private val log = LoggerFactory.getLogger(this::class.simpleName)
 
     override fun run() {
         // Check incoming user for invite
@@ -61,6 +63,7 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
             }
         } else {
             try {
+                log.info("Member joined received for: $event and guild: $guild")
                 val entity = possibleInvites[0]
                 // Its only 1 invite possible
                 // Add role if one exists to add
@@ -114,6 +117,7 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
                 logApplicationError(possibleInvites[0], event, e)
             }
         }
+        log.debug("Finished the invite task!")
     }
 
     /**

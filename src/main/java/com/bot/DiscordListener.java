@@ -9,6 +9,7 @@ import com.bot.service.TextChannelService;
 import com.bot.service.UserService;
 import com.bot.tasks.InvitedMemberTask;
 import com.bot.tasks.SyncUserFamilyNameTask;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.events.channel.text.TextChannelCreateEvent;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Component
+@Slf4j
 public class DiscordListener extends ListenerAdapter {
 
     @Autowired
@@ -57,7 +59,7 @@ public class DiscordListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
-        System.out.println("Member joined: " + event.getMember().getEffectiveName());
+        log.info("Member joined: " + event.getMember().getEffectiveName());
         try {
             var guild = guildService.getById(event.getGuild().getId());
             if (guild == null) {
