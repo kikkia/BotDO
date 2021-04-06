@@ -9,6 +9,7 @@ import com.bot.service.TextChannelService;
 import com.bot.service.UserService;
 import com.bot.tasks.InvitedMemberTask;
 import com.bot.tasks.SyncUserFamilyNameTask;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.events.channel.text.TextChannelCreateEvent;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 
 @Component
+@Slf4j
 public class DiscordListener extends ListenerAdapter {
 
     @Autowired
@@ -57,21 +59,25 @@ public class DiscordListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
-        var guild = guildService.getById(event.getGuild().getId());
-        if (guild == null) {
-            guild = guildService.addFreshGuild(event.getGuild());
+        log.info("Member joined: " + event.getMember().getEffectiveName());
+        try {
+            var guild = guildService.getById(event.getGuild().getId());
+            if (guild == null) {
+                guild = guildService.addFreshGuild(event.getGuild());
+            }
+
+            // Check invite member joined with and act accordingly
+            executorService.submit(new InvitedMemberTask(event, inviteService, userService, guild));
+
+            UserEntity user = userService.getById(event.getUser().getId());
+            if (user == null) {
+                user = userService.addUser(event.getUser().getId(),
+                        event.getUser().getName());
+            }
+            guildService.addUser(guild, user);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-        // Check invite member joined with and act accordingly
-        executorService.submit(new InvitedMemberTask(event, inviteService, userService, guild));
-
-        UserEntity user = userService.getById(event.getUser().getId());
-        if(user == null) {
-            user = userService.addUser(event.getUser().getId(),
-                    event.getUser().getName());
-        }
-        guildService.addUser(guild, user);
-
         super.onGuildMemberJoin(event);
     }
 
