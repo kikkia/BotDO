@@ -3,14 +3,14 @@ package com.bot;
 import com.bot.db.entities.GuildEntity;
 import com.bot.db.entities.TextChannel;
 import com.bot.db.entities.UserEntity;
-import com.bot.service.GuildService;
-import com.bot.service.InviteService;
-import com.bot.service.TextChannelService;
-import com.bot.service.UserService;
+import com.bot.models.Region;
+import com.bot.service.*;
 import com.bot.tasks.InvitedMemberTask;
+import com.bot.tasks.ScanGuildsTask;
 import com.bot.tasks.SyncUserFamilyNameTask;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Invite;
+import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.channel.text.TextChannelCreateEvent;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.channel.text.update.TextChannelUpdateNameEvent;
@@ -34,6 +34,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
@@ -48,7 +49,18 @@ public class DiscordListener extends ListenerAdapter {
     @Autowired
     private InviteService inviteService;
     @Autowired
+    private FamilyService familyService;
+    @Autowired
+    private BdoGuildService bdoGuildService;
+    @Autowired
     private ScheduledExecutorService executorService;
+
+    @Override
+    public void onReady(@NotNull ReadyEvent event) {
+        // Schedule the NA scan
+        executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, Region.NORTH_AMERICA),
+                0, 24, TimeUnit.HOURS);
+    }
 
     @Override
     public void onGuildJoin(@Nonnull GuildJoinEvent event) {

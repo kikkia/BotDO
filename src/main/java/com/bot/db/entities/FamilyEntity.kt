@@ -1,5 +1,6 @@
 package com.bot.db.entities
 
+import java.sql.Timestamp
 import javax.persistence.*
 
 @Entity
@@ -9,12 +10,12 @@ class FamilyEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int,
     @Column(name = "external_id")
-    val externalId: String,
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "family", cascade = [CascadeType.ALL])
+    var externalId: String,
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "family", cascade = [CascadeType.ALL])
     var memberships: List<GuildMembershipEntity>,
-    @Column(name = "family_name")
+    @Column(name = "name")
     var name: String,
     @Column(name = "region")
     val region: String,
-    @OneToMany(fetch = FetchType.LAZY)
-    var characters: List<CharacterEntity>)
+    @Column(name = "last_updated")
+    var lastUpdated: Timestamp)

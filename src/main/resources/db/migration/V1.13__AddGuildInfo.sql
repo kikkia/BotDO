@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS `family` (
     `external_id` VARCHAR(1024) NOT NULL,
     `name` VARCHAR(255) NOT NULL,
     `region` VARCHAR(255) NOT NULL,
+    `last_updated` TIMESTAMP NOT NULL,
     PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 
