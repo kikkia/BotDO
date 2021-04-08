@@ -53,7 +53,7 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
                         possibleInvites.add(entity)
                     }
                 }
-                inviteService.remove(entity)
+                inviteService.removeByCode(entity.code)
             }
         }
 
