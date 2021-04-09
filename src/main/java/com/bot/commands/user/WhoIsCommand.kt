@@ -30,12 +30,13 @@ class WhoIsCommand(private val familyService: FamilyService) : RequiredArgsComma
         if (family.lastUpdated.toInstant().isBefore(Instant.now().minus(1, ChronoUnit.DAYS))) {
             // TODO: refresh user info
         }
-        val guilds = family.memberships.stream().map { it.guild.name }.collect(Collectors.toList())
+        val guilds = family.memberships.stream().filter {!it.active}.map { it.guild.name }.collect(Collectors.toList());
         val activeGuild = family.memberships.stream().filter { it.active }.map { it.guild.name }.findFirst().orElseGet{ "None" }
+        val pastGuilds = if (guilds.isEmpty()) "None that I know of (Past guilds indexed from 4/6/21)" else guilds.toString()
         val embedBuilder = EmbedBuilder()
         embedBuilder.setTitle(family.name)
         embedBuilder.addField("Current Guild", activeGuild, true)
-        embedBuilder.addField("Past Guilds", guilds.toString(), false)
+        embedBuilder.addField("Past Guilds", pastGuilds, false)
         commandEvent.reply(embedBuilder.build())
     }
 }
