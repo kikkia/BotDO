@@ -46,7 +46,7 @@ class ScanGuildsTask(private val familyService: FamilyService,
                     }
 
                     for (fam in families) {
-                        val famOpt = familyService.getFamily(fam.name, region)
+                        val famOpt = familyService.getFamily(fam.name, region, false)
                         val family = if (famOpt.isEmpty) {
                             familyService.createMinimal(fam.name, fam.id, region)
                         } else {

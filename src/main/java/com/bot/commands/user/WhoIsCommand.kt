@@ -3,6 +3,7 @@ package com.bot.commands.user
 import com.bot.commands.RequiredArgsCommand
 import com.bot.models.Region
 import com.bot.service.FamilyService
+import com.bot.utils.GuildScrapeUtils
 import com.jagrosh.jdautilities.command.CommandEvent
 import net.dv8tion.jda.api.EmbedBuilder
 import org.springframework.stereotype.Component
@@ -20,11 +21,14 @@ class WhoIsCommand(private val familyService: FamilyService) : RequiredArgsComma
     }
 
     override fun executeCommand(commandEvent: CommandEvent?) {
-        val familyOpt = familyService.getFamily(commandEvent!!.args, Region.NORTH_AMERICA)
+        var familyOpt = familyService.getFamily(commandEvent!!.args, Region.NORTH_AMERICA, true)
         if (familyOpt.isEmpty) {
-            commandEvent.replyWarning("I do not have this user in my database. Please double check the family name. " +
-                    "I only have information on users I see in guilds. I cannot get info if they have not been in a guild recently.")
-            return
+            // Try to search the site for a user, rather than use our cache
+            if (familyOpt.isEmpty) {
+                commandEvent.replyWarning("I do not have this user in my database. Please double check the family name. " +
+                        "I only have information on users I see in guilds. I cannot get info if they have not been in a guild recently.")
+                return
+            }
         }
         val family = familyOpt.get()
         if (family.lastUpdated.toInstant().isBefore(Instant.now().minus(1, ChronoUnit.DAYS))) {

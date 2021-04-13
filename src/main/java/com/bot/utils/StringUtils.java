@@ -10,4 +10,11 @@ public class StringUtils {
             return false;
         }
     }
+
+    public static boolean nullSafeEquals(String first, String second) {
+        if (first == null && second == null) {
+            return true;
+        }
+        return first != null && first.equals(second);
+    }
 }
