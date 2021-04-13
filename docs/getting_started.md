@@ -2,9 +2,10 @@
 
 1. [Intro](#Intro)
 2. [Family names](#Family)
-3. [Invites](#Invites)
-4. [Scrolls](#Scrolls)
-5. [Events](#Events)
+3. [Player directory](#PlayerDirectory)
+4. [Invites](#Invites)
+5. [Scrolls](#Scrolls)
+6. [Events](#Events)
 
 # Intro
 This bot's purpose is to provide some tools to help make managing a BDO guild/community a little easier on discord. 
@@ -17,6 +18,9 @@ This is not required but allows some info given from the bot to be more in-game 
 BETA: An experimental feature allows server admins to enforce family names show up in discord nicknames. The bot 
 will automattically put the family name in users nicknames if they have it setup. 
 (Still working a bit on this feature so use at your own risk)
+
+# PlayerDirectory
+You can look up players in game information with their family name. [See here](PlayerDirectory.md)
 
 # Invites
 The bot allows you to make invites to your discord server that have certain behaviour. I recommend looking [here](custom_invites.md)
