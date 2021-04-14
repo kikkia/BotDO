@@ -119,7 +119,7 @@ public class FamilyService {
                 .map(GuildMembershipEntity::getGuild)
                 .map(BDOGuildEntity::getName)
                 .findFirst().orElse(null);
-        if (!StringUtils.nullSafeEquals(scrapedMember.getGuild(), activeGuildName)) {
+        if (!StringUtils.nullSafeEquals(scrapedMember.getGuild(), activeGuildName) && !scrapedMember.getPrivate()) {
             if (scrapedMember.getGuild() == null) {
                 removeFromGuild(existing);
             } else {

@@ -22,6 +22,7 @@ class GuildScrapeUtils {
         private val GUILD_NAME_REGEX = Regex("(guildName=)(.+)&region=",
                 setOf(RegexOption.MULTILINE))
         private val USER_PROFILE_REGEX = Regex("profileTarget=(.+)\">(.+)</a>")
+        private val USER_PRIVATE_REGEX = Regex("<a href=\"javascript:void\\(0\\)\">Private</a>")
 
         private val GUILD_SEARCH_URL = "https://www.naeu.playblackdesert.com/en-US/Adventure/Guild?searchText=&Page="
         private val GUILD_PAGE_URL = "https://www.naeu.playblackdesert.com/en-US/Adventure/Guild/GuildProfile?guildName="
@@ -79,7 +80,8 @@ class GuildScrapeUtils {
                 val guild = GUILD_NAME_REGEX.find(body)
                 // If member not found, empty opt else bdo family model
                 val member = USER_PROFILE_REGEX.find(body) ?: return Optional.empty()
-                return Optional.of(BdoFamilyId(member.groupValues[2], member.groupValues[1], guild?.groupValues?.get(2)));
+                val private = USER_PRIVATE_REGEX.containsMatchIn(body)
+                return Optional.of(BdoFamilyId(member.groupValues[2], member.groupValues[1], guild?.groupValues?.get(2), private))
             }
         }
     }

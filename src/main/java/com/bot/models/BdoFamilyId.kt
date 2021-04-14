@@ -2,7 +2,7 @@ package com.bot.models
 
 import java.util.*
 
-data class BdoFamilyId(val name: String, val id : String, val guild: String?) {
+data class BdoFamilyId(val name: String, val id : String, val guild: String?, val private: Boolean = false) {
     override fun hashCode(): Int {
         return Objects.hashCode(name)
     }
