@@ -15,17 +15,17 @@ class RecruitPostCommand(val recruitmentPostService: RecruitmentPostService) : R
         arguments = "Server name or world"
     }
 
-    val possibleVals = asList("season", "olvia", "world", "discord", "reddit",
+    val possibleVals = asList("kamasylvia", "olvia", "world", "discord", "reddit",
             "serendia", "balenos", "valencia", "mediah", "velia", "calpheon")
 
     override fun executeCommand(event: CommandEvent?) {
-        val arg = event!!.args.toLowerCase()
+        val arg = event!!.args.split(" ")[0].toLowerCase()
         if (!possibleVals.contains(arg)) {
             event.replyWarning("Please use a valid server name. (No channel number)")
             return
         }
 
-        recruitmentPostService.add(event.author, event.guild, arg)
+        recruitmentPostService.add(event.author, event.guild, event.args.toLowerCase())
         event.reactSuccess()
     }
 

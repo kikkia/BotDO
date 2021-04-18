@@ -1,6 +1,6 @@
 package com.bot.tasks
 
-import com.bot.models.BdoFamilyId
+import com.bot.models.BdoFamily
 import com.bot.models.Region
 import com.bot.service.BdoGuildService
 import com.bot.service.FamilyService
@@ -30,7 +30,7 @@ class ScanGuildsTask(private val familyService: FamilyService,
                 }
 
                 for (name in guildNames) {
-                    var families: Set<BdoFamilyId>
+                    var families: Set<BdoFamily>
                     try {
                         families = GuildScrapeUtils.getGuildFamilies(name, region)
                     } catch (e : Exception) {
