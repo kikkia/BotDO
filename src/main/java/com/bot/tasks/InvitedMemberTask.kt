@@ -43,7 +43,6 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
         // Could be due to an invite that hit limit and disappeared when they used it
         // Check the invites that are only in our db and not in discord
         // If we find one that is 1 away from max, then choose that one
-        // Remove all defunct entities
         if (possibleInvites.size == 0) {
             for (entity in inviteEntities.values) {
 
@@ -53,7 +52,6 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
                         possibleInvites.add(entity)
                     }
                 }
-                inviteService.removeByCode(entity.code)
             }
         }
 
