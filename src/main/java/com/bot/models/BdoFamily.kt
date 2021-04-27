@@ -2,7 +2,10 @@ package com.bot.models
 
 import java.util.*
 
-data class BdoFamilyId(val name: String, val id : String) {
+data class BdoFamily(val name: String, val id : String, val guild: String?, val private: Boolean = false) {
+
+    var characters: List<BdoCharacter> = listOf()
+
     override fun hashCode(): Int {
         return Objects.hashCode(name)
     }
@@ -14,7 +17,7 @@ data class BdoFamilyId(val name: String, val id : String) {
         if (this === other) return true
         if (other?.javaClass != javaClass) return false
 
-        other as BdoFamilyId
+        other as BdoFamily
 
         return other.name == this.name
     }
