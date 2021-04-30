@@ -71,7 +71,7 @@ public class CreateInviteCommand extends RequiredArgsCommand {
 
         Invite invite;
         try {
-            invite = channel.createInvite().setUnique(true).setMaxAge(14L, TimeUnit.DAYS)
+            invite = channel.createInvite().setUnique(true).setMaxAge(0)
                     .setMaxUses(maxUses).complete();
         } catch (InsufficientPermissionException e) {
             commandEvent.replyWarning("Please make sure I have permission to make create an invite in " + channel.getAsMention());
