@@ -14,7 +14,7 @@ class GimmeAllAvatarsCommand: Command() {
 
     override fun execute(p0: CommandEvent?) {
         for (m in p0!!.guild.members) {
-            p0.reply(m.user.avatarUrl)
+            p0.reply(m.effectiveName + "\n" + m.user.avatarUrl)
         }
     }
 }
