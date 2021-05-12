@@ -19,6 +19,9 @@ data class UserEntity(
                 nullable = true)
         var familyName: String? = null
 
+        @OneToOne(mappedBy = "userEntity")
+        var gearset: GearsetEntity? = null
+
         fun getEffectiveName() : String {
                 return familyName ?: name
         }
