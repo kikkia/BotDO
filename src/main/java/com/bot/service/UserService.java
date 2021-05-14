@@ -46,6 +46,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public UserEntity save(UserEntity userEntity) {
+        return userRepository.save(userEntity);
+    }
+
     public UserEntity addUser(String id, String name) {
         var user = userRepository.save(new UserEntity(id, name));
         // Save default inventory

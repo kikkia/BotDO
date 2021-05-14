@@ -19,7 +19,7 @@ data class UserEntity(
                 nullable = true)
         var familyName: String? = null
 
-        @OneToOne(mappedBy = "userEntity")
+        @OneToOne(mappedBy = "userEntity", cascade = [CascadeType.ALL])
         var gearset: GearsetEntity? = null
 
         fun getEffectiveName() : String {

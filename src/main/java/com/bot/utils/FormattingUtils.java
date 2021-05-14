@@ -210,4 +210,22 @@ public class FormattingUtils {
     public static String generateWelcomeMessage(GuildMemberJoinEvent event, String message) {
         return message.replaceAll("%name%", event.getMember().getEffectiveName());
     }
+
+    public static String getEnhancementString(int level) {
+        if (level <= 15) {
+            return "+" + level;
+        } else if (level == 16) {
+            return "PRI";
+        } else if (level == 17) {
+            return "DUO";
+        } else if (level == 18) {
+            return "TRI";
+        } else if (level == 19) {
+            return "TET";
+        } else if (level == 20) {
+            return "PEN";
+        } else {
+            return "wtf is this? " + level;
+        }
+    }
 }

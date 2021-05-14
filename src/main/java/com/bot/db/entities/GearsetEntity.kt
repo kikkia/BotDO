@@ -1,5 +1,6 @@
 package com.bot.db.entities
 
+import com.bot.models.ClassState
 import javax.persistence.*
 
 @Entity
@@ -8,7 +9,7 @@ class GearsetEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int,
-    @OneToOne(cascade = [CascadeType.ALL])
+    @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     val userEntity: UserEntity
 ) {
@@ -30,4 +31,32 @@ class GearsetEntity(
     var plannerLink: String? = null
     @Column(name = "gear_img_link")
     var gearImgLink: String? = null
+
+    fun getGearScore() : Int {
+        if (dp == null) {
+            return 0
+        }
+        var totalAp = 0
+        var apCount = 0
+        if (ap != null) {
+            totalAp += ap!!
+            apCount++
+        }
+        if (awkAp != null) {
+            totalAp += awkAp!!
+            apCount++
+        }
+
+        return (totalAp / apCount) + dp!!
+    }
+
+    fun getClassName() : String {
+        if (characterClass == null) {
+            return "unknown"
+        }
+        if (classState == null) {
+            return characterClass!!
+        }
+        return if (classState == ClassState.SUCCESSION.id) "Succ $characterClass" else "Awk $characterClass"
+    }
 }
