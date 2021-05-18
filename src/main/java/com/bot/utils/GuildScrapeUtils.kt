@@ -32,13 +32,13 @@ class GuildScrapeUtils {
         private val CHARACTER_CLASS_LEVEL_REGEX = Regex("<em>(.+)</em>")
         private val CHARACTER_MAIN_REGEX = Regex("<span class=\"selected_label\">Main Character</span>")
 
-        private val GUILD_SEARCH_URL = "https://www.naeu.playblackdesert.com/en-US/Adventure/Guild?searchText=&Page="
+        private val GUILD_SEARCH_URL = "https://www.naeu.playblackdesert.com/en-US/Adventure/Guild?Page="
         private val GUILD_PAGE_URL = "https://www.naeu.playblackdesert.com/en-US/Adventure/Guild/GuildProfile?guildName="
         private val FAMILY_PAGE_URL = "https://www.naeu.playblackdesert.com/en-US/Adventure/Profile?profileTarget="
         private val FAMILY_SEARCH_URL = "https://www.naeu.playblackdesert.com/en-US/Adventure?searchType=2&region="
 
-        private fun getGuildSearchUrl(page: Int) : String {
-            return "$GUILD_SEARCH_URL$page"
+        private fun getGuildSearchUrl(page: Int, search: String) : String {
+            return "$GUILD_SEARCH_URL${page}&searchText=$search"
         }
 
         private fun getGuildPageUrl(name: String, region: Region) : String {
@@ -53,8 +53,8 @@ class GuildScrapeUtils {
             return "$FAMILY_PAGE_URL$id"
         }
 
-        fun getGuildNamesOnPage(page: Int) : List<String> {
-            val request = Request.Builder().url(getGuildSearchUrl(page)).build()
+        fun getGuildNamesOnPage(page: Int, search: String) : List<String> {
+            val request = Request.Builder().url(getGuildSearchUrl(page, search)).build()
 
             client.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) throw IOException("Unexpected Http Code $response")
