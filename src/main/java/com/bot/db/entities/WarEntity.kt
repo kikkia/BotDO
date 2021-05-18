@@ -12,8 +12,10 @@ class WarEntity(
         val id: Int,
         @Column(name = "war_time")
         val warTime: Timestamp,
-        @OneToMany
-        val attendees: List<WarAttendanceEntity>) {
+        @OneToMany(fetch = FetchType.EAGER, mappedBy = "war", cascade = [CascadeType.ALL])
+        val attendees: List<WarAttendanceEntity>,
+        @Column(name = "messageId")
+        val messageId: String) {
     @Column(name = "won")
     var won: Boolean? = null
     @Column(name = "node")
