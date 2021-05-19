@@ -19,4 +19,7 @@ class BDOGuildEntity(
     var members: List<GuildMembershipEntity>,
     @OneToOne
     @JoinColumn(name = "master_family")
-    var master: FamilyEntity?)
+    var master: FamilyEntity?) {
+    @OneToOne(mappedBy = "bdoGuild")
+    var discordGuild: GuildEntity? = null
+}
