@@ -31,6 +31,9 @@ data class GuildEntity(
         var recruitRole: String? = null
         @Column(name = "log_channel")
         var logChannel: String? = null
+        @OneToOne
+        @JoinColumn(name = "bdo_guild_id")
+        var bdoGuild: BDOGuildEntity? = null
 
         fun hasDefaultInviteChannel() : Boolean {
                 return entryChannel != null

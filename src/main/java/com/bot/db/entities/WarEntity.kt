@@ -13,9 +13,12 @@ class WarEntity(
         @Column(name = "war_time")
         val warTime: Timestamp,
         @OneToMany(fetch = FetchType.EAGER, mappedBy = "war", cascade = [CascadeType.ALL])
-        val attendees: List<WarAttendanceEntity>,
+        var attendees: List<WarAttendanceEntity>,
         @Column(name = "messageId")
-        val messageId: String) {
+        val messageId: String,
+        @ManyToOne
+        @JoinColumn(name = "guild_id")
+        val guild: BDOGuildEntity) {
     @Column(name = "won")
     var won: Boolean? = null
     @Column(name = "node")

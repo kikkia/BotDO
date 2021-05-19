@@ -34,4 +34,8 @@ public class BdoGuildService {
     public Optional<BDOGuildEntity> getById(Integer id) {
         return repository.findById(id);
     }
+
+    public BDOGuildEntity save(BDOGuildEntity entity) {
+        return repository.save(entity);
+    }
 }

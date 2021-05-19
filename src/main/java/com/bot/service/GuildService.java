@@ -1,5 +1,6 @@
 package com.bot.service;
 
+import com.bot.db.entities.BDOGuildEntity;
 import com.bot.db.entities.GuildEntity;
 import com.bot.db.entities.UserEntity;
 import com.bot.db.mapper.UserMapper;
@@ -97,6 +98,11 @@ public class GuildService {
 
     public GuildEntity setRecruitMessage(GuildEntity guildEntity, String recruitMessage) {
         guildEntity.setRecruitMessage(recruitMessage);
+        return guildRepository.save(guildEntity);
+    }
+
+    public GuildEntity setBdoGuild(GuildEntity guildEntity, BDOGuildEntity bdoGuildEntity) {
+        guildEntity.setBdoGuild(bdoGuildEntity);
         return guildRepository.save(guildEntity);
     }
 }
