@@ -8,6 +8,7 @@ import com.bot.utils.GuildScrapeUtils
 import org.slf4j.LoggerFactory
 import java.time.Duration
 import java.time.Instant
+import java.util.stream.IntStream
 
 class ScanGuildsTask(private val familyService: FamilyService,
                      private val bdoGuildService: BdoGuildService,
@@ -23,52 +24,54 @@ class ScanGuildsTask(private val familyService: FamilyService,
         var guildCount = 0
         var familyCount = 0
         while(true) {
-            try {
-                val guildNames = GuildScrapeUtils.getGuildNamesOnPage(page)
-                if (guildNames.isEmpty()) {
-                    break
-                }
-
-                for (name in guildNames) {
-                    var families: Set<BdoFamily>
-                    try {
-                        families = GuildScrapeUtils.getGuildFamilies(name, region)
-                    } catch (e : Exception) {
-                        log.warn("Hit unexpected error when getting guild members", e)
-                        continue
+            for (i in IntStream.range('a'.toInt(), 'z'.toInt())) {
+                try {
+                    val guildNames = GuildScrapeUtils.getGuildNamesOnPage(page, i.toChar().toString())
+                    if (guildNames.isEmpty()) {
+                        break
                     }
 
-                    val guildOpt = bdoGuildService.getByNameAndRegion(name, region)
-                    val guild = if (guildOpt.isEmpty) {
-                        bdoGuildService.createNewGuild(name, region)
-                    } else {
-                        guildOpt.get()
-                    }
+                    for (name in guildNames) {
+                        var families: Set<BdoFamily>
+                        try {
+                            families = GuildScrapeUtils.getGuildFamilies(name, region)
+                        } catch (e: Exception) {
+                            log.warn("Hit unexpected error when getting guild members", e)
+                            continue
+                        }
 
-                    for (fam in families) {
-                        val famOpt = familyService.getFamily(fam.name, region, false)
-                        val family = if (famOpt.isEmpty) {
-                            familyService.createMinimal(fam.name, fam.id, region)
+                        val guildOpt = bdoGuildService.getByNameAndRegion(name, region)
+                        val guild = if (guildOpt.isEmpty) {
+                            bdoGuildService.createNewGuild(name, region)
                         } else {
-                            famOpt.get()
+                            guildOpt.get()
                         }
-                        familyService.addToGuild(family, guild)
 
-                        // These Ids can potentially change
-                        if (family.externalId != fam.id) {
-                            familyService.updateExternalId(family, fam.id)
+                        for (fam in families) {
+                            val famOpt = familyService.getFamily(fam.name, region, false)
+                            val family = if (famOpt.isEmpty) {
+                                familyService.createMinimal(fam.name, fam.id, region)
+                            } else {
+                                famOpt.get()
+                            }
+                            familyService.addToGuild(family, guild)
+
+                            // These Ids can potentially change
+                            if (family.externalId != fam.id) {
+                                familyService.updateExternalId(family, fam.id)
+                            }
+                            familyCount++
                         }
-                        familyCount++
+                        guildCount++
                     }
-                    guildCount++
+                    if (page % 50 == 0) {
+                        log.info("Guild sync progress.. Page: $page | Guilds: $guildCount | Families: $familyCount")
+                    }
+                    page++
+                } catch (e: Exception) {
+                    log.error("Sync Job Step failed due to exception", e)
+                    log.warn("Sync job step for ${i.toChar()} failed after $page pages, $guildCount guilds and $familyCount families")
                 }
-                if (page % 50 == 0) {
-                    log.info("Guild sync progress.. Page: $page | Guilds: $guildCount | Families: $familyCount")
-                }
-                page++
-            } catch (e: Exception) {
-                log.error("Sync Job failed due to exception", e)
-                log.warn("Sync job failed after $page pages, $guildCount guilds and $familyCount families")
             }
         }
         log.info("Scan complete. Pages: $page | Guilds: $guildCount | Families: $familyCount")
