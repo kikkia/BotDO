@@ -4,11 +4,15 @@ CREATE TABLE IF NOT EXISTS `war` (
     `node` VARCHAR(64) NULL DEFAULT NULL,
     `won` TINYINT(1) NULL DEFAULT NULL,
     `message_id` VARCHAR(64) NOT NULL,
+    `text_channel` VARCHAR(64) NOT NULL,
     `guild_id` INT(32) NOT NULL,
     PRIMARY KEY (`id`),
     CONSTRAINT `war_guild_fk`
       FOREIGN KEY (`guild_id`)
-      REFERENCES `bdo_guild` (`id`))
+      REFERENCES `bdo_guild` (`id`),
+    CONSTRAINT `war_channel_fk`
+      FOREIGN KEY (`text_channel`)
+      REFERENCES `text_channel` (`id`))
 ENGINE = innodb;
 
 CREATE TABLE IF NOT EXISTS `war_attendance` (
@@ -50,3 +54,9 @@ ENGINE = innodb;
 ALTER TABLE `guild`
 ADD bdo_guild_id INT(32) NULL DEFAULT NULL,
 ADD FOREIGN KEY (`bdo_guild_id`) REFERENCES `bdo_guild`(`id`);
+
+ALTER TABLE `bdo_guild`
+ADD war_days INT(32) NULL DEFAULT NULL;
+
+ALTER TABLE `text_channel`
+ADD war_channel INT(32) NULL DEFAULT NULL;

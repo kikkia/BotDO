@@ -1,9 +1,6 @@
 package com.bot.service
 
-import com.bot.db.entities.BDOGuildEntity
-import com.bot.db.entities.UserEntity
-import com.bot.db.entities.WarAttendanceEntity
-import com.bot.db.entities.WarEntity
+import com.bot.db.entities.*
 import com.bot.db.repositories.WarRepository
 import org.springframework.stereotype.Service
 import java.sql.Timestamp
@@ -18,8 +15,8 @@ class WarService(private val warRepository: WarRepository) {
         return warRepository.findByMessageId(messageId)
     }
 
-    fun createWar(time: Instant, messageId: String, guild: BDOGuildEntity) : WarEntity {
-        val newWar = WarEntity(0, Timestamp.from(time), listOf(), messageId, guild)
+    fun createWar(time: Instant, messageId: String, channel: TextChannel, guild: BDOGuildEntity) : WarEntity {
+        val newWar = WarEntity(0, Timestamp.from(time), listOf(), messageId, channel, guild)
         return save(newWar)
     }
 

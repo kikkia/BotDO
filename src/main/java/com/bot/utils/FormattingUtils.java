@@ -30,6 +30,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
@@ -227,5 +228,10 @@ public class FormattingUtils {
         } else {
             return "wtf is this? " + level;
         }
+    }
+
+    public static String formatDateToChannelName(Date date) {
+        SimpleDateFormat formatter = new SimpleDateFormat("E dd-MMM", Locale.ENGLISH);
+        return formatter.format(date);
     }
 }

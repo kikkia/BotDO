@@ -1,5 +1,6 @@
 package com.bot.db.entities
 
+import com.bot.models.WarDay
 import com.bot.models.WarNode
 import java.sql.Timestamp
 import javax.persistence.*
@@ -14,8 +15,11 @@ class WarEntity(
         val warTime: Timestamp,
         @OneToMany(fetch = FetchType.EAGER, mappedBy = "war", cascade = [CascadeType.ALL])
         var attendees: List<WarAttendanceEntity>,
-        @Column(name = "messageId")
+        @Column(name = "message_id")
         val messageId: String,
+        @ManyToOne
+        @JoinColumn(name = "text_channel")
+        val channel: TextChannel,
         @ManyToOne
         @JoinColumn(name = "guild_id")
         val guild: BDOGuildEntity) {
@@ -30,5 +34,9 @@ class WarEntity(
 
     fun getWarNode(): WarNode? {
         return WarNode.getNodeFromId(node)
+    }
+
+    fun getWarDay(): WarDay {
+        return WarDay.getFromTimestamp(warTime)
     }
 }
