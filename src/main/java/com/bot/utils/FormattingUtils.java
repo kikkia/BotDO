@@ -1,8 +1,6 @@
 package com.bot.utils;
 
-import com.bot.db.entities.EventEntity;
-import com.bot.db.entities.ScrollGroup;
-import com.bot.db.entities.UserEntity;
+import com.bot.db.entities.*;
 import com.bot.db.mapper.ScrollInventoryMapper;
 import com.bot.models.Scroll;
 import com.bot.models.ScrollInventory;
@@ -12,6 +10,8 @@ import com.vladsch.flexmark.util.data.DataHolder;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import org.joda.time.Duration;
 import org.joda.time.Period;
@@ -230,8 +230,54 @@ public class FormattingUtils {
         }
     }
 
-    public static String formatDateToChannelName(Date date) {
+    public static String formatDateToBasicString(Date date) {
         SimpleDateFormat formatter = new SimpleDateFormat("E dd-MMM", Locale.ENGLISH);
         return formatter.format(date);
+    }
+
+    public static MessageEmbed generateWarMessage(WarEntity warEntity) {
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setAuthor(formatDateToBasicString(warEntity.getWarTime()) + " war signup.");
+        embedBuilder.addField("Avg gearscore", String.valueOf(warEntity.getAverageGS()), true);
+        embedBuilder.addField("Total attendees", String.valueOf(warEntity.getAttendees().size()), true);
+        if (warEntity.getWarNode() != null) {
+            embedBuilder.addField("Node", warEntity.getWarNode().getDisplayName(), true);
+            embedBuilder.addField("Tier", warEntity.getWarNode().getTier().getDisplay(), true);
+            embedBuilder.addField("Cap", String.valueOf(warEntity.getWarNode().getCap()), true);
+        } else {
+            embedBuilder.addField("Node", "No node set, you can set one by using the ,node command", false);
+        }
+
+        embedBuilder.setDescription(buildAttendeeList(warEntity));
+        embedBuilder.setFooter("To sign up react `Y` for yes, `N` for no");
+        return embedBuilder.build();
+    }
+
+    private static String buildAttendeeList(WarEntity warEntity) {
+        if (warEntity.getAttendees().isEmpty()) {
+            return "No attendees yet";
+        }
+        StringBuilder toReturn = new StringBuilder("```css\n");
+        for (WarAttendanceEntity attendee : warEntity.getAttendees()) {
+            GearsetEntity gear = attendee.getUser().getGearset();
+            String ap = gear != null ? String.valueOf(gear.getAp()) : "";
+            String dp = gear != null ? String.valueOf(gear.getDp()) : "";
+            String aap = gear != null ? String.valueOf(gear.getAwkAp()) : "";
+            String cl = gear != null ? gear.getClassName() : "Unknown";
+            toReturn
+                    .append("<")
+                    .append(ap)
+                    .append(">/<")
+                    .append(aap)
+                    .append(">/<")
+                    .append(dp)
+                    .append("> - ")
+                    .append(attendee.getUser().getEffectiveName()).append(" - [")
+                    .append(cl)
+                    .append("]")
+                    .append("\n");
+        }
+        toReturn.append("```");
+        return toReturn.toString();
     }
 }

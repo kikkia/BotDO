@@ -15,6 +15,10 @@ class WarService(private val warRepository: WarRepository) {
         return warRepository.findByMessageId(messageId)
     }
 
+    fun getWarByGuildAndDate(guild: GuildEntity, date: Date) : Optional<WarEntity> {
+        return warRepository.findByGuildIdAndWarTime(guild.bdoGuild!!.id, Timestamp.from(date.toInstant()))
+    }
+
     fun createWar(time: Instant, messageId: String, channel: TextChannel, guild: BDOGuildEntity) : WarEntity {
         val newWar = WarEntity(0, Timestamp.from(time), listOf(), messageId, channel, guild)
         return save(newWar)

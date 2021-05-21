@@ -2,6 +2,8 @@ package com.bot.models
 
 import java.sql.Timestamp
 import java.time.DayOfWeek
+import java.time.LocalDateTime
+import java.util.*
 
 enum class WarDay(val day: DayOfWeek, val id: Int) {
     SUNDAY(DayOfWeek.SUNDAY, 1),
@@ -33,6 +35,10 @@ enum class WarDay(val day: DayOfWeek, val id: Int) {
 
         fun getFromTimestamp(time: Timestamp) : WarDay {
             return getFromDayOfWeek(time.toLocalDateTime().dayOfWeek)!!
+        }
+
+        fun getFromDate(time: Date) : WarDay {
+            return getFromTimestamp(Timestamp.from(time.toInstant()))
         }
 
         fun getFromDayOfWeek(day: DayOfWeek) : WarDay? {

@@ -39,4 +39,19 @@ class WarEntity(
     fun getWarDay(): WarDay {
         return WarDay.getFromTimestamp(warTime)
     }
+
+    fun getAverageGS(): Int {
+        if (attendees.isEmpty()) {
+            return 0
+        }
+        var totalGS = 0
+        for (att in attendees) {
+            var userGS = 0
+            if (att.user.gearset != null) {
+                userGS = att.user.gearset!!.getGearScore()
+            }
+            totalGS += userGS
+        }
+        return totalGS / attendees.size
+    }
 }
