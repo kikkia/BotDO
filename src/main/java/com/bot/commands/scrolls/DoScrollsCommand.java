@@ -43,7 +43,7 @@ public class DoScrollsCommand extends Command {
                     .filter(e -> e.getValue() > 0)
                     .map(e -> new Pair<>(e.getKey(), e.getValue()))
                     .collect(Collectors.toList()) :
-                    CommandParsingUtils.parseScrollUpdates(commandEvent.getArgs());
+                    CommandParsingUtils.INSTANCE.parseScrollUpdates(commandEvent.getArgs());
             var scrollHistory = new ScrollHistory(inventory.getUser());
             for (Pair<Scroll, Integer> p : scrollsToRemove) {
                 inventory.removeScroll(p.getFirst(), p.getSecond());

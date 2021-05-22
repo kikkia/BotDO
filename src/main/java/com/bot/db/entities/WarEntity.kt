@@ -13,7 +13,7 @@ class WarEntity(
         val id: Int,
         @Column(name = "war_time")
         val warTime: Timestamp,
-        @OneToMany(fetch = FetchType.EAGER, mappedBy = "war", cascade = [CascadeType.ALL])
+        @OneToMany(fetch = FetchType.EAGER, mappedBy = "war", cascade = [CascadeType.ALL], orphanRemoval = true)
         var attendees: List<WarAttendanceEntity>,
         @Column(name = "message_id")
         val messageId: String,

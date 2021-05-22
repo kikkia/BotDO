@@ -30,7 +30,7 @@ public class AddScrollsCommand extends Command {
         }
 
         try {
-            var scrollPairs = CommandParsingUtils.parseScrollUpdates(commandEvent.getArgs());
+            var scrollPairs = CommandParsingUtils.INSTANCE.parseScrollUpdates(commandEvent.getArgs());
             var scrollInventory = inventoryService.getByUser(commandEvent.getAuthor().getId());
             for (Pair<Scroll, Integer> update : scrollPairs) {
                 scrollInventory.addScroll(update.getFirst(), update.getSecond());

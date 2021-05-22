@@ -27,6 +27,7 @@ class WarService(private val warRepository: WarRepository) {
     fun addAttendee(war: WarEntity, user: UserEntity) : WarEntity {
         val attendees = war.attendees.toMutableList()
         attendees.add(WarAttendanceEntity(0, war, user))
+        war.attendees = attendees
         return save(war)
     }
 

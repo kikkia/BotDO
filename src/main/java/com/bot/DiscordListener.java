@@ -3,11 +3,14 @@ package com.bot;
 import com.bot.db.entities.GuildEntity;
 import com.bot.db.entities.TextChannel;
 import com.bot.db.entities.UserEntity;
+import com.bot.db.entities.WarEntity;
 import com.bot.models.Region;
 import com.bot.service.*;
 import com.bot.tasks.InvitedMemberTask;
 import com.bot.tasks.ScanGuildsTask;
 import com.bot.tasks.SyncUserFamilyNameTask;
+import com.bot.utils.Constants;
+import com.bot.utils.FormattingUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.events.ReadyEvent;
@@ -33,8 +36,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -52,6 +57,8 @@ public class DiscordListener extends ListenerAdapter {
     private FamilyService familyService;
     @Autowired
     private BdoGuildService bdoGuildService;
+    @Autowired
+    private WarService warService;
     @Autowired
     private ScheduledExecutorService executorService;
 
@@ -175,7 +182,32 @@ public class DiscordListener extends ListenerAdapter {
 
     @Override
     public void onGuildMessageReactionAdd(@Nonnull GuildMessageReactionAddEvent event) {
+        if (event.getUser().isBot()) {
+            return;
+        }
         // TODO: For use in reaction roles
+        // Check if this message is a war attendance message
+        Optional<WarEntity> warOpt = warService.getWarByMessageId(event.getMessageId());
+        if (warOpt.isPresent()) {
+            // TODO: Family name in guild verification
+            // If emoji is not a proper emoji, remove it
+            if (Constants.WAR_REACTIONS.contains(event.getReactionEmote().getName())) {
+                WarEntity warEntity = warOpt.get();
+                // If yes reaction
+                if (event.getReactionEmote().getName().equals(Constants.WAR_REACTION_YES)) {
+                    // If they are not already signed up
+                    if (!warEntity.getAttendees().stream().map(a -> a.getUser().getId()).collect(Collectors.toList()).contains(event.getUserId())) {
+                        warEntity = warService.addAttendee(warEntity, userService.getById(event.getUserId()));
+                    }
+                } else if (event.getReactionEmote().getName().equals(Constants.WAR_REACTION_NO)) {
+                    // If no reaction remove them from the list if they are on it
+                    warEntity = warService.removeAttendee(warEntity, userService.getById(event.getUserId()));
+                }
+                event.getChannel().editMessageById(event.getMessageId(), FormattingUtils.generateWarMessage(warEntity)).complete();
+            }
+
+            event.getReaction().removeReaction(event.getUser()).queue();
+        }
         super.onGuildMessageReactionAdd(event);
     }
 

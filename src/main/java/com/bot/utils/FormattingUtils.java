@@ -240,6 +240,7 @@ public class FormattingUtils {
         embedBuilder.setAuthor(formatDateToBasicString(warEntity.getWarTime()) + " war signup.");
         embedBuilder.addField("Avg gearscore", String.valueOf(warEntity.getAverageGS()), true);
         embedBuilder.addField("Total attendees", String.valueOf(warEntity.getAttendees().size()), true);
+        embedBuilder.addBlankField(true);
         if (warEntity.getWarNode() != null) {
             embedBuilder.addField("Node", warEntity.getWarNode().getDisplayName(), true);
             embedBuilder.addField("Tier", warEntity.getWarNode().getTier().getDisplay(), true);

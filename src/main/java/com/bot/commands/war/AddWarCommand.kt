@@ -5,6 +5,8 @@ import com.bot.models.WarDay
 import com.bot.service.GuildService
 import com.bot.service.TextChannelService
 import com.bot.service.WarService
+import com.bot.utils.CommandParsingUtils
+import com.bot.utils.Constants
 import com.bot.utils.FormattingUtils
 import com.jagrosh.jdautilities.command.CommandEvent
 import net.dv8tion.jda.api.entities.TextChannel
@@ -32,14 +34,14 @@ class AddWarCommand(val warService: WarService, guildService: GuildService, val 
             return
         }
 
-        val date = parseArgsToDate(command.args)
+        val date = CommandParsingUtils.parseArgsToDate(command.args)
         if (date == null) {
             command.replyWarning("Could not parse time, please make sure that you are formatting it correctly (dd-mm-yyyy)")
             return
         } else if (date.toInstant().isBefore(Instant.now())) {
             command.replyWarning("That date has already happened :cry:")
             return
-        } else if (date.toInstant().isBefore(Instant.now().plus(14, ChronoUnit.DAYS))) {
+        } else if (date.toInstant().isAfter(Instant.now().plus(14, ChronoUnit.DAYS))) {
             command.replyWarning("You cannot add a war more than 2 weeks in advance :cry:")
             return
         } else if (warService.getWarByGuildAndDate(guild, date).isPresent) {
@@ -70,23 +72,8 @@ class AddWarCommand(val warService: WarService, guildService: GuildService, val 
         // TODO: Vod
         // TODO: Stats
         warMessage.editMessage(FormattingUtils.generateWarMessage(war)).complete()
+        warMessage.addReaction(Constants.WAR_REACTION_YES).complete()
+        warMessage.addReaction(Constants.WAR_REACTION_NO).complete()
         command.reactSuccess()
-    }
-
-    fun parseArgsToDate(input: String) : Date? {
-        val args = input.split(" ")
-        val formatter: SimpleDateFormat = SimpleDateFormat("dd-M-yyyy hh:mm:ss", Locale.ENGLISH)
-        formatter.timeZone = TimeZone.getTimeZone("America/Chicago")
-        var date: Date? = null
-        for (arg in args) {
-            val timeToParse = "$arg 20:00:00"
-            try {
-                date = formatter.parse(timeToParse)
-                break
-            } catch (e: ParseException) {
-                continue
-            }
-        }
-        return date
     }
 }
