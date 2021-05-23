@@ -27,6 +27,8 @@ class WarEntity(
     var won: Boolean? = null
     @Column(name = "node")
     var node: Int? = null
+    @Column(name = "archived")
+    var archived: Boolean = false
 
     fun setNode(node: WarNode) {
         this.node = node.id

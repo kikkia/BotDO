@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
@@ -193,6 +194,10 @@ public class DiscordListener extends ListenerAdapter {
             // If emoji is not a proper emoji, remove it
             if (Constants.WAR_REACTIONS.contains(event.getReactionEmote().getName())) {
                 WarEntity warEntity = warOpt.get();
+                // If war has happened already, return
+                if (warEntity.getWarTime().toInstant().isBefore(Instant.now())) {
+                    return;
+                }
                 // If yes reaction
                 if (event.getReactionEmote().getName().equals(Constants.WAR_REACTION_YES)) {
                     // If they are not already signed up

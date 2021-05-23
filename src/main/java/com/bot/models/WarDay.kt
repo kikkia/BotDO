@@ -15,7 +15,11 @@ enum class WarDay(val day: DayOfWeek, val id: Int) {
     SATURDAY(DayOfWeek.SATURDAY, 64);
 
     companion object {
-        fun getAllDays(days: Int) : List<WarDay> {
+        fun getAllDays(days: Int?) : List<WarDay> {
+            if (days == null) {
+                return mutableListOf()
+            }
+
             val list = mutableListOf<WarDay>()
             for (day in values()) {
                 if (days.and(day.id) > 0) {
@@ -53,6 +57,15 @@ enum class WarDay(val day: DayOfWeek, val id: Int) {
         fun getDayFromBitwise(bitwise: Int) : WarDay? {
             for (day in values()) {
                 if (day.id.and(bitwise) > 0) {
+                    return day
+                }
+            }
+            return null
+        }
+
+        fun getFromString(input: String) : WarDay? {
+            for (day in values()) {
+                if (day.name.equals(input, ignoreCase = true)) {
                     return day
                 }
             }

@@ -6,21 +6,18 @@ import com.bot.service.GuildService
 import com.bot.service.TextChannelService
 import com.bot.service.WarService
 import com.bot.utils.CommandParsingUtils
-import com.bot.utils.Constants
 import com.bot.utils.FormattingUtils
+import com.bot.utils.WarUtils
 import com.jagrosh.jdautilities.command.CommandEvent
 import net.dv8tion.jda.api.entities.TextChannel
 import org.springframework.stereotype.Component
-import java.text.ParseException
-import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 
 @Component
-class AddWarCommand(val warService: WarService, guildService: GuildService, val textChannelService: TextChannelService) : WarCommand(guildService) {
+class AddWarCommand(private val warService: WarService, guildService: GuildService,
+                    private val textChannelService: TextChannelService) : WarCommand(guildService) {
 
     init {
         this.name = "addwar"
@@ -61,19 +58,7 @@ class AddWarCommand(val warService: WarService, guildService: GuildService, val 
             channel = command.message.mentionedChannels[0]
         }
 
-        val warMessage = channel.sendMessage("Generating War...").complete()
-        val channelEntity = textChannelService.getById(channel.id)
-
-        val war = warService.createWar(date.toInstant(), warMessage.id, channelEntity, guild.bdoGuild!!);
-        // TODO: REACTIONS (dont forget on startup)
-        // TODO: Guild war days
-        // TODO: War reminders
-        // TODO: Archive channel
-        // TODO: Vod
-        // TODO: Stats
-        warMessage.editMessage(FormattingUtils.generateWarMessage(war)).complete()
-        warMessage.addReaction(Constants.WAR_REACTION_YES).complete()
-        warMessage.addReaction(Constants.WAR_REACTION_NO).complete()
+        WarUtils.sendNewWar(guild, date, channel, textChannelService, warService)
         command.reactSuccess()
     }
 }

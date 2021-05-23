@@ -5,13 +5,14 @@ import com.bot.db.entities.GuildEntity;
 import com.bot.db.entities.UserEntity;
 import com.bot.db.mapper.UserMapper;
 import com.bot.db.repositories.GuildRepository;
-import net.dv8tion.jda.api.entities.Invite;
+import com.bot.models.WarDay;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -103,6 +104,11 @@ public class GuildService {
 
     public GuildEntity setBdoGuild(GuildEntity guildEntity, BDOGuildEntity bdoGuildEntity) {
         guildEntity.setBdoGuild(bdoGuildEntity);
+        return guildRepository.save(guildEntity);
+    }
+
+    public GuildEntity setArchiveChannel(GuildEntity guildEntity, String channelId) {
+        guildEntity.setArchiveChannel(channelId);
         return guildRepository.save(guildEntity);
     }
 }

@@ -250,7 +250,7 @@ public class FormattingUtils {
         }
 
         embedBuilder.setDescription(buildAttendeeList(warEntity));
-        embedBuilder.setFooter("To sign up react `Y` for yes, `N` for no");
+        embedBuilder.setFooter("To sign up react `Y` for yes, `N` for no. War Id: " + warEntity.getId());
         return embedBuilder.build();
     }
 

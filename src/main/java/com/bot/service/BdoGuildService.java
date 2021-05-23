@@ -3,6 +3,7 @@ package com.bot.service;
 import com.bot.db.entities.BDOGuildEntity;
 import com.bot.db.repositories.BdoGuildRepository;
 import com.bot.models.Region;
+import com.bot.models.WarDay;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ import javax.transaction.Transactional;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Transactional
@@ -33,6 +35,11 @@ public class BdoGuildService {
 
     public Optional<BDOGuildEntity> getById(Integer id) {
         return repository.findById(id);
+    }
+
+    public BDOGuildEntity setWarDays(BDOGuildEntity bdoGuildEntity, List<WarDay> days) {
+        bdoGuildEntity.setWarDays(days.stream().mapToInt(WarDay::getId).sum());
+        return save(bdoGuildEntity);
     }
 
     public BDOGuildEntity save(BDOGuildEntity entity) {
