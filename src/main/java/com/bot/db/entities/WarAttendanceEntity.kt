@@ -1,5 +1,7 @@
 package com.bot.db.entities
 
+import java.sql.Timestamp
+import java.time.Instant
 import javax.persistence.*
 
 @Entity
@@ -18,4 +20,17 @@ class WarAttendanceEntity(
     var tardy: Boolean = false
     @Column(name = "no_show")
     var noShow: Boolean = false
+    @Column(name = "maybe")
+    var maybe: Boolean = false
+    @Column(name = "created")
+    val created: Timestamp = Timestamp.from(Instant.now())
+
+    fun toMessageEntry() : String {
+        val gear = user.gearset
+        val ap = gear?.ap?.toString() ?: "?"
+        val dp = gear?.dp?.toString() ?: "?"
+        val aap = gear?.awkAp?.toString() ?: "?"
+        val cl: String = gear?.getClassName() ?: "?"
+        return "$ap/$aap/$dp - ${user.getEffectiveName()} - $cl"
+    }
 }

@@ -41,25 +41,40 @@ class SetWarDaysCommand(val warService: WarService, val bdoGuildService: BdoGuil
             }
             days.add(day)
         }
-        var existing = WarDay.getAllDays(guild.bdoGuild!!.warDays)
+        var existingDays = WarDay.getAllDays(guild.bdoGuild!!.warDays)
         val addedDays = HashMap<WarDay, TextChannel>()
         // Do nothing on days no longer warred
         // Do nothing on existing days
         // Create channels and first war on new days
         for (day in days) {
-            if (!existing.contains(day)) {
+            val channelName = "war-${day.day.getDisplayName(TextStyle.FULL, Locale.US)}"
+            if (!existingDays.contains(day)) {
+                // Checks for existing wars on the upcoming day of week
+                val warDate = DateUtils.getNextWarDate(day)
+                val existingWarOptional = warService.getWarByGuildAndDate(guild, warDate)
+                if (existingWarOptional.isPresent) {
+                    // Handle the case of a war existing but not being on an official war day
+                    val existingWar = existingWarOptional.get()
+                    val existingChannel = command.guild.getTextChannelById(existingWar.channel.id)
+                            ?: // Channel deleted? Do nothing
+                            continue
+                    existingChannel.manager.setName(channelName).queue()
+                    addedDays[day] = existingChannel
+                    continue
+                }
+                
                 // Setup new channel
                 addedDays[day] = command.guild.createTextChannel(
-                        "war-${day.day.getDisplayName(TextStyle.FULL, Locale.US)}").complete()
+                        channelName).complete()
                 textChannelService.add(addedDays[day], guild)
-                WarUtils.sendNewWar(guild, DateUtils.getNextWarDate(day), addedDays[day]!!, textChannelService, warService)
+                WarUtils.sendNewWar(guild, warDate, addedDays[day]!!, textChannelService, warService)
             }
             // Remove from existing list
-            existing = existing.stream().filter{ it.id != day.id }.collect(Collectors.toList())
+            existingDays = existingDays.stream().filter{ it.id != day.id }.collect(Collectors.toList())
         }
 
         bdoGuildService.setWarDays(guild.bdoGuild, days.toList())
-        val removed = existing.stream().map {it.name}.collect(Collectors.toList())
+        val removed = existingDays.stream().map {it.name}.collect(Collectors.toList())
         val added = addedDays.entries.stream().map { "${it.key.name} - ${it.value.asMention}"}.collect(Collectors.toList())
         command.replySuccess("Successfully set war days:\nAdded: ${added.toString()}\nRemoved: ${removed.toString()}")
     }

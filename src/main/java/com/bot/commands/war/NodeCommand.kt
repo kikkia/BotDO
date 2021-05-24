@@ -29,7 +29,12 @@ class NodeCommand(val warService: WarService, guildService: GuildService, val te
             command.replyWarning("Date not valid, please make sure your arguments are correct. (e.g. dd-mm-yyyy / Node name)")
             return
         }
-        val warNode = WarNode.getNodeFromName(argsSplit[1], WarDay.getFromDate(date))
+        if (argsSplit.size != 2) {
+            command.replyWarning("Format or arguments is incorrect, " +
+                    "please make sure your arguments are correct. (e.g. dd-mm-yyyy / Node name)")
+            return
+        }
+        val warNode = WarNode.getNodeFromName(argsSplit[1].trim(), WarDay.getFromDate(date))
         if (warNode == null) {
             command.replyWarning("Node not found, please make sure it's spelled correctly.")
             return

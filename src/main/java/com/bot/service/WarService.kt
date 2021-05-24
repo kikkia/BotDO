@@ -24,9 +24,11 @@ class WarService(private val warRepository: WarRepository) {
         return save(newWar)
     }
 
-    fun addAttendee(war: WarEntity, user: UserEntity) : WarEntity {
+    fun addAttendee(war: WarEntity, user: UserEntity, maybe: Boolean = false) : WarEntity {
         val attendees = war.attendees.toMutableList()
-        attendees.add(WarAttendanceEntity(0, war, user))
+        val entity = WarAttendanceEntity(0, war, user)
+        entity.maybe = maybe
+        attendees.add(entity)
         war.attendees = attendees
         return save(war)
     }

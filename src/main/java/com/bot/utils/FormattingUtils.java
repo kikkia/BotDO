@@ -4,6 +4,7 @@ import com.bot.db.entities.*;
 import com.bot.db.mapper.ScrollInventoryMapper;
 import com.bot.models.Scroll;
 import com.bot.models.ScrollInventory;
+import com.bot.models.WarNode;
 import com.vladsch.flexmark.profile.pegdown.Extensions;
 import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter;
 import com.vladsch.flexmark.util.data.DataHolder;
@@ -236,10 +237,15 @@ public class FormattingUtils {
     }
 
     public static MessageEmbed generateWarMessage(WarEntity warEntity) {
+        var limit = warEntity.getWarNode() == null ? 100: warEntity.getWarNode().getCap();
+        var attendees = warEntity.getAttendees().stream()
+                .sorted(warSignupComparator)
+                .collect(Collectors.toList());
+
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setAuthor(formatDateToBasicString(warEntity.getWarTime()) + " war signup.");
         embedBuilder.addField("Avg gearscore", String.valueOf(warEntity.getAverageGS()), true);
-        embedBuilder.addField("Total attendees", String.valueOf(warEntity.getAttendees().size()), true);
+        embedBuilder.addField("Total signups (Maybes included)", String.valueOf(warEntity.getAttendees().size()), true);
         embedBuilder.addBlankField(true);
         if (warEntity.getWarNode() != null) {
             embedBuilder.addField("Node", warEntity.getWarNode().getDisplayName(), true);
@@ -249,36 +255,43 @@ public class FormattingUtils {
             embedBuilder.addField("Node", "No node set, you can set one by using the ,node command", false);
         }
 
-        embedBuilder.setDescription(buildAttendeeList(warEntity));
-        embedBuilder.setFooter("To sign up react `Y` for yes, `N` for no. War Id: " + warEntity.getId());
+        embedBuilder.setDescription(buildAttendeeList(attendees, limit));
+        embedBuilder.setFooter("To sign up react `Y` for yes, `N` for no. ? for maybe. War Id: " + warEntity.getId());
         return embedBuilder.build();
     }
 
-    private static String buildAttendeeList(WarEntity warEntity) {
-        if (warEntity.getAttendees().isEmpty()) {
+    private static String buildAttendeeList(List<WarAttendanceEntity> attendees, int limit) {
+        var count = 0; // Used to keep track for when we hit the limit
+        var maybe = false; // Denotes if we have hit the maybe category yet
+        if (attendees.isEmpty()) {
             return "No attendees yet";
         }
         StringBuilder toReturn = new StringBuilder("```css\n");
-        for (WarAttendanceEntity attendee : warEntity.getAttendees()) {
-            GearsetEntity gear = attendee.getUser().getGearset();
-            String ap = gear != null ? String.valueOf(gear.getAp()) : "";
-            String dp = gear != null ? String.valueOf(gear.getDp()) : "";
-            String aap = gear != null ? String.valueOf(gear.getAwkAp()) : "";
-            String cl = gear != null ? gear.getClassName() : "Unknown";
-            toReturn
-                    .append("<")
-                    .append(ap)
-                    .append(">/<")
-                    .append(aap)
-                    .append(">/<")
-                    .append(dp)
-                    .append("> - ")
-                    .append(attendee.getUser().getEffectiveName()).append(" - [")
-                    .append(cl)
-                    .append("]")
-                    .append("\n");
+
+        for (WarAttendanceEntity attendee : attendees) {
+            if (attendee.getMaybe() && !maybe) { // Maybes are always last on the list
+                toReturn.append("--Maybe--\n");
+                maybe = true;
+            }
+            if (count == limit && !maybe) { // If we are at limit and not in the maybes yet
+                toReturn.append("--BACKUPS--\n");
+            }
+            toReturn.append(attendee.toMessageEntry()).append("\n");
+            count++;
         }
         toReturn.append("```");
         return toReturn.toString();
     }
+
+    private static Comparator<WarAttendanceEntity> warSignupComparator = new Comparator<WarAttendanceEntity>() {
+        @Override
+        public int compare(WarAttendanceEntity o1, WarAttendanceEntity o2) {
+            if (o1.getMaybe() && !o2.getMaybe()) {
+                return 1;
+            } else if (!o1.getMaybe() && o2.getMaybe()) {
+                return -1;
+            }
+            return o1.getCreated().compareTo(o2.getCreated());
+        }
+    };
 }

@@ -49,7 +49,7 @@ class AddWarCommand(private val warService: WarService, guildService: GuildServi
             return
         }
 
-        var channel: TextChannel? = null
+        val channel: TextChannel?
         if (command.message.mentionedChannels.isEmpty()) {
             // Create new channel
             channel = command.guild.createTextChannel("War ${FormattingUtils.formatDateToBasicString(date)}").complete()

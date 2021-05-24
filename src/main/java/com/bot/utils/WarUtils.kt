@@ -14,13 +14,14 @@ class WarUtils {
             val channelEntity = textChannelService.getById(channel.id)
 
             val war = warService.createWar(date.toInstant(), warMessage.id, channelEntity, guild.bdoGuild!!);
-            // TODO: Guild war days
+            // TODO: Guild war completion
             // TODO: War reminders
             // TODO: Archive channel
             // TODO: Stats
             warMessage.editMessage(FormattingUtils.generateWarMessage(war)).complete()
-            warMessage.addReaction(Constants.WAR_REACTION_YES).complete()
-            warMessage.addReaction(Constants.WAR_REACTION_NO).complete()
+            for (reaction in Constants.WAR_REACTIONS) {
+                warMessage.addReaction(reaction).complete()
+            }
         }
     }
 }
