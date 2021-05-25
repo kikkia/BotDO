@@ -13,4 +13,8 @@ class WarStatsEntity(
         val war: WarEntity,
         @Column(name = "img_link")
         val imgLink: String
-) {}
+) {
+        fun toEmbed() : String {
+                return "[Stats$id]($imgLink)"
+        }
+}

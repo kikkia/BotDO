@@ -1,8 +1,12 @@
 package com.bot.utils
 
 import com.bot.db.entities.GuildEntity
+import com.bot.db.entities.WarEntity
+import com.bot.db.entities.WarStatsEntity
+import com.bot.db.entities.WarVodEntity
 import com.bot.service.TextChannelService
 import com.bot.service.WarService
+import com.jagrosh.jdautilities.command.CommandEvent
 import net.dv8tion.jda.api.entities.TextChannel
 import java.util.*
 
@@ -14,14 +18,21 @@ class WarUtils {
             val channelEntity = textChannelService.getById(channel.id)
 
             val war = warService.createWar(date.toInstant(), warMessage.id, channelEntity, guild.bdoGuild!!);
-            // TODO: Guild war completion
             // TODO: War reminders
-            // TODO: Archive channel
-            // TODO: Stats
             warMessage.editMessage(FormattingUtils.generateWarMessage(war)).complete()
             for (reaction in Constants.WAR_REACTIONS) {
                 warMessage.addReaction(reaction).complete()
             }
+        }
+
+        fun sendArchivedWar(war: WarEntity, vods: List<WarVodEntity>, stats: List<WarStatsEntity>, channel: TextChannel) : String {
+            val warMessage = channel.sendMessage("Archiving War...").complete()
+
+            warMessage.editMessage(FormattingUtils.generateArchivedWarMessage(war,
+                    vods,
+                    stats)).complete()
+            warMessage.addReaction(Constants.WAR_REACTION_REFRESH).complete()
+            return warMessage.id
         }
     }
 }

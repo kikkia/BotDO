@@ -12,8 +12,11 @@ class WarVodEntity(
         @JoinColumn(name = "war_id")
         val war: WarEntity,
         @Column(name = "vod_link")
-        val vodLink: String
+        val vodLink: String,
+        @Column(name = "type")
+        var type: String
 ) {
-    @Column(name = "type")
-    var type: String? = null
+    fun toEmbed() : String {
+        return "[$type]($vodLink)"
+    }
 }

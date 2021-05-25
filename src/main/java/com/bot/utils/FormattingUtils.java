@@ -236,6 +236,7 @@ public class FormattingUtils {
         return formatter.format(date);
     }
 
+    // TODO: Clean this up with archived builder
     public static MessageEmbed generateWarMessage(WarEntity warEntity) {
         var limit = warEntity.getWarNode() == null ? 100: warEntity.getWarNode().getCap();
         var attendees = warEntity.getAttendees().stream()
@@ -258,6 +259,53 @@ public class FormattingUtils {
         embedBuilder.setDescription(buildAttendeeList(attendees, limit));
         embedBuilder.setFooter("To sign up react `Y` for yes, `N` for no. ? for maybe. War Id: " + warEntity.getId());
         return embedBuilder.build();
+    }
+
+    public static MessageEmbed generateArchivedWarMessage(WarEntity warEntity,
+                                                          List<WarVodEntity> vods,
+                                                          List<WarStatsEntity> stats) {
+        var limit = warEntity.getWarNode() == null ? 100: warEntity.getWarNode().getCap();
+        var attendees = warEntity.getAttendees().stream()
+                .filter(it -> !it.getNoShow())
+                .collect(Collectors.toList());
+
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setAuthor(formatDateToBasicString(warEntity.getWarTime()) + " war results.");
+        embedBuilder.addField("Avg gearscore", String.valueOf(warEntity.getAverageGS()), true);
+        embedBuilder.addField("Total Attendance (No shows removed)", String.valueOf(attendees.size()), true);
+        embedBuilder.addField("Win", String.valueOf(warEntity.getWon()), true);
+        if (warEntity.getWarNode() != null) {
+            embedBuilder.addField("Node", warEntity.getWarNode().getDisplayName(), true);
+            embedBuilder.addField("Tier", warEntity.getWarNode().getTier().getDisplay(), true);
+            embedBuilder.addField("Cap", String.valueOf(warEntity.getWarNode().getCap()), true);
+        } else {
+            embedBuilder.addField("Node", "No node set, you can set one by using the ,node command", false);
+        }
+        if (!vods.isEmpty()) {
+            embedBuilder.addField("Vods", generateVodsField(vods), false);
+        }
+        if (!stats.isEmpty()) {
+            embedBuilder.addField("Stats", generateStatsField(stats), false);
+        }
+        embedBuilder.setDescription(buildAttendeeList(attendees, limit));
+        embedBuilder.setFooter("War Id: " + warEntity.getId());
+        return embedBuilder.build();
+    }
+
+    private static String generateVodsField(List<WarVodEntity> vods) {
+        StringBuilder builder = new StringBuilder();
+        for (WarVodEntity vod : vods) {
+            builder.append(vod.toEmbed()).append(" ");
+        }
+        return builder.toString();
+    }
+
+    private static String generateStatsField(List<WarStatsEntity> stats) {
+        StringBuilder builder = new StringBuilder();
+        for (WarStatsEntity stat: stats) {
+            builder.append(stat.toEmbed()).append(" ");
+        }
+        return builder.toString();
     }
 
     private static String buildAttendeeList(List<WarAttendanceEntity> attendees, int limit) {

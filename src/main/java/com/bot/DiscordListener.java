@@ -58,6 +58,10 @@ public class DiscordListener extends ListenerAdapter {
     @Autowired
     private WarService warService;
     @Autowired
+    private WarVodService warVodService;
+    @Autowired
+    private WarStatsService warStatsService;
+    @Autowired
     private ScheduledExecutorService executorService;
 
     @Override
@@ -186,47 +190,7 @@ public class DiscordListener extends ListenerAdapter {
         // TODO: For use in reaction roles
         // Check if this message is a war attendance message
         Optional<WarEntity> warOpt = warService.getWarByMessageId(event.getMessageId());
-        if (warOpt.isPresent()) {
-            // TODO: Family name in guild verification
-            // If emoji is not a proper emoji, remove it
-            if (Constants.WAR_REACTIONS.contains(event.getReactionEmote().getName())) {
-                WarEntity warEntity = warOpt.get();
-                // If war has happened already, return
-                if (warEntity.getWarTime().toInstant().isBefore(Instant.now())) {
-                    return;
-                }
-                // If yes reaction
-                if (event.getReactionEmote().getName().equals(Constants.WAR_REACTION_YES)) {
-                    // If they are signed up as maybe, remove the maybe
-                    var attendeeOpt = warEntity.getAttendees().stream()
-                            .filter(a -> a.getUser().getId().equals(event.getUserId()))
-                            .filter(WarAttendanceEntity::getMaybe).findFirst();
-                    if (attendeeOpt.isPresent()) {
-                        // Remove and re add attendee as maybe (We want to refresh their created timestamp)
-                        warEntity = warService.removeAttendee(warEntity, userService.getById(event.getUserId()));
-                    }
-
-                    // If they are not signed up then add them
-                    if (!warEntity.getAttendees().stream().map(a -> a.getUser().getId()).collect(Collectors.toList()).contains(event.getUserId())) {
-                        warEntity = warService.addAttendee(warEntity, userService.getById(event.getUserId()), false);
-                    }
-                } else if (event.getReactionEmote().getName().equals(Constants.WAR_REACTION_NO)) {
-                    // If no reaction remove them from the list if they are on it
-                    warEntity = warService.removeAttendee(warEntity, userService.getById(event.getUserId()));
-                } else if (event.getReactionEmote().getName().equals(Constants.WAR_REACTION_MAYBE)) {
-                    // Set the user to maybe or create maybe attendance
-                    var attendeeOpt = warEntity.getAttendees().stream().filter(a -> a.getUser().getId().equals(event.getUserId())).findFirst();
-                    if (attendeeOpt.isPresent()) {
-                        // Remove and re add attendee as maybe (We want to refresh their created timestamp)
-                        warEntity = warService.removeAttendee(warEntity, userService.getById(event.getUserId()));
-                    }
-                    warEntity = warService.addAttendee(warEntity, userService.getById(event.getUserId()), true);
-                }
-                event.getChannel().editMessageById(event.getMessageId(), FormattingUtils.generateWarMessage(warEntity)).complete();
-            }
-
-            event.getReaction().removeReaction(event.getUser()).queue();
-        }
+        warOpt.ifPresent(warEntity -> handleWarReaction(warEntity, event));
         super.onGuildMessageReactionAdd(event);
     }
 
@@ -273,5 +237,44 @@ public class DiscordListener extends ListenerAdapter {
         }
         super.onGuildInviteCreate(event);
 
+    }
+
+    private void handleWarReaction(WarEntity warEntity, GuildMessageReactionAddEvent event) {
+        // TODO: Family name in guild verification
+        // TODO: Move some logic to service layer
+        // If emoji is not a proper emoji, remove it
+        if (Constants.WAR_REACTIONS.contains(event.getReactionEmote().getName())) {
+            // If war has happened already, only refresh
+            if (warEntity.getArchived()) {
+                // Do nothing just refresh
+            } else if (event.getReactionEmote().getName().equals(Constants.WAR_REACTION_YES)) {
+                // If they are signed up as maybe, remove the maybe
+                var attendeeOpt = warEntity.getAttendees().stream()
+                        .filter(a -> a.getUser().getId().equals(event.getUserId()))
+                        .filter(WarAttendanceEntity::getMaybe).findFirst();
+                if (attendeeOpt.isPresent()) {
+                    // Remove and re add attendee as maybe (We want to refresh their created timestamp)
+                    warEntity = warService.removeAttendee(warEntity, userService.getById(event.getUserId()));
+                }
+
+                // If they are not signed up then add them
+                if (!warEntity.getAttendees().stream().map(a -> a.getUser().getId()).collect(Collectors.toList()).contains(event.getUserId())) {
+                    warEntity = warService.addAttendee(warEntity, userService.getById(event.getUserId()), false);
+                }
+            } else if (event.getReactionEmote().getName().equals(Constants.WAR_REACTION_NO)) {
+                // If no reaction remove them from the list if they are on it
+                warEntity = warService.removeAttendee(warEntity, userService.getById(event.getUserId()));
+            } else if (event.getReactionEmote().getName().equals(Constants.WAR_REACTION_MAYBE)) {
+                // Set the user to maybe or create maybe attendance
+                var attendeeOpt = warEntity.getAttendees().stream().filter(a -> a.getUser().getId().equals(event.getUserId())).findFirst();
+                if (attendeeOpt.isPresent()) {
+                    // Remove and re add attendee as maybe (We want to refresh their created timestamp)
+                    warEntity = warService.removeAttendee(warEntity, userService.getById(event.getUserId()));
+                }
+                warEntity = warService.addAttendee(warEntity, userService.getById(event.getUserId()), true);
+            }
+            warService.refreshMessage(event.getGuild(), warEntity);
+        }
+        event.getReaction().removeReaction(event.getUser()).queue();
     }
 }
