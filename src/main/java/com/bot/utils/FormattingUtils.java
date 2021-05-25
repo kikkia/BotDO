@@ -1,17 +1,18 @@
 package com.bot.utils;
 
-import com.bot.db.entities.EventEntity;
-import com.bot.db.entities.ScrollGroup;
-import com.bot.db.entities.UserEntity;
+import com.bot.db.entities.*;
 import com.bot.db.mapper.ScrollInventoryMapper;
 import com.bot.models.Scroll;
 import com.bot.models.ScrollInventory;
+import com.bot.models.WarNode;
 import com.vladsch.flexmark.profile.pegdown.Extensions;
 import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter;
 import com.vladsch.flexmark.util.data.DataHolder;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import org.joda.time.Duration;
 import org.joda.time.Period;
@@ -30,6 +31,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.*;
 import java.util.List;
@@ -228,4 +230,116 @@ public class FormattingUtils {
             return "wtf is this? " + level;
         }
     }
+
+    public static String formatDateToBasicString(Date date) {
+        SimpleDateFormat formatter = new SimpleDateFormat("E dd-MMM", Locale.ENGLISH);
+        return formatter.format(date);
+    }
+
+    // TODO: Clean this up with archived builder
+    public static MessageEmbed generateWarMessage(WarEntity warEntity) {
+        var limit = warEntity.getWarNode() == null ? 100: warEntity.getWarNode().getCap();
+        var attendees = warEntity.getAttendees().stream()
+                .sorted(warSignupComparator)
+                .collect(Collectors.toList());
+
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setAuthor(formatDateToBasicString(warEntity.getWarTime()) + " war signup.");
+        embedBuilder.addField("Avg gearscore", String.valueOf(warEntity.getAverageGS()), true);
+        embedBuilder.addField("Total signups (Maybes included)", String.valueOf(warEntity.getAttendees().size()), true);
+        embedBuilder.addBlankField(true);
+        if (warEntity.getWarNode() != null) {
+            embedBuilder.addField("Node", warEntity.getWarNode().getDisplayName(), true);
+            embedBuilder.addField("Tier", warEntity.getWarNode().getTier().getDisplay(), true);
+            embedBuilder.addField("Cap", String.valueOf(warEntity.getWarNode().getCap()), true);
+        } else {
+            embedBuilder.addField("Node", "No node set, you can set one by using the ,node command", false);
+        }
+
+        embedBuilder.setDescription(buildAttendeeList(attendees, limit));
+        embedBuilder.setFooter("To sign up react `Y` for yes, `N` for no. ? for maybe. War Id: " + warEntity.getId());
+        return embedBuilder.build();
+    }
+
+    public static MessageEmbed generateArchivedWarMessage(WarEntity warEntity,
+                                                          List<WarVodEntity> vods,
+                                                          List<WarStatsEntity> stats) {
+        var limit = warEntity.getWarNode() == null ? 100: warEntity.getWarNode().getCap();
+        var attendees = warEntity.getAttendees().stream()
+                .filter(it -> !it.getNoShow())
+                .collect(Collectors.toList());
+
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setAuthor(formatDateToBasicString(warEntity.getWarTime()) + " war results.");
+        embedBuilder.addField("Avg gearscore", String.valueOf(warEntity.getAverageGS()), true);
+        embedBuilder.addField("Total Attendance (No shows removed)", String.valueOf(attendees.size()), true);
+        embedBuilder.addField("Win", String.valueOf(warEntity.getWon()), true);
+        if (warEntity.getWarNode() != null) {
+            embedBuilder.addField("Node", warEntity.getWarNode().getDisplayName(), true);
+            embedBuilder.addField("Tier", warEntity.getWarNode().getTier().getDisplay(), true);
+            embedBuilder.addField("Cap", String.valueOf(warEntity.getWarNode().getCap()), true);
+        } else {
+            embedBuilder.addField("Node", "No node set, you can set one by using the ,node command", false);
+        }
+        if (!vods.isEmpty()) {
+            embedBuilder.addField("Vods", generateVodsField(vods), false);
+        }
+        if (!stats.isEmpty()) {
+            embedBuilder.addField("Stats", generateStatsField(stats), false);
+        }
+        embedBuilder.setDescription(buildAttendeeList(attendees, limit));
+        embedBuilder.setFooter("War Id: " + warEntity.getId());
+        return embedBuilder.build();
+    }
+
+    private static String generateVodsField(List<WarVodEntity> vods) {
+        StringBuilder builder = new StringBuilder();
+        for (WarVodEntity vod : vods) {
+            builder.append(vod.toEmbed()).append(" ");
+        }
+        return builder.toString();
+    }
+
+    private static String generateStatsField(List<WarStatsEntity> stats) {
+        StringBuilder builder = new StringBuilder();
+        for (WarStatsEntity stat: stats) {
+            builder.append(stat.toEmbed()).append(" ");
+        }
+        return builder.toString();
+    }
+
+    private static String buildAttendeeList(List<WarAttendanceEntity> attendees, int limit) {
+        var count = 0; // Used to keep track for when we hit the limit
+        var maybe = false; // Denotes if we have hit the maybe category yet
+        if (attendees.isEmpty()) {
+            return "No attendees yet";
+        }
+        StringBuilder toReturn = new StringBuilder("```css\n");
+
+        for (WarAttendanceEntity attendee : attendees) {
+            if (attendee.getMaybe() && !maybe) { // Maybes are always last on the list
+                toReturn.append("--Maybe--\n");
+                maybe = true;
+            }
+            if (count == limit && !maybe) { // If we are at limit and not in the maybes yet
+                toReturn.append("--BACKUPS--\n");
+            }
+            toReturn.append(attendee.toMessageEntry()).append("\n");
+            count++;
+        }
+        toReturn.append("```");
+        return toReturn.toString();
+    }
+
+    private static Comparator<WarAttendanceEntity> warSignupComparator = new Comparator<WarAttendanceEntity>() {
+        @Override
+        public int compare(WarAttendanceEntity o1, WarAttendanceEntity o2) {
+            if (o1.getMaybe() && !o2.getMaybe()) {
+                return 1;
+            } else if (!o1.getMaybe() && o2.getMaybe()) {
+                return -1;
+            }
+            return o1.getCreated().compareTo(o2.getCreated());
+        }
+    };
 }

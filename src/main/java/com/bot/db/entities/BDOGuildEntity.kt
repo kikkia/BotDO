@@ -1,5 +1,6 @@
 package com.bot.db.entities
 
+import com.bot.models.WarDay
 import java.sql.Timestamp
 import javax.persistence.*
 
@@ -19,4 +20,17 @@ class BDOGuildEntity(
     var members: List<GuildMembershipEntity>,
     @OneToOne
     @JoinColumn(name = "master_family")
-    var master: FamilyEntity?)
+    var master: FamilyEntity?) {
+    @OneToOne(mappedBy = "bdoGuild")
+    var discordGuild: GuildEntity? = null
+    @Column(name = "war_days")
+    var warDays: Int? = null
+
+    fun getWarDays() : List<WarDay> {
+        return if (warDays == null) {
+            listOf()
+        } else {
+            WarDay.getAllDays(warDays!!)
+        }
+    }
+}

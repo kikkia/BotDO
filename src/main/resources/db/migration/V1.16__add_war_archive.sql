@@ -1,0 +1,5 @@
+ALTER TABLE `guild`
+ADD war_archive_channel VARCHAR(128) NULL DEFAULT NULL;
+
+ALTER TABLE `war`
+ADD archived TINYINT(1) NULL DEFAULT 0;
