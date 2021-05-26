@@ -15,16 +15,13 @@ class BDOGuildEntity(
     @Column(name = "region")
     val region: String,
     @Column(name = "last_scan")
-    var last_scan: Timestamp,
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "guild", cascade = [CascadeType.ALL])
-    var members: List<GuildMembershipEntity>,
-    @OneToOne
-    @JoinColumn(name = "master_family")
-    var master: FamilyEntity?) {
+    var last_scan: Timestamp) {
     @OneToOne(mappedBy = "bdoGuild")
     var discordGuild: GuildEntity? = null
     @Column(name = "war_days")
     var warDays: Int? = null
+    @Column(name = "master_family")
+    var master: Int? = null
 
     fun getWarDays() : List<WarDay> {
         return if (warDays == null) {

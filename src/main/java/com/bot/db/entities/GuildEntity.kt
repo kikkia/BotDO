@@ -15,7 +15,7 @@ data class GuildEntity(
         @ManyToMany(cascade = [
                 CascadeType.PERSIST,
                 CascadeType.MERGE
-        ], fetch = FetchType.EAGER)
+        ], fetch = FetchType.LAZY)
         @JoinTable(name = "guild_membership",
                 joinColumns = [JoinColumn(name = "guild_id", referencedColumnName = "id")],
                 inverseJoinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")])

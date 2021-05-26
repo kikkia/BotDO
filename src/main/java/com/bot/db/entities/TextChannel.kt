@@ -9,9 +9,8 @@ import javax.persistence.*
 data class TextChannel(
         @Id
         val id: String,
-        @ManyToOne
-        @JoinColumn(name = "guild")
-        val guild: GuildEntity,
+        @Column(name = "guild")
+        val guild: String,
         var name: String,
         var announcement: Boolean,
         @Column(name="persistent_scrolls")

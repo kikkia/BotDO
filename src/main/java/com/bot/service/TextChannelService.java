@@ -21,7 +21,7 @@ public class TextChannelService {
     public TextChannel add(net.dv8tion.jda.api.entities.TextChannel channel,
                            GuildEntity guild) {
         TextChannel textChannel = new TextChannel(channel.getId(),
-                guild,
+                guild.getId(),
                 channel.getName(),
                 false,
                 false);

@@ -24,9 +24,7 @@ public class BdoGuildService {
         return repository.save(new BDOGuildEntity(0,
                 name,
                 region.getCode(),
-                Timestamp.from(Instant.now()),
-                Collections.emptyList(),
-                null));
+                Timestamp.from(Instant.now())));
     }
 
     public Optional<BDOGuildEntity> getByNameAndRegion(String name, Region region) {
