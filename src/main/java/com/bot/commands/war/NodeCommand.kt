@@ -4,8 +4,6 @@ import com.bot.db.entities.GuildEntity
 import com.bot.models.WarDay
 import com.bot.models.WarNode
 import com.bot.service.*
-import com.bot.utils.CommandParsingUtils
-import com.bot.utils.WarUtils
 import com.jagrosh.jdautilities.command.CommandEvent
 import org.springframework.stereotype.Component
 import java.lang.Integer.parseInt
