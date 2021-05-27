@@ -22,7 +22,7 @@ enum class BdoClass(val display: String, val aliases: List<String>, val stateful
     ARCHER("Archer", emptyList(), false),
     LAHN("Lahn", emptyList(), true),
     SHAI("Shai", listOf("loli"), false),
-    GAURDIAN("Gaurdian", listOf("thicc bitch", "thighs", "boobs"), true),
+    GUARDIAN("Guardian", listOf("thicc bitch", "thighs", "boobs"), true),
     HASHASHIN("Hash", listOf("hashashin"), true),
     NOVA("Nova", emptyList(), true),
     SAGE("Sage", listOf("sadge"), true);

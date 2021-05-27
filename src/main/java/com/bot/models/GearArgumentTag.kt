@@ -154,7 +154,7 @@ enum class GearArgumentTag(val tag: String) {
         private fun cleanToFirstArg(input: String) : String {
             var toReturn = input
             for (tag in values()) {
-                toReturn = toReturn.split(tag.tag)[0]
+                toReturn = toReturn.toLowerCase().split(tag.tag)[0]
             }
             return toReturn.trim()
         }
