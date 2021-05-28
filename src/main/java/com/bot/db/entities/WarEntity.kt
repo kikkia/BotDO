@@ -58,14 +58,15 @@ class WarEntity(
         if (attendees.isEmpty()) {
             return 0
         }
+        val gearscores = attendees.asSequence()
+                .filter { it.user.gearset != null }
+                .filter { it.user.gearset!!.getGearScore() > 0 }
+                .map { it.user.gearset!!.getGearScore() }
+                .toList()
         var totalGS = 0
-        for (att in attendees) {
-            var userGS = 0
-            if (att.user.gearset != null) {
-                userGS = att.user.gearset!!.getGearScore()
-            }
-            totalGS += userGS
+        for (att in gearscores) {
+            totalGS += att
         }
-        return totalGS / attendees.size
+        return totalGS / gearscores.size
     }
 }
