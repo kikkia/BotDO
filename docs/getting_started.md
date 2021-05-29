@@ -21,7 +21,7 @@ will automattically put the family name in users nicknames if they have it setup
 (Still working a bit on this feature so use at your own risk)
 
 # Gear
-You can use WackyToshi to track your gear and the gear of others in your guild. For more info [see here](Gear.md)
+You can use WackyToshi to track your gear and the gear of others in your guild. For more info [see here](gear.md)
 
 # PlayerDirectory
 You can look up players in game information with their family name. [See here](PlayerDirectory.md)
