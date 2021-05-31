@@ -23,8 +23,8 @@ class ScanGuildsTask(private val familyService: FamilyService,
         var page = 1
         var guildCount = 0
         var familyCount = 0
-        while(true) {
-            for (i in IntStream.range('a'.toInt(), 'z'.toInt())) {
+        for (i in IntStream.range('a'.toInt(), 'z'.toInt())) {
+            while(true) {
                 try {
                     val guildNames = GuildScrapeUtils.getGuildNamesOnPage(page, i.toChar().toString())
                     if (guildNames.isEmpty()) {
@@ -71,6 +71,7 @@ class ScanGuildsTask(private val familyService: FamilyService,
                 } catch (e: Exception) {
                     log.error("Sync Job Step failed due to exception", e)
                     log.warn("Sync job step for ${i.toChar()} failed after $page pages, $guildCount guilds and $familyCount families")
+                    continue
                 }
             }
         }
