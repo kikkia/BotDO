@@ -6,7 +6,6 @@ import com.bot.db.entities.WarStatsEntity
 import com.bot.db.entities.WarVodEntity
 import com.bot.service.TextChannelService
 import com.bot.service.WarService
-import com.jagrosh.jdautilities.command.CommandEvent
 import net.dv8tion.jda.api.entities.TextChannel
 import java.util.*
 

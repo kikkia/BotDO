@@ -267,6 +267,7 @@ public class FormattingUtils {
         var limit = warEntity.getWarNode() == null ? 100: warEntity.getWarNode().getCap();
         var attendees = warEntity.getAttendees().stream()
                 .filter(it -> !it.getNoShow())
+                .sorted(warSignupComparator)
                 .collect(Collectors.toList());
 
         EmbedBuilder embedBuilder = new EmbedBuilder();
@@ -331,15 +332,12 @@ public class FormattingUtils {
         return toReturn.toString();
     }
 
-    private static Comparator<WarAttendanceEntity> warSignupComparator = new Comparator<WarAttendanceEntity>() {
-        @Override
-        public int compare(WarAttendanceEntity o1, WarAttendanceEntity o2) {
-            if (o1.getMaybe() && !o2.getMaybe()) {
-                return 1;
-            } else if (!o1.getMaybe() && o2.getMaybe()) {
-                return -1;
-            }
-            return o1.getCreated().compareTo(o2.getCreated());
+    private static final Comparator<WarAttendanceEntity> warSignupComparator = (o1, o2) -> {
+        if (o1.getMaybe() && !o2.getMaybe()) {
+            return 1;
+        } else if (!o1.getMaybe() && o2.getMaybe()) {
+            return -1;
         }
+        return o1.getCreated().compareTo(o2.getCreated());
     };
 }
