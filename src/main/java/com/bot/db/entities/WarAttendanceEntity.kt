@@ -22,6 +22,8 @@ class WarAttendanceEntity(
     var noShow: Boolean = false
     @Column(name = "maybe")
     var maybe: Boolean = false
+    @Column(name = "not_attending")
+    var notAttending: Boolean = false
     @Column(name = "created")
     val created: Timestamp = Timestamp.from(Instant.now())
 

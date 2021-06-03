@@ -243,6 +243,8 @@ public class DiscordListener extends ListenerAdapter {
         // TODO: Family name in guild verification
         // TODO: Move some logic to service layer
         // If emoji is not a proper emoji, remove it
+        var user = userService.getById(event.getUserId());
+
         if (Constants.WAR_REACTIONS.contains(event.getReactionEmote().getName())) {
             // If war has happened already, only refresh
             if (warEntity.getArchived()) {
@@ -250,20 +252,21 @@ public class DiscordListener extends ListenerAdapter {
             } else if (event.getReactionEmote().getName().equals(Constants.WAR_REACTION_YES)) {
                 // If they are signed up as maybe, remove the maybe
                 var attendeeOpt = warEntity.getAttendees().stream()
-                        .filter(a -> a.getUser().getId().equals(event.getUserId()))
-                        .filter(WarAttendanceEntity::getMaybe).findFirst();
+                        .filter(a -> a.getUser().getId().equals(event.getUserId())).findFirst();
                 if (attendeeOpt.isPresent()) {
                     // Remove and re add attendee as maybe (We want to refresh their created timestamp)
-                    warEntity = warService.removeAttendee(warEntity, userService.getById(event.getUserId()));
+                    warEntity = warService.removeAttendee(warEntity, user);
                 }
 
                 // If they are not signed up then add them
                 if (!warEntity.getAttendees().stream().map(a -> a.getUser().getId()).collect(Collectors.toList()).contains(event.getUserId())) {
-                    warEntity = warService.addAttendee(warEntity, userService.getById(event.getUserId()), false);
+                    warEntity = warService.addAttendee(warEntity, user, false);
                 }
             } else if (event.getReactionEmote().getName().equals(Constants.WAR_REACTION_NO)) {
                 // If no reaction remove them from the list if they are on it
-                warEntity = warService.removeAttendee(warEntity, userService.getById(event.getUserId()));
+                warEntity = warService.removeAttendee(warEntity, user);
+                // Add a new entity with the NO
+                warEntity = warService.notAttending(warEntity, user);
             } else if (event.getReactionEmote().getName().equals(Constants.WAR_REACTION_MAYBE)) {
                 // Set the user to maybe or create maybe attendance
                 var attendeeOpt = warEntity.getAttendees().stream().filter(a -> a.getUser().getId().equals(event.getUserId())).findFirst();
@@ -271,7 +274,7 @@ public class DiscordListener extends ListenerAdapter {
                     // Remove and re add attendee as maybe (We want to refresh their created timestamp)
                     warEntity = warService.removeAttendee(warEntity, userService.getById(event.getUserId()));
                 }
-                warEntity = warService.addAttendee(warEntity, userService.getById(event.getUserId()), true);
+                warEntity = warService.addAttendee(warEntity, user, true);
             }
             warService.refreshMessage(event.getGuild(), warEntity);
         }

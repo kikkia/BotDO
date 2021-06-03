@@ -4,7 +4,6 @@ import com.bot.db.entities.*;
 import com.bot.db.mapper.ScrollInventoryMapper;
 import com.bot.models.Scroll;
 import com.bot.models.ScrollInventory;
-import com.bot.models.WarNode;
 import com.vladsch.flexmark.profile.pegdown.Extensions;
 import com.vladsch.flexmark.profile.pegdown.PegdownOptionsAdapter;
 import com.vladsch.flexmark.util.data.DataHolder;
@@ -13,6 +12,7 @@ import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import org.joda.time.Duration;
 import org.joda.time.Period;
@@ -239,14 +239,21 @@ public class FormattingUtils {
     // TODO: Clean this up with archived builder
     public static MessageEmbed generateWarMessage(WarEntity warEntity) {
         var limit = warEntity.getWarNode() == null ? 100: warEntity.getWarNode().getCap();
+        var notAttendingCount = warEntity.getAttendees()
+                .stream()
+                .filter(WarAttendanceEntity::getNotAttending)
+                .count();
+
         var attendees = warEntity.getAttendees().stream()
                 .sorted(warSignupComparator)
+                .filter(it -> !it.getNotAttending())
                 .collect(Collectors.toList());
 
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setAuthor(formatDateToBasicString(warEntity.getWarTime()) + " war signup.");
         embedBuilder.addField("Avg gearscore", String.valueOf(warEntity.getAverageGS()), true);
         embedBuilder.addField("Total signups (Maybes included)", String.valueOf(warEntity.getAttendees().size()), true);
+        embedBuilder.addField("Not attending", String.valueOf(notAttendingCount), true);
         embedBuilder.addBlankField(true);
         if (warEntity.getWarNode() != null) {
             embedBuilder.addField("Node", warEntity.getWarNode().getDisplayName(), true);
@@ -267,6 +274,7 @@ public class FormattingUtils {
         var limit = warEntity.getWarNode() == null ? 100: warEntity.getWarNode().getCap();
         var attendees = warEntity.getAttendees().stream()
                 .filter(it -> !it.getNoShow())
+                .filter(it -> !it.getNotAttending())
                 .sorted(warSignupComparator)
                 .collect(Collectors.toList());
 
@@ -318,6 +326,11 @@ public class FormattingUtils {
         StringBuilder toReturn = new StringBuilder("```css\n");
 
         for (WarAttendanceEntity attendee : attendees) {
+            // Skip those not attending
+            if (attendee.getNotAttending()) {
+                continue;
+            }
+
             if (attendee.getMaybe() && !maybe) { // Maybes are always last on the list
                 toReturn.append("--Maybe--\n");
                 maybe = true;
