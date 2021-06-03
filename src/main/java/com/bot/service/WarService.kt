@@ -77,10 +77,24 @@ open class WarService(private val warRepository: WarRepository,
         return save(war)
     }
 
+    open fun noShow(war: WarEntity, attendee: WarAttendanceEntity) : WarEntity {
+        val attendees = war.attendees.toMutableList()
+        attendees.remove(attendee)
+        attendee.noShow = true
+        attendees.add(attendee)
+        war.attendees = attendees
+        return save(war)
+    }
+
     open fun removeAttendee(war: WarEntity, user: UserEntity) : WarEntity {
         val attendees = war.attendees.stream().filter{ it.user.id != user.id}.collect(Collectors.toList())
         war.attendees = attendees
         return save(war)
+    }
+
+    open fun refreshAttendee(war: WarEntity, user: UserEntity) : WarEntity {
+        removeAttendee(war, user)
+        return addAttendee(war, user)
     }
 
     open fun save(war: WarEntity) : WarEntity {

@@ -22,7 +22,7 @@ class WeWonCommand(val warService: WarService,
             val id = Integer.parseInt(command.args)
             val warOpt = warService.getByGuildAndId(guild, id)
             if (warOpt.isEmpty) {
-                command.replyWarning("War not found, make sure you are using the right Id")
+                command.replyWarning("War not found, make sure you are using the right ID")
                 return
             }
             val war = warOpt.get()

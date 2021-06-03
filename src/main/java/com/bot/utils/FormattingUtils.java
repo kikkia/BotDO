@@ -278,6 +278,11 @@ public class FormattingUtils {
                 .sorted(warSignupComparator)
                 .collect(Collectors.toList());
 
+        var noShows = warEntity.getAttendees().stream()
+                .filter(WarAttendanceEntity::getNoShow)
+                .map(it -> it.getUser().getEffectiveName())
+                .collect(Collectors.toList());
+
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setAuthor(formatDateToBasicString(warEntity.getWarTime()) + " war results.");
         embedBuilder.addField("Avg gearscore", String.valueOf(warEntity.getAverageGS()), true);
@@ -295,6 +300,9 @@ public class FormattingUtils {
         }
         if (!stats.isEmpty()) {
             embedBuilder.addField("Stats", generateStatsField(stats), false);
+        }
+        if (!noShows.isEmpty()) {
+            embedBuilder.addField("No shows", noShows.toString(), false);
         }
         embedBuilder.setDescription(buildAttendeeList(attendees, limit));
         embedBuilder.setFooter("War Id: " + warEntity.getId());
