@@ -71,8 +71,8 @@ public class DiscordListener extends ListenerAdapter {
     public void onReady(@NotNull ReadyEvent event) {
         // Schedule the NA scan
         // TODO: This runs once for every shard, be careful if sharding is ever needed
-//        executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, Region.NORTH_AMERICA),
-//                0, 24, TimeUnit.HOURS);
+        executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, Region.NORTH_AMERICA),
+                0, 24, TimeUnit.HOURS);
 
         // Open dm channels with users with active dm signups to listen for updates
         List<String> usersWithDmSignups = warService
