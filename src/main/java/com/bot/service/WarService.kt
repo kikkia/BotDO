@@ -1,6 +1,7 @@
 package com.bot.service
 
 import com.bot.db.entities.*
+import com.bot.db.repositories.WarDmSignupRepository
 import com.bot.db.repositories.WarRepository
 import com.bot.utils.FormattingUtils
 import net.dv8tion.jda.api.entities.Guild
@@ -14,12 +15,24 @@ import javax.transaction.Transactional
 @Transactional
 @Service
 open class WarService(private val warRepository: WarRepository,
+                      private val warDmSignupRepository: WarDmSignupRepository,
                       private val warVodService: WarVodService,
                       private val warStatsService: WarStatsService,
                       private val textChannelService: TextChannelService) {
 
     open fun getWarByMessageId(messageId: String) : Optional<WarEntity> {
         return warRepository.findByMessageId(messageId)
+    }
+
+    /**
+     * Get a war entity from a dm message id if that message is for a war signup
+     */
+    open fun getWarByDmMessageId(messageId: String) : Optional<WarEntity> {
+        val signupOpt = warDmSignupRepository.findByMessageIdAndActiveTrue(messageId)
+        if (signupOpt.isPresent) {
+            return Optional.of(signupOpt.get().warEntity)
+        }
+        return Optional.empty()
     }
 
     open fun getWarByGuildAndDate(guild: GuildEntity, date: Date) : Optional<WarEntity> {
@@ -35,6 +48,7 @@ open class WarService(private val warRepository: WarRepository,
     }
 
     open fun setArchived(war: WarEntity) : WarEntity {
+        deactivateDmSignup(war)
         war.archived = true
         return save(war)
     }
@@ -57,6 +71,34 @@ open class WarService(private val warRepository: WarRepository,
     open fun createWar(time: Instant, messageId: String, channel: TextChannel, guild: BDOGuildEntity) : WarEntity {
         val newWar = WarEntity(0, Timestamp.from(time), listOf(), messageId, channel, guild)
         return save(newWar)
+    }
+
+    open fun addDmSignupMessage(war: WarEntity, messageId: String, userId: String) : WarDmSignupEntity {
+        val signup = WarDmSignupEntity(0, messageId, userId, war)
+        return warDmSignupRepository.save(signup)
+    }
+
+    open fun deactivateDmSignup(war: WarEntity, userId: String) {
+        val signupEntities = warDmSignupRepository.findAllByWarEntityAndUserId(war, userId)
+        for (signupEntity in signupEntities) {
+            deactivateDmSignup(signupEntity)
+        }
+    }
+
+    open fun deactivateDmSignup(war: WarEntity) {
+        val signupEntities = warDmSignupRepository.findAllByWarEntityAndActiveTrue(war)
+        for (signupEntity in signupEntities) {
+            deactivateDmSignup(signupEntity)
+        }
+    }
+
+    open fun deactivateDmSignup(entity: WarDmSignupEntity) {
+        entity.active = false
+        warDmSignupRepository.save(entity)
+    }
+
+    open fun getActiveDmSignups() : List<WarDmSignupEntity> {
+        return warDmSignupRepository.findAllByActiveTrue()
     }
 
     open fun addAttendee(war: WarEntity, user: UserEntity, maybe: Boolean = false) : WarEntity {

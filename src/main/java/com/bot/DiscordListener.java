@@ -9,6 +9,7 @@ import com.bot.tasks.SyncUserFamilyNameTask;
 import com.bot.utils.Constants;
 import com.bot.utils.FormattingUtils;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.channel.text.TextChannelCreateEvent;
@@ -24,6 +25,8 @@ import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameE
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateNameEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
+import net.dv8tion.jda.api.events.message.priv.react.PrivateMessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.react.GenericMessageReactionEvent;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -67,8 +70,23 @@ public class DiscordListener extends ListenerAdapter {
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         // Schedule the NA scan
-        executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, Region.NORTH_AMERICA),
-                0, 24, TimeUnit.HOURS);
+        // TODO: This runs once for every shard, be careful if sharding is ever needed
+//        executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, Region.NORTH_AMERICA),
+//                0, 24, TimeUnit.HOURS);
+
+        // Open dm channels with users with active dm signups to listen for updates
+        List<String> usersWithDmSignups = warService
+                .getActiveDmSignups()
+                .stream()
+                .map(WarDmSignupEntity::getUserId)
+                .collect(Collectors.toList());
+        for (String userId: usersWithDmSignups) {
+            var user = event.getJDA().getUserById(userId);
+            if (user != null) {
+                // Cached if already opened
+                user.openPrivateChannel().queue();
+            }
+        }
     }
 
     @Override
@@ -195,6 +213,15 @@ public class DiscordListener extends ListenerAdapter {
     }
 
     @Override
+    public void onPrivateMessageReactionAdd(@NotNull PrivateMessageReactionAddEvent event) {
+        if (!event.getUser().isBot()) {
+            Optional<WarEntity> warOpt = warService.getWarByDmMessageId(event.getMessageId());
+            warOpt.ifPresent(warEntity -> handleDmWarReaction(warEntity, event));
+            super.onPrivateMessageReactionAdd(event);
+        }
+    }
+
+    @Override
     public void onGuildMessageReactionRemove(@Nonnull GuildMessageReactionRemoveEvent event) {
         // TODO: For use in reaction roles
         super.onGuildMessageReactionRemove(event);
@@ -236,48 +263,64 @@ public class DiscordListener extends ListenerAdapter {
             inviteService.addExisting(event.getInvite());
         }
         super.onGuildInviteCreate(event);
-
     }
 
     private void handleWarReaction(WarEntity warEntity, GuildMessageReactionAddEvent event) {
+        warEntity = handleWarAttendanceUpdate(warEntity, event.getUserId(), event.getReactionEmote().getName());
+        warService.refreshMessage(event.getGuild(), warEntity);
+        event.getReaction().removeReaction(event.getUser()).queue();
+    }
+
+    private WarEntity handleWarAttendanceUpdate(WarEntity warEntity, String userId, String reactionName) {
         // TODO: Family name in guild verification
         // TODO: Move some logic to service layer
         // If emoji is not a proper emoji, remove it
-        var user = userService.getById(event.getUserId());
+        var user = userService.getById(userId);
 
-        if (Constants.WAR_REACTIONS.contains(event.getReactionEmote().getName())) {
+        if (Constants.WAR_REACTIONS.contains(reactionName)) {
             // If war has happened already, only refresh
             if (warEntity.getArchived()) {
                 // Do nothing just refresh
-            } else if (event.getReactionEmote().getName().equals(Constants.WAR_REACTION_YES)) {
+            } else if (reactionName.equals(Constants.WAR_REACTION_YES)) {
                 // If they are signed up as maybe, remove the maybe
                 var attendeeOpt = warEntity.getAttendees().stream()
-                        .filter(a -> a.getUser().getId().equals(event.getUserId())).findFirst();
+                        .filter(a -> a.getUser().getId().equals(userId)).findFirst();
                 if (attendeeOpt.isPresent()) {
                     // Remove and re add attendee as maybe (We want to refresh their created timestamp)
                     warEntity = warService.removeAttendee(warEntity, user);
                 }
 
                 // If they are not signed up then add them
-                if (!warEntity.getAttendees().stream().map(a -> a.getUser().getId()).collect(Collectors.toList()).contains(event.getUserId())) {
+                if (!warEntity.getAttendees().stream().map(a -> a.getUser().getId()).collect(Collectors.toList()).contains(userId)) {
                     warEntity = warService.addAttendee(warEntity, user, false);
                 }
-            } else if (event.getReactionEmote().getName().equals(Constants.WAR_REACTION_NO)) {
+            } else if (reactionName.equals(Constants.WAR_REACTION_NO)) {
                 // If no reaction remove them from the list if they are on it
                 warEntity = warService.removeAttendee(warEntity, user);
                 // Add a new entity with the NO
                 warEntity = warService.notAttending(warEntity, user);
-            } else if (event.getReactionEmote().getName().equals(Constants.WAR_REACTION_MAYBE)) {
+            } else if (reactionName.equals(Constants.WAR_REACTION_MAYBE)) {
                 // Set the user to maybe or create maybe attendance
-                var attendeeOpt = warEntity.getAttendees().stream().filter(a -> a.getUser().getId().equals(event.getUserId())).findFirst();
+                var attendeeOpt = warEntity.getAttendees().stream().filter(a -> a.getUser().getId().equals(userId)).findFirst();
                 if (attendeeOpt.isPresent()) {
                     // Remove and re add attendee as maybe (We want to refresh their created timestamp)
-                    warEntity = warService.removeAttendee(warEntity, userService.getById(event.getUserId()));
+                    warEntity = warService.removeAttendee(warEntity, userService.getById(userId));
                 }
                 warEntity = warService.addAttendee(warEntity, user, true);
             }
-            warService.refreshMessage(event.getGuild(), warEntity);
+            // Deactivate their dm signups (Cleans up the need for opening dm channel with user on startup)
+            warService.deactivateDmSignup(warEntity, userId);
         }
-        event.getReaction().removeReaction(event.getUser()).queue();
+        return warEntity;
+    }
+
+    private void handleDmWarReaction(WarEntity warEntity, PrivateMessageReactionAddEvent event) {
+        warEntity = handleWarAttendanceUpdate(warEntity, event.getUserId(), event.getReactionEmote().getName());
+        Guild guild = event.getJDA().getGuildById(warEntity.getGuild().getDiscordGuild().getId());
+        if (guild != null) {
+            warService.refreshMessage(guild, warEntity);
+        }
+        event.getChannel().sendMessage("Thank you for responding, if you want to change your answer please do it in the "
+                + warEntity.getChannel().getName() + " channel.").queue();
     }
 }

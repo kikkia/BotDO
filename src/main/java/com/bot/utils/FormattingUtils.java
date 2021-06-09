@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
@@ -252,9 +253,8 @@ public class FormattingUtils {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setAuthor(formatDateToBasicString(warEntity.getWarTime()) + " war signup.");
         embedBuilder.addField("Avg gearscore", String.valueOf(warEntity.getAverageGS()), true);
-        embedBuilder.addField("Total signups (Maybes included)", String.valueOf(warEntity.getAttendees().size()), true);
+        embedBuilder.addField("Total signups (Maybes included)", String.valueOf(attendees.size()), true);
         embedBuilder.addField("Not attending", String.valueOf(notAttendingCount), true);
-        embedBuilder.addBlankField(true);
         if (warEntity.getWarNode() != null) {
             embedBuilder.addField("Node", warEntity.getWarNode().getDisplayName(), true);
             embedBuilder.addField("Tier", warEntity.getWarNode().getTier().getDisplay(), true);
@@ -361,4 +361,11 @@ public class FormattingUtils {
         }
         return o1.getCreated().compareTo(o2.getCreated());
     };
+
+    public static String generateDmWarReminder(@NotNull WarEntity war) {
+        return "Hey, just reminding you to fill out if you are going to war on " +
+                formatDateToBasicString(war.getWarTime()) + ".\nYou can react to one of the reactions on " +
+                "this message to mark Yes, No or Maybe.\nOtherwise you can sign up in the " + war.getChannel().getName() +
+                " channel in the discord server.\nHope to see you there!";
+    }
 }
