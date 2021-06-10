@@ -1,6 +1,7 @@
 package com.bot.configuration;
 
-import com.bot.DiscordListener;
+import com.bot.listeners.CommandListener;
+import com.bot.listeners.DiscordListener;
 import com.bot.configuration.properties.DiscordProperties;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
@@ -61,7 +62,8 @@ public class DiscordConfiguration {
 
     @Bean
     public CommandClient commandClient(DiscordProperties properties,
-                                       ScheduledExecutorService executorService) {
+                                       ScheduledExecutorService executorService,
+                                       CommandListener commandListener) {
         CommandClientBuilder builder = new CommandClientBuilder();
         builder.setPrefix(",");
         builder.setAlternativePrefix("@mention");
@@ -70,6 +72,7 @@ public class DiscordConfiguration {
         builder.setEmojis("\u2705", "\u2757", "\u274c");
         builder.setActivity(null);
         builder.setScheduleExecutor(executorService);
+        builder.setListener(commandListener);
         builder.addCommands(commandList.toArray(new Command[commandList.size()]));
         return builder.build();
     }
