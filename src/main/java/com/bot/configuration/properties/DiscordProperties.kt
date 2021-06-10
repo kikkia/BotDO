@@ -11,4 +11,5 @@ open class DiscordProperties {
     var shards = 1
     var startShard = 0
     var endShard = 0
+    var scanFamilies = true
 }
