@@ -3,6 +3,7 @@ package com.bot.db.entities
 import com.bot.models.WarDay
 import com.bot.models.WarNode
 import java.sql.Timestamp
+import java.time.Instant
 import javax.persistence.*
 
 @Entity
@@ -55,12 +56,17 @@ class WarEntity(
     }
 
     fun getAverageGS(): Int {
-        if (attendees.isEmpty()) {
+        val attendeeList = attendees
+                .filter { it.user.gearset != null }
+                .filter { !it.notAttending }
+                .filter { it.user.gearset!!.getGearScore() > 0 }
+                .toList()
+
+        if (attendeeList.isEmpty()) {
             return 0
         }
-        val gearscores = attendees.asSequence()
-                .filter { it.user.gearset != null }
-                .filter { it.user.gearset!!.getGearScore() > 0 }
+
+        val gearscores = attendeeList.asSequence()
                 .map { it.user.gearset!!.getGearScore() }
                 .toList()
         var totalGS = 0
@@ -68,5 +74,9 @@ class WarEntity(
             totalGS += att
         }
         return totalGS / gearscores.size
+    }
+
+    fun past(): Boolean {
+        return warTime.before(Timestamp.from(Instant.now()))
     }
 }
