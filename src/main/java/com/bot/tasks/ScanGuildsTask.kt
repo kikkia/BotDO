@@ -4,6 +4,7 @@ import com.bot.models.BdoFamily
 import com.bot.models.Region
 import com.bot.service.BdoGuildService
 import com.bot.service.FamilyService
+import com.bot.service.MetricsService
 import com.bot.utils.GuildScrapeUtils
 import org.slf4j.LoggerFactory
 import java.time.Duration
@@ -12,6 +13,7 @@ import java.util.stream.IntStream
 
 class ScanGuildsTask(private val familyService: FamilyService,
                      private val bdoGuildService: BdoGuildService,
+                     private val metricsService: MetricsService,
                      val region: Region) : Thread() {
 
     override fun run() {
@@ -60,8 +62,10 @@ class ScanGuildsTask(private val familyService: FamilyService,
                             if (family.externalId != fam.id) {
                                 familyService.updateExternalId(family, fam.id)
                             }
+                            metricsService.markFamilyUpdateExectution()
                             familyCount++
                         }
+                        metricsService.markGuildUpdateExcecution()
                         guildCount++
                     }
                     if (page % 50 == 0) {
