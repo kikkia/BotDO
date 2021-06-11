@@ -23,9 +23,11 @@ class ScanGuildsTask(private val familyService: FamilyService,
 
         // Scan entire list of guilds and sync them
         var page = 1
+        var pageCount = 0
         var guildCount = 0
         var familyCount = 0
         for (i in IntStream.range('a'.toInt(), 'z'.toInt())) {
+            page = 1
             while(true) {
                 try {
                     val guildNames = GuildScrapeUtils.getGuildNamesOnPage(page, i.toChar().toString())
@@ -78,6 +80,7 @@ class ScanGuildsTask(private val familyService: FamilyService,
                     continue
                 }
             }
+            pageCount += page
         }
         log.info("Scan complete. Pages: $page | Guilds: $guildCount | Families: $familyCount")
         val duration = Duration.between(start, Instant.now())
