@@ -35,14 +35,15 @@ class WarReminderCommand(val warService: WarService,
                 return
             }
 
-            val failedUsers = mutableListOf<String>()
-            val sentUsers = mutableListOf<String>()
-            val signedUpUserIds = war.attendees.asSequence().map { it.user.id }.toList()
             val channel = command.guild.getTextChannelById(war.channel.id)
             if (channel == null) {
                 command.replyError("Channel for war not found. Something is really wrong here...")
                 return
             }
+            channel.sendTyping().queue()
+            val failedUsers = mutableListOf<String>()
+            val sentUsers = mutableListOf<String>()
+            val signedUpUserIds = war.attendees.asSequence().map { it.user.id }.toList()
 
             for (member in channel.members) {
                 if (!member.user.isBot) {
