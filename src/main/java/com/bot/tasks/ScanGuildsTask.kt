@@ -48,7 +48,7 @@ class ScanGuildsTask(private val familyService: FamilyService,
                         val guild = if (guildOpt.isEmpty) {
                             bdoGuildService.createNewGuild(name, region)
                         } else {
-                            if (guildOpt.get().last_scan.toInstant().isAfter(Instant.now().minusSeconds(7200))) {
+                            if (guildOpt.get().last_scan.toInstant().isAfter(Instant.now().minusSeconds(3600 * 12))) {
                                 continue
                             }
                             bdoGuildService.setScan(guildOpt.get())
