@@ -40,6 +40,11 @@ public class BdoGuildService {
         return save(bdoGuildEntity);
     }
 
+    public BDOGuildEntity setScan(BDOGuildEntity guildEntity) {
+        guildEntity.setLast_scan(Timestamp.from(Instant.now()));
+        return save(guildEntity);
+    }
+
     public BDOGuildEntity save(BDOGuildEntity entity) {
         return repository.save(entity);
     }

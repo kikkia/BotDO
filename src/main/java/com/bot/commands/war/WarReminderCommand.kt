@@ -8,6 +8,7 @@ import com.bot.service.WarService
 import com.bot.utils.Constants
 import com.bot.utils.FormattingUtils
 import com.jagrosh.jdautilities.command.CommandEvent
+import lombok.extern.slf4j.Slf4j
 import net.dv8tion.jda.api.entities.User
 import org.springframework.stereotype.Component
 import java.lang.NumberFormatException
@@ -35,22 +36,25 @@ class WarReminderCommand(val warService: WarService,
                 return
             }
 
-            val failedUsers = mutableListOf<String>()
-            val sentUsers = mutableListOf<String>()
-            val signedUpUserIds = war.attendees.asSequence().map { it.user.id }.toList()
             val channel = command.guild.getTextChannelById(war.channel.id)
             if (channel == null) {
                 command.replyError("Channel for war not found. Something is really wrong here...")
                 return
             }
+            channel.sendTyping().queue()
+            val failedUsers = mutableListOf<String>()
+            val sentUsers = mutableListOf<String>()
+            val signedUpUserIds = war.attendees.asSequence().map { it.user.id }.toList()
 
             for (member in channel.members) {
                 if (!member.user.isBot) {
                     if (!signedUpUserIds.contains(member.user.id)) {
                         try {
                             sentUsers.add(sendDmMessage(war, member.user))
-                        } catch (e: WarDmReminderException) {
+                        } catch (e: Exception) {
                             failedUsers.add(member.effectiveName)
+                            print("Failed to remind user")
+                            e.printStackTrace()
                         }
                     }
                 }
