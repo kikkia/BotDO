@@ -12,4 +12,6 @@ open class DiscordProperties {
     var startShard = 0
     var endShard = 0
     var scanFamilies = true
+    var clientSecret = ""
+    var clientId = ""
 }

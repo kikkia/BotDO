@@ -80,7 +80,7 @@ public class DiscordListener extends ListenerAdapter {
             executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, metricsService, Region.NORTH_AMERICA),
                     0, 24, TimeUnit.HOURS);
         }
-        
+
         // Open dm channels with users with active dm signups to listen for updates
         List<String> usersWithDmSignups = warService
                 .getActiveDmSignups()

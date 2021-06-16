@@ -1,5 +1,7 @@
 package com.bot.controllers
 
+import com.bot.service.TokenService
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -7,10 +9,11 @@ import org.springframework.web.bind.annotation.RestController
 // This controller is responsible for getting a discord oauth2 callback and minting a signed jwt with user info
 @RestController
 @RequestMapping("/auth")
-class AuthController {
+class AuthController(private val tokenService: TokenService) {
 
     @RequestMapping("/callback")
-    public fun oauthCallback(@RequestParam code: String, @RequestParam state: String) : String {
-        return "Hello World"
+    fun oauthCallback(@RequestParam code: String) : String {
+        val token = tokenService.generateToken("user")
+        return "Code: $code \ntoken: $token"
     }
 }
