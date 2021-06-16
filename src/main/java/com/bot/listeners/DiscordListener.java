@@ -1,5 +1,6 @@
 package com.bot.listeners;
 
+import com.bot.configuration.properties.DiscordProperties;
 import com.bot.db.entities.*;
 import com.bot.models.Region;
 import com.bot.service.*;
@@ -67,14 +68,18 @@ public class DiscordListener extends ListenerAdapter {
     @Autowired
     private ScheduledExecutorService executorService;
     @Autowired
+    private DiscordProperties discordProperties;
+    @Autowired
     private MetricsService metricsService;
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         // Schedule the NA scan
         // TODO: This runs once for every shard, be careful if sharding is ever needed
-        executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, metricsService, Region.NORTH_AMERICA),
-                0, 24, TimeUnit.HOURS);
+        if (discordProperties.getScanFamilies()) {
+            executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, metricsService, Region.NORTH_AMERICA),
+                    0, 24, TimeUnit.HOURS);
+        }
 
         // Open dm channels with users with active dm signups to listen for updates
         List<String> usersWithDmSignups = warService
