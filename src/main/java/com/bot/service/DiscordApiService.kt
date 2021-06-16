@@ -2,7 +2,6 @@ package com.bot.service
 
 import com.bot.configuration.properties.DiscordProperties
 import com.bot.models.DiscordUserIdentity
-import com.fasterxml.jackson.core.JsonParser
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -50,10 +49,11 @@ open class DiscordApiService(val discordProperties: DiscordProperties) {
                 print("Request to discord failed $response")
                 throw RuntimeException("REEEEEE")
             }
-            val jsonRepsonse = JSONObject(response.body!!.string())
-            return DiscordUserIdentity(jsonRepsonse.getString("id"),
-                    jsonRepsonse.getString("username"),
-                    jsonRepsonse.getInt("discriminator"))
+            val jsonResponse = JSONObject(response.body!!.string())
+            return DiscordUserIdentity(jsonResponse.getString("id"),
+                    jsonResponse.getString("username"),
+                    jsonResponse.getInt("discriminator"),
+                    jsonResponse.getString("avatar"))
         }
     }
 }

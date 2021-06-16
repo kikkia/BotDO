@@ -4,6 +4,7 @@ import com.bot.models.DiscordUserIdentity
 import org.springframework.stereotype.Service
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.MalformedJwtException
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import io.jsonwebtoken.security.SignatureException
@@ -17,7 +18,7 @@ class TokenService {
     // TODO: Set this up for private key
     private val key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
 
-    val JWT_TOKEN_VALIDITY = (12 * 60 * 60).toLong()
+    public val JWT_TOKEN_VALIDITY = (12 * 60 * 60).toLong()
 
     //retrieve username from jwt token
     fun getUsernameFromToken(token: String?): String {
@@ -60,13 +61,20 @@ class TokenService {
                 .compact();
     }
 
-    //validate token
+    /**
+     * True if signature is good and not expired, false if bad sig or expired.
+     */
     fun validateToken(token: String): Boolean {
         return try {
             !isTokenExpired(token)
-        } catch (e : SignatureException) {
-            // TODO: Log this
-            false
+        } catch (e: Exception) {
+            when (e) {
+                is SignatureException, is MalformedJwtException -> {
+                    // TODO: Log this
+                    false
+                }
+                else -> throw e
+            }
         }
     }
 }

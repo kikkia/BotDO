@@ -1,26 +1,55 @@
 package com.bot.controllers
 
+import com.bot.models.DiscordUserIdentity
 import com.bot.service.DiscordApiService
 import com.bot.service.TokenService
-import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.web.servlet.server.Session
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.CookieValue
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import javax.servlet.http.Cookie
+import javax.servlet.http.HttpServletResponse
 
 // This controller is responsible for getting a discord oauth2 callback and minting a signed jwt with user info
 @RestController
 @RequestMapping("/auth")
 class AuthController(private val tokenService: TokenService, private val discordApiService: DiscordApiService) {
     @RequestMapping("/callback")
-    fun oauthCallback(@RequestParam code: String) : String {
+    fun oauthCallback(@RequestParam code: String, response: HttpServletResponse) : ResponseEntity<String> {
         val discordToken = discordApiService.getUserAccessToken(code)
         val discordUser = discordApiService.getUserIdentity(discordToken)
-        val token = tokenService.generateToken(discordUser)
-        return "Code: $code \ntoken: $token"
+        setAuthCookies(discordUser, response)
+        response.sendRedirect("http://localhost:3000/")
+        return ResponseEntity.ok("success");
     }
 
     @RequestMapping("/test")
-    fun testAuth(@RequestParam token: String) : String {
-        return tokenService.validateToken(token).toString()
+    fun testAuth(@CookieValue(name = "token", defaultValue = "foo") token: String) : ResponseEntity<String> {
+        return if (tokenService.validateToken(token)) {
+            ResponseEntity.ok("valid")
+        } else {
+            ResponseEntity(HttpStatus.UNAUTHORIZED)
+        }
+    }
+
+    private fun setAuthCookies(user: DiscordUserIdentity, response: HttpServletResponse) {
+        val tokenCookie = Cookie("token", tokenService.generateToken(user))
+        tokenCookie.maxAge = tokenService.JWT_TOKEN_VALIDITY.toInt()
+        tokenCookie.isHttpOnly = true
+        tokenCookie.domain = ".kikkia.testdev"
+        response.addCookie(tokenCookie)
+
+        val displayNameCookie = Cookie("displayName", user.username)
+        displayNameCookie.maxAge = tokenService.JWT_TOKEN_VALIDITY.toInt()
+        displayNameCookie.domain = ".kikkia.testdev"
+        response.addCookie(displayNameCookie)
+
+        val avatarCookie = Cookie("avatar", user.avatar)
+        avatarCookie.maxAge = tokenService.JWT_TOKEN_VALIDITY.toInt()
+        avatarCookie.domain = ".kikkia.tesstdev"
+        response.addCookie(displayNameCookie)
     }
 }
