@@ -1,10 +1,12 @@
 package com.bot.service
 
+import com.bot.models.DiscordUserIdentity
 import org.springframework.stereotype.Service
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
+import io.jsonwebtoken.security.SignatureException
 import java.time.Instant
 import java.util.*
 import kotlin.collections.HashMap
@@ -35,17 +37,17 @@ class TokenService {
     }
 
     //check if the token has expired
-    private fun isTokenExpired(token: String?): Boolean? {
+    private fun isTokenExpired(token: String?): Boolean {
         val expiration: Date = getExpirationDateFromToken(token)
         return expiration.before(Date())
     }
 
     //generate token for user
-    fun generateToken(username: String): String? {
+    fun generateToken(user: DiscordUserIdentity): String? {
         val claims = HashMap<String, Any>()
-        claims["test1"] = "test1"
-        claims["test2"] = "test2"
-        return doGenerateToken(claims, username)
+        claims["userId"] = user.userId
+        claims["discriminator"] = user.discriminator
+        return doGenerateToken(claims, user.username)
     }
 
     private fun doGenerateToken(claims: Map<String, Any>, subject: String): String? {
@@ -59,8 +61,12 @@ class TokenService {
     }
 
     //validate token
-    fun validateToken(token: String?, username: String): Boolean {
-        val tokenUsername = getUsernameFromToken(token)
-        return tokenUsername == username && !isTokenExpired(token)!!
+    fun validateToken(token: String): Boolean {
+        return try {
+            !isTokenExpired(token)
+        } catch (e : SignatureException) {
+            // TODO: Log this
+            false
+        }
     }
 }
