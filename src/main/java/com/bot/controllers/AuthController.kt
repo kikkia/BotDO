@@ -1,5 +1,6 @@
 package com.bot.controllers
 
+import com.bot.configuration.properties.APIProperties
 import com.bot.models.DiscordUserIdentity
 import com.bot.service.DiscordApiService
 import com.bot.service.TokenService
@@ -16,13 +17,15 @@ import javax.servlet.http.HttpServletResponse
 // This controller is responsible for getting a discord oauth2 callback and minting a signed jwt with user info
 @RestController
 @RequestMapping("/auth")
-class AuthController(private val tokenService: TokenService, private val discordApiService: DiscordApiService) {
+class AuthController(private val tokenService: TokenService,
+                     private val discordApiService: DiscordApiService,
+                     val apiProperties: APIProperties) {
     @RequestMapping("/callback")
     fun oauthCallback(@RequestParam code: String, response: HttpServletResponse) : ResponseEntity<String> {
         val discordToken = discordApiService.getUserAccessToken(code)
         val discordUser = discordApiService.getUserIdentity(discordToken)
         setAuthCookies(discordUser, response)
-        response.sendRedirect("http://localhost:3000/")
+        response.sendRedirect(apiProperties.frontendUrl)
         return ResponseEntity.ok("success");
     }
 
@@ -36,20 +39,21 @@ class AuthController(private val tokenService: TokenService, private val discord
     }
 
     private fun setAuthCookies(user: DiscordUserIdentity, response: HttpServletResponse) {
+        val cookieDomain = apiProperties.domain
         val tokenCookie = Cookie("token", tokenService.generateToken(user))
         tokenCookie.maxAge = tokenService.JWT_TOKEN_VALIDITY.toInt()
         tokenCookie.isHttpOnly = true
-        tokenCookie.domain = ".kikkia.testdev"
+        tokenCookie.domain = cookieDomain
         response.addCookie(tokenCookie)
 
         val displayNameCookie = Cookie("displayName", user.username)
         displayNameCookie.maxAge = tokenService.JWT_TOKEN_VALIDITY.toInt()
-        displayNameCookie.domain = ".kikkia.testdev"
+        displayNameCookie.domain = cookieDomain
         response.addCookie(displayNameCookie)
 
         val avatarCookie = Cookie("avatar", user.avatar)
         avatarCookie.maxAge = tokenService.JWT_TOKEN_VALIDITY.toInt()
-        avatarCookie.domain = ".kikkia.tesstdev"
+        avatarCookie.domain = cookieDomain
         response.addCookie(displayNameCookie)
     }
 }

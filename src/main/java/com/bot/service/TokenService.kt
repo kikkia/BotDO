@@ -1,5 +1,6 @@
 package com.bot.service
 
+import com.bot.configuration.properties.APIProperties
 import com.bot.models.DiscordUserIdentity
 import org.springframework.stereotype.Service
 import io.jsonwebtoken.Claims
@@ -8,17 +9,16 @@ import io.jsonwebtoken.MalformedJwtException
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import io.jsonwebtoken.security.SignatureException
+import java.nio.charset.StandardCharsets
 import java.time.Instant
 import java.util.*
 import kotlin.collections.HashMap
 
 @Service
-class TokenService {
-    private val serialVersionUID = -255018516526007488L
-    // TODO: Set this up for private key
-    private val key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+class TokenService(val apiProperties: APIProperties) {
+    private val key = Keys.hmacShaKeyFor(apiProperties.keySecret.byteInputStream(StandardCharsets.UTF_8).readAllBytes())
 
-    public val JWT_TOKEN_VALIDITY = (12 * 60 * 60).toLong()
+    val JWT_TOKEN_VALIDITY = (12 * 60 * 60).toLong()
 
     //retrieve username from jwt token
     fun getUsernameFromToken(token: String?): String {

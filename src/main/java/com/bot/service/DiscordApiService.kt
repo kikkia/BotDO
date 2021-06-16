@@ -1,5 +1,6 @@
 package com.bot.service
 
+import com.bot.configuration.properties.APIProperties
 import com.bot.configuration.properties.DiscordProperties
 import com.bot.models.DiscordUserIdentity
 import okhttp3.FormBody
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Service
 import java.lang.RuntimeException
 
 @Service
-open class DiscordApiService(val discordProperties: DiscordProperties) {
+open class DiscordApiService(val discordProperties: DiscordProperties, val apiProperties: APIProperties) {
     private val DISCORD_TOKEN_ENDPOINT = "https://discord.com/api/v8/oauth2/token"
     private val DISCORD_USER_ENDPOINT = "https://discord.com/api/v8/users/@me"
 
@@ -22,7 +23,7 @@ open class DiscordApiService(val discordProperties: DiscordProperties) {
                 .add("client_secret", discordProperties.clientSecret)
                 .add("grant_type", "authorization_code")
                 .add("code", code)
-                .add("redirect_uri", "http://localhost:42069/auth/callback")
+                .add("redirect_uri", "${apiProperties.host}/auth/callback")
                 .build()
         val request = Request.Builder()
                 .post(requestBody)
