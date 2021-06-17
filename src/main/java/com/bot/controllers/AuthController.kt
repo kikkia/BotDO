@@ -7,10 +7,7 @@ import com.bot.service.TokenService
 import org.springframework.boot.web.servlet.server.Session
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.CookieValue
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
 
@@ -29,6 +26,7 @@ class AuthController(private val tokenService: TokenService,
         return ResponseEntity.ok("success");
     }
 
+    @CrossOrigin(origins = ["http://toshi.kikkia.dev"])
     @RequestMapping("/test")
     fun testAuth(@CookieValue(name = "token", defaultValue = "foo") token: String) : ResponseEntity<String> {
         return if (tokenService.validateToken(token)) {
