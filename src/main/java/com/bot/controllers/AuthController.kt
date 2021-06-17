@@ -4,7 +4,6 @@ import com.bot.configuration.properties.APIProperties
 import com.bot.models.DiscordUserIdentity
 import com.bot.service.DiscordApiService
 import com.bot.service.TokenService
-import org.springframework.boot.web.servlet.server.Session
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -26,7 +25,7 @@ class AuthController(private val tokenService: TokenService,
         return ResponseEntity.ok("success");
     }
 
-    @CrossOrigin(origins = ["http://toshi.kikkia.dev"])
+    @CrossOrigin(origins = ["http://toshi.kikkia.dev"], allowCredentials = "true")
     @RequestMapping("/test")
     fun testAuth(@CookieValue(name = "token", defaultValue = "foo") token: String) : ResponseEntity<String> {
         return if (tokenService.validateToken(token)) {
