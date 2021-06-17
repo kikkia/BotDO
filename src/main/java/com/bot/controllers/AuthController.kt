@@ -39,7 +39,7 @@ class AuthController(private val tokenService: TokenService,
     }
 
     private fun setAuthCookies(user: DiscordUserIdentity, response: HttpServletResponse) {
-        val cookieDomain = "*.${apiProperties.domain}"
+        val cookieDomain = apiProperties.domain
         val tokenCookie = Cookie("token", tokenService.generateToken(user))
         tokenCookie.maxAge = tokenService.JWT_TOKEN_VALIDITY.toInt()
         tokenCookie.isHttpOnly = true
