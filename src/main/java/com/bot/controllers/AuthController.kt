@@ -4,6 +4,7 @@ import com.bot.configuration.properties.APIProperties
 import com.bot.models.DiscordUserIdentity
 import com.bot.service.DiscordApiService
 import com.bot.service.TokenService
+import org.json.JSONObject
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -29,7 +30,12 @@ class AuthController(private val tokenService: TokenService,
     @RequestMapping("/test")
     fun testAuth(@CookieValue(name = "token", defaultValue = "foo") token: String) : ResponseEntity<String> {
         return if (tokenService.validateToken(token)) {
-            ResponseEntity.ok("valid")
+            val name = tokenService.getSubjectFromToken(token)
+            val avatar = tokenService.getStringClaimFromToken(token, "avatar")
+            val response = JSONObject()
+            response.put("name", name)
+            response.put("avatar", avatar)
+            ResponseEntity.ok(response.toString())
         } else {
             ResponseEntity(HttpStatus.UNAUTHORIZED)
         }
@@ -43,9 +49,6 @@ class AuthController(private val tokenService: TokenService,
         tokenCookie.isHttpOnly = true
         tokenCookie.secure = true
         cookies.add(tokenCookie)
-
-        cookies.add(Cookie("displayName", user.username))
-        cookies.add(Cookie("avatar", user.avatar))
 
         for (cookie in cookies) {
             cookie.maxAge = tokenService.JWT_TOKEN_VALIDITY.toInt()
