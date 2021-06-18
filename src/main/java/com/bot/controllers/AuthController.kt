@@ -25,7 +25,7 @@ class AuthController(private val tokenService: TokenService,
         return ResponseEntity.ok("success");
     }
 
-    @CrossOrigin(origins = ["http://toshi.kikkia.dev"], allowCredentials = "true")
+    @CrossOrigin(origins = ["https://toshi.kikkia.dev"], allowCredentials = "true")
     @RequestMapping("/test")
     fun testAuth(@CookieValue(name = "token", defaultValue = "foo") token: String) : ResponseEntity<String> {
         return if (tokenService.validateToken(token)) {

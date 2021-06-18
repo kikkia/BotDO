@@ -2,11 +2,8 @@ package com.bot.service
 
 import com.bot.configuration.properties.APIProperties
 import com.bot.models.DiscordUserIdentity
+import io.jsonwebtoken.*
 import org.springframework.stereotype.Service
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.MalformedJwtException
-import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import io.jsonwebtoken.security.SignatureException
 import java.nio.charset.StandardCharsets
@@ -69,7 +66,7 @@ class TokenService(val apiProperties: APIProperties) {
             !isTokenExpired(token)
         } catch (e: Exception) {
             when (e) {
-                is SignatureException, is MalformedJwtException -> {
+                is SignatureException, is MalformedJwtException, is ExpiredJwtException -> {
                     // TODO: Log this
                     false
                 }
