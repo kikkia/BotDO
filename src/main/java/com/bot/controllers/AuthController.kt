@@ -37,20 +37,21 @@ class AuthController(private val tokenService: TokenService,
 
     private fun setAuthCookies(user: DiscordUserIdentity, response: HttpServletResponse) {
         val cookieDomain = apiProperties.domain
+        val cookies = mutableListOf<Cookie>()
+        
         val tokenCookie = Cookie("token", tokenService.generateToken(user))
-        tokenCookie.maxAge = tokenService.JWT_TOKEN_VALIDITY.toInt()
         tokenCookie.isHttpOnly = true
-        tokenCookie.domain = cookieDomain
-        response.addCookie(tokenCookie)
+        tokenCookie.secure = true
+        cookies.add(tokenCookie)
 
-        val displayNameCookie = Cookie("displayName", user.username)
-        displayNameCookie.maxAge = tokenService.JWT_TOKEN_VALIDITY.toInt()
-        displayNameCookie.domain = cookieDomain
-        response.addCookie(displayNameCookie)
+        cookies.add(Cookie("displayName", user.username))
+        cookies.add(Cookie("avatar", user.avatar))
 
-        val avatarCookie = Cookie("avatar", user.avatar)
-        avatarCookie.maxAge = tokenService.JWT_TOKEN_VALIDITY.toInt()
-        avatarCookie.domain = cookieDomain
-        response.addCookie(avatarCookie)
+        for (cookie in cookies) {
+            cookie.maxAge = tokenService.JWT_TOKEN_VALIDITY.toInt()
+            cookie.domain = cookieDomain
+            cookie.path = "/"
+            response.addCookie(cookie)
+        }
     }
 }
