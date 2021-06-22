@@ -17,5 +17,5 @@ data class RecruitBellEntity(
         var guild: GuildEntity
 ) {
     @Column(name = "created")
-    val timestamp: Timestamp? = null
+    val created: Timestamp? = null
 }
