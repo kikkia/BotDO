@@ -7,6 +7,7 @@
 5. [Invites](#Invites)
 6. [Scrolls](#Scrolls)
 7. [Events](#Events)
+8. [War Tracking](#War)
 
 # Intro
 This bot's purpose is to provide some tools to help make managing a BDO guild/community a little easier on discord. 
@@ -37,3 +38,5 @@ I recommend looking at [this page.](scrolls.md)
 # Events
 The bot can make and keep track of guild wide events. This is still under development, [this page ](events.md) will have the most updated info.
 
+# War
+The bot can track Node war related things like signups, stats, and vods. For more info look [here](wars.md)
