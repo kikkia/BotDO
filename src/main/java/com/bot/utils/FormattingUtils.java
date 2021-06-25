@@ -209,6 +209,11 @@ public class FormattingUtils {
         return formatter.print(p);
     }
 
+    public static String prettyPrintMillis(Long s) {
+        Duration duration = new Duration(s);
+        return prettyPrintDuration(duration);
+    }
+
     public static String generateWelcomeMessage(GuildMemberJoinEvent event, String message) {
         return message.replaceAll("%name%", event.getMember().getEffectiveName());
     }
