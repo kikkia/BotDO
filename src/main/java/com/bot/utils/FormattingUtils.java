@@ -253,11 +253,14 @@ public class FormattingUtils {
                 .sorted(warSignupComparator)
                 .filter(it -> !it.getNotAttending())
                 .collect(Collectors.toList());
+        var maybeCount = warEntity.getAttendees().stream()
+                .filter(WarAttendanceEntity::getMaybe)
+                .count();
 
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setAuthor(formatDateToBasicString(warEntity.getWarTime()) + " war signup.");
         embedBuilder.addField("Avg gearscore", String.valueOf(warEntity.getAverageGS()), true);
-        embedBuilder.addField("Total signups (Maybes included)", String.valueOf(attendees.size()), true);
+        embedBuilder.addField("Yes/Maybe", attendees.size() - maybeCount + "/" + maybeCount, true);
         embedBuilder.addField("Not attending", String.valueOf(notAttendingCount), true);
         if (warEntity.getWarNode() != null) {
             embedBuilder.addField("Node", warEntity.getWarNode().getDisplayName(), true);

@@ -26,64 +26,68 @@ class ScanGuildsTask(private val familyService: FamilyService,
         var pageCount = 0
         var guildCount = 0
         var familyCount = 0
+        // Website now requires 2 characters to search, so we have to go through all 2 letter combos
+        // TODO: Take the time to do a test run keeping track of which letter combos we can take out to speed up
         for (i in IntStream.range('a'.toInt(), 'z'.toInt())) {
-            page = 1
-            while(true) {
-                try {
-                    val guildNames = GuildScrapeUtils.getGuildNamesOnPage(page, i.toChar().toString())
-                    if (guildNames.isEmpty()) {
-                        break
-                    }
-
-                    for (name in guildNames) {
-                        var families: Set<BdoFamily>
-                        try {
-                            families = GuildScrapeUtils.getGuildFamilies(name, region)
-                        } catch (e: Exception) {
-                            log.warn("Hit unexpected error when getting guild members", e)
-                            continue
+            for (j in IntStream.range('a'.toInt(), 'z'.toInt())) {
+                page = 1
+                while (true) {
+                    try {
+                        val guildNames = GuildScrapeUtils.getGuildNamesOnPage(page, "${i.toChar()}${j.toChar()}")
+                        if (guildNames.isEmpty()) {
+                            break
                         }
 
-                        val guildOpt = bdoGuildService.getByNameAndRegion(name, region)
-                        val guild = if (guildOpt.isEmpty) {
-                            bdoGuildService.createNewGuild(name, region)
-                        } else {
-                            if (guildOpt.get().last_scan.toInstant().isAfter(Instant.now().minusSeconds(3600 * 12))) {
+                        for (name in guildNames) {
+                            val guildOpt = bdoGuildService.getByNameAndRegion(name, region)
+                            val guild = if (guildOpt.isEmpty) {
+                                bdoGuildService.createNewGuild(name, region)
+                            } else {
+                                if (guildOpt.get().last_scan.toInstant().isAfter(Instant.now().minusSeconds(3600 * 18))) {
+                                    continue
+                                }
+                                bdoGuildService.setScan(guildOpt.get())
+                            }
+
+                            var families: Set<BdoFamily>
+                            try {
+                                families = GuildScrapeUtils.getGuildFamilies(name, region)
+                            } catch (e: Exception) {
+                                log.warn("Hit unexpected error when getting guild members", e)
                                 continue
                             }
-                            bdoGuildService.setScan(guildOpt.get())
-                        }
 
-                        for (fam in families) {
-                            val famOpt = familyService.getFamily(fam.name, region, false)
-                            val family = if (famOpt.isEmpty) {
-                                familyService.createMinimal(fam.name, fam.id, region)
-                            } else {
-                                famOpt.get()
-                            }
-                            familyService.addToGuild(family, guild)
+                            for (fam in families) {
+                                val famOpt = familyService.getFamily(fam.name, region, false)
+                                val family = if (famOpt.isEmpty) {
+                                    familyService.createMinimal(fam.name, fam.id, region)
+                                } else {
+                                    famOpt.get()
+                                }
+                                familyService.addToGuild(family, guild)
 
-                            // These Ids can potentially change
-                            if (family.externalId != fam.id) {
-                                familyService.updateExternalId(family, fam.id)
+                                // These Ids can potentially change
+                                if (family.externalId != fam.id) {
+                                    familyService.updateExternalId(family, fam.id)
+                                }
+                                metricsService.markFamilyUpdateExectution()
+                                familyCount++
                             }
-                            metricsService.markFamilyUpdateExectution()
-                            familyCount++
+                            metricsService.markGuildUpdateExcecution()
+                            guildCount++
                         }
-                        metricsService.markGuildUpdateExcecution()
-                        guildCount++
+                        if (page % 50 == 0) {
+                            log.info("Guild sync progress.. Page: $page | Guilds: $guildCount | Families: $familyCount")
+                        }
+                        page++
+                    } catch (e: Exception) {
+                        log.error("Sync Job Step failed due to exception", e)
+                        log.warn("Sync job step for ${i.toChar()}${j.toChar()} failed after $page pages, $guildCount guilds and $familyCount families")
+                        continue
                     }
-                    if (page % 50 == 0) {
-                        log.info("Guild sync progress.. Page: $page | Guilds: $guildCount | Families: $familyCount")
-                    }
-                    page++
-                } catch (e: Exception) {
-                    log.error("Sync Job Step failed due to exception", e)
-                    log.warn("Sync job step for ${i.toChar()} failed after $page pages, $guildCount guilds and $familyCount families")
-                    continue
                 }
+                pageCount += page
             }
-            pageCount += page
         }
         log.info("Scan complete. Pages: $page | Guilds: $guildCount | Families: $familyCount")
         val duration = Duration.between(start, Instant.now())
