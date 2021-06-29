@@ -16,7 +16,7 @@ class RecruitPostCommand(val recruitmentPostService: RecruitmentPostService) : R
     }
 
     val possibleVals = asList("kamasylvia", "olvia", "world", "discord", "reddit",
-            "serendia", "balenos", "valencia", "mediah", "velia", "calpheon", "arsha")
+            "serendia", "balenos", "valencia", "mediah", "velia", "calpheon", "arsha", "season")
 
     override fun executeCommand(event: CommandEvent?) {
         val arg = event!!.args.split(" ")[0].toLowerCase()
