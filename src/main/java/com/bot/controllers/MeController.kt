@@ -14,6 +14,7 @@ class MeController(private val discordUserService: DiscordUserService) {
 
     val objectMapper = ObjectMapper()
 
+    @CrossOrigin(origins = ["https://toshi.kikkia.dev"], allowCredentials = "true")
     @RequestMapping("/guilds")
     fun guildsEndpoint(): ResponseEntity<String> {
         val auth = SecurityContextHolder.getContext().authentication
