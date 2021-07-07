@@ -15,7 +15,7 @@ import kotlin.collections.HashMap
 class TokenService(val apiProperties: APIProperties) {
     private val key = Keys.hmacShaKeyFor(apiProperties.keySecret.byteInputStream(StandardCharsets.UTF_8).readAllBytes())
 
-    val JWT_TOKEN_VALIDITY = (12 * 60 * 60).toLong()
+    val JWT_TOKEN_VALIDITY = (24 * 7 * 60 * 60).toLong()
 
     //retrieve username from jwt token
     fun getUsernameFromToken(token: String): String {
