@@ -32,7 +32,7 @@ open class DiscordApiService(val discordProperties: DiscordProperties, val apiPr
                 .build()
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
-                print("Request to discord failed $response")
+                print("Request to discord failed ${response.code} ${response.body.toString()}")
                 throw RuntimeException("REEEEEE")
             }
             val jsonRepsonse = JSONObject(response.body!!.string())
