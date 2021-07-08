@@ -50,8 +50,10 @@ public class UserService {
         return userRepository.save(userEntity);
     }
 
-    public UserEntity addUser(String id, String name) {
-        var user = userRepository.save(new UserEntity(id, name));
+    public UserEntity addUser(String id, String name, String avatar) {
+        var user = new UserEntity(id, name);
+        user.setAvatar(avatar);
+        user = userRepository.save(user);
         // Save default inventory
         if (!inventoryService.getInventoryExistsForUser(id)) {
             inventoryService.save(new ScrollInventory(user));

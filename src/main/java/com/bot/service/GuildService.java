@@ -6,6 +6,7 @@ import com.bot.db.entities.UserEntity;
 import com.bot.db.mapper.UserMapper;
 import com.bot.db.repositories.GuildRepository;
 import com.bot.models.WarDay;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ public class GuildService {
         for (Member m : guild.getMembers()) {
             if (userService.getById(m.getUser().getId()) == null) {
                 userService.addUser(m.getUser().getId(),
-                        m.getUser().getName());
+                        m.getUser().getName(), m.getUser().getAvatarUrl());
             }
         }
 
@@ -58,6 +59,7 @@ public class GuildService {
                 guild.getMembers().stream()
                         .map(UserMapper.Companion::map)
                         .collect(Collectors.toSet()));
+        guild1.setAvatar(guild.getIconUrl());
         GuildEntity internalGuild = guildRepository.save(guild1);
 
         for (TextChannel t : guild.getTextChannels()) {
@@ -109,6 +111,11 @@ public class GuildService {
 
     public GuildEntity setArchiveChannel(GuildEntity guildEntity, String channelId) {
         guildEntity.setArchiveChannel(channelId);
+        return guildRepository.save(guildEntity);
+    }
+
+    public GuildEntity setAvatar(GuildEntity guildEntity, String avatarUrl) {
+        guildEntity.setAvatar(avatarUrl);
         return guildRepository.save(guildEntity);
     }
 }

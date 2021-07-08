@@ -22,6 +22,9 @@ data class UserEntity(
         @OneToOne(mappedBy = "userEntity", cascade = [CascadeType.ALL])
         var gearset: GearsetEntity? = null
 
+        @Column(name = "avatar", nullable = true)
+        var avatar: String? = null
+
         fun getEffectiveName() : String {
                 return familyName ?: name
         }

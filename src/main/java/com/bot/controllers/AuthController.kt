@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse
 
 // This controller is responsible for getting a discord oauth2 callback and minting a signed jwt with user info
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 class AuthController(private val tokenService: TokenService,
                      private val discordApiService: DiscordApiService,
                      val apiProperties: APIProperties) {
@@ -22,7 +22,6 @@ class AuthController(private val tokenService: TokenService,
         val discordToken = discordApiService.getUserAccessToken(code)
         val discordUser = discordApiService.getUserIdentity(discordToken)
         setAuthCookies(discordUser, response)
-        response.sendRedirect(apiProperties.frontendUrl)
         return ResponseEntity.ok("success");
     }
 
@@ -42,17 +41,19 @@ class AuthController(private val tokenService: TokenService,
     }
 
     private fun setAuthCookies(user: DiscordUserIdentity, response: HttpServletResponse) {
-        val cookieDomain = apiProperties.domain
         val cookies = mutableListOf<Cookie>()
         
         val tokenCookie = Cookie("token", tokenService.generateToken(user))
         tokenCookie.isHttpOnly = true
-        tokenCookie.secure = true
+
+        val usernameCookie = Cookie("username", user.username)
+        val userAvatarCookie = Cookie("avatar", user.avatar)
         cookies.add(tokenCookie)
+        cookies.add(usernameCookie)
+        cookies.add(userAvatarCookie)
 
         for (cookie in cookies) {
             cookie.maxAge = tokenService.JWT_TOKEN_VALIDITY.toInt()
-            cookie.domain = cookieDomain
             cookie.path = "/"
             response.addCookie(cookie)
         }

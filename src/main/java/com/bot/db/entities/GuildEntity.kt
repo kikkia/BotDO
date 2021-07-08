@@ -36,6 +36,8 @@ data class GuildEntity(
         var bdoGuild: BDOGuildEntity? = null
         @Column(name = "war_archive_channel")
         var archiveChannel: String? = null
+        @Column(name = "avatar", nullable = true)
+        var avatar: String? = null
 
         fun hasDefaultInviteChannel() : Boolean {
                 return entryChannel != null

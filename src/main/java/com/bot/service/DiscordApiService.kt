@@ -23,7 +23,7 @@ open class DiscordApiService(val discordProperties: DiscordProperties, val apiPr
                 .add("client_secret", discordProperties.clientSecret)
                 .add("grant_type", "authorization_code")
                 .add("code", code)
-                .add("redirect_uri", "${apiProperties.host}/auth/callback")
+                .add("redirect_uri", "${apiProperties.frontendUrl}/auth")
                 .build()
         val request = Request.Builder()
                 .post(requestBody)

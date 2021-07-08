@@ -23,12 +23,14 @@ import net.dv8tion.jda.api.events.guild.invite.GuildInviteDeleteEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
+import net.dv8tion.jda.api.events.guild.update.GuildUpdateIconEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateNameEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.message.priv.react.PrivateMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.GenericMessageReactionEvent;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
+import net.dv8tion.jda.api.events.user.update.UserUpdateAvatarEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -118,7 +120,7 @@ public class DiscordListener extends ListenerAdapter {
             UserEntity user = userService.getById(event.getUser().getId());
             if (user == null) {
                 user = userService.addUser(event.getUser().getId(),
-                        event.getUser().getName());
+                        event.getUser().getName(), event.getUser().getAvatarUrl());
             }
             guildService.addUser(guild, user);
         } catch (Exception e) {
@@ -270,6 +272,16 @@ public class DiscordListener extends ListenerAdapter {
             inviteService.addExisting(event.getInvite());
         }
         super.onGuildInviteCreate(event);
+    }
+
+    @Override
+    public void onGuildUpdateIcon(@NotNull GuildUpdateIconEvent event) {
+        super.onGuildUpdateIcon(event);
+    }
+
+    @Override
+    public void onUserUpdateAvatar(@NotNull UserUpdateAvatarEvent event) {
+        super.onUserUpdateAvatar(event);
     }
 
     private void handleWarReaction(WarEntity warEntity, GuildMessageReactionAddEvent event) {

@@ -28,7 +28,7 @@ class AuthenticationFilter(val tokenService: TokenService) : GenericFilterBean()
         val httpResponse = response as HttpServletResponse
 
         // If auth callback, do not check
-        if (httpRequest.requestURI == "/auth/callback") {
+        if (httpRequest.requestURI == "/api/auth/callback") {
             chain.doFilter(request, response)
             return
         }

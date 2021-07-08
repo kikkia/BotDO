@@ -5,8 +5,8 @@ import com.bot.models.GuildDiscord
 
 class GuildDiscordMapper {
     companion object {
-        fun map(guildEntity: GuildEntity, guildIcon: String? = null) : GuildDiscord {
-            return GuildDiscord(guildEntity.id, guildEntity.name, guildEntity.bdoGuild!!.name, guildIcon)
+        fun map(guildEntity: GuildEntity) : GuildDiscord {
+            return GuildDiscord(guildEntity.id, guildEntity.name, guildEntity.bdoGuild!!.name, guildEntity.avatar)
         }
     }
 }
