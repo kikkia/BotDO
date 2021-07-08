@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,19 +48,23 @@ public class GuildService {
     }
 
     public GuildEntity addFreshGuild(net.dv8tion.jda.api.entities.Guild guild) {
+        var members = new HashSet<UserEntity>();
         for (Member m : guild.getMembers()) {
-            if (userService.getById(m.getUser().getId()) == null) {
-                userService.addUser(m.getUser().getId(),
-                        m.getUser().getName(), m.getUser().getAvatarUrl());
+            var existingUser = userService.getById(m.getUser().getId());
+            if (existingUser == null) {
+               members.add(userService.addUser(m.getUser().getId(),
+                        m.getUser().getName(), m.getUser().getAvatarUrl()));
+            } else {
+                // Sync avatars
+                existingUser.setAvatar(m.getUser().getAvatarUrl());
+                members.add(userService.save(existingUser));
             }
         }
 
         GuildEntity guild1 = new GuildEntity(guild.getId(),
                 guild.getName(),
                 false,
-                guild.getMembers().stream()
-                        .map(UserMapper.Companion::map)
-                        .collect(Collectors.toSet()));
+                members);
         guild1.setAvatar(guild.getIconUrl());
         GuildEntity internalGuild = guildRepository.save(guild1);
 

@@ -25,7 +25,7 @@ class RecruitmentController(private val recruitmentPostService: RecruitmentPostS
     val objectMapper = ObjectMapper()
 
     @RequestMapping("/posts")
-    fun guildsEndpoint(@RequestParam daysAgo: Int, @PathVariable("guildId") guildId : String): ResponseEntity<String> {
+    fun recruitPostEndpoint(@RequestParam daysAgo: Int, @PathVariable("guildId") guildId : String): ResponseEntity<String> {
         val auth = SecurityContextHolder.getContext().authentication
         if (!discordService.canUserAdminGuild(auth.name, guildId)) {
             throw InsufficientPermissionException("You do not have permission to view this guilds info.")
