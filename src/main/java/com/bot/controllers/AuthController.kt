@@ -48,9 +48,11 @@ class AuthController(private val tokenService: TokenService,
 
         val usernameCookie = Cookie("username", user.username)
         val userAvatarCookie = Cookie("avatar", user.avatar)
+        val userIdCookie = Cookie("userId", user.userId)
         cookies.add(tokenCookie)
         cookies.add(usernameCookie)
         cookies.add(userAvatarCookie)
+        cookies.add(userIdCookie)
 
         for (cookie in cookies) {
             cookie.maxAge = tokenService.JWT_TOKEN_VALIDITY.toInt()
