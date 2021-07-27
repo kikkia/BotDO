@@ -1,12 +1,11 @@
 package com.bot.configuration;
 
-import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -30,7 +29,8 @@ public class JpaConfig{
         return em;
     }
 
-    @Bean
+    @Bean("jpaTransactionManager")
+    @Primary
     public PlatformTransactionManager transactionManager(DataSource dataSource){
         JpaTransactionManager transactionManager
                 = new JpaTransactionManager();

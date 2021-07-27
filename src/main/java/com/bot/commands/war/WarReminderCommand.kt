@@ -2,13 +2,11 @@ package com.bot.commands.war
 
 import com.bot.db.entities.GuildEntity
 import com.bot.db.entities.WarEntity
-import com.bot.exceptions.WarDmReminderException
 import com.bot.service.GuildService
 import com.bot.service.WarService
 import com.bot.utils.Constants
 import com.bot.utils.FormattingUtils
 import com.jagrosh.jdautilities.command.CommandEvent
-import lombok.extern.slf4j.Slf4j
 import net.dv8tion.jda.api.entities.User
 import org.springframework.stereotype.Component
 import java.lang.NumberFormatException
@@ -70,6 +68,7 @@ class WarReminderCommand(val warService: WarService,
         }
     }
 
+    // TODO: Get this out of here, cannot use discord service as it makes a circular dep
     fun sendDmMessage(war: WarEntity, user: User) : String {
         val privateChannel = user.openPrivateChannel().complete()
         val message = privateChannel.sendMessage(FormattingUtils.generateDmWarReminder(war)).complete()

@@ -375,4 +375,12 @@ public class FormattingUtils {
                 "this message to mark Yes, No or Maybe.\nOtherwise you can sign up in the " + war.getChannel().getName() +
                 " channel in the discord server.\nHope to see you there!";
     }
+
+    public static String generateDmWarMaybeReminder(@NotNull WarEntity war) {
+        return "Hey, we have war in a couple hours at " + formatDateToBasicString(war.getWarTime()) +
+                ".\nYou are currently marked as `Maybe`. Will you be able to make it to war? " +
+                "You can react to this message to change your signup status.\n" +
+                "Otherwise you can change it in the " + war.getChannel().getName() +
+                " channel in the discord server.\nHope to see you there!";
+    }
 }

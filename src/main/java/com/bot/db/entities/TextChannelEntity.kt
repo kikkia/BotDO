@@ -6,7 +6,7 @@ import javax.persistence.*
 
 @Entity
 @Table(name = "text_channel")
-data class TextChannel(
+data class TextChannelEntity(
         @Id
         val id: String,
         @Column(name = "guild")

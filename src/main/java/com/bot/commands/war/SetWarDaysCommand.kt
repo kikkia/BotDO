@@ -66,8 +66,8 @@ class SetWarDaysCommand(val warService: WarService, val bdoGuildService: BdoGuil
                 // Setup new channel
                 addedDays[day] = command.guild.createTextChannel(
                         channelName).complete()
-                textChannelService.add(addedDays[day], guild)
-                WarUtils.sendNewWar(guild, warDate, addedDays[day]!!, textChannelService, warService)
+                val channel = textChannelService.add(addedDays[day], guild)
+                WarUtils.sendNewWar(guild, warDate, addedDays[day]!!, channel, warService)
             }
             // Remove from existing list
             existingDays = existingDays.stream().filter{ it.id != day.id }.collect(Collectors.toList())

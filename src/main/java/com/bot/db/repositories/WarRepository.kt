@@ -13,7 +13,7 @@ interface WarRepository : CrudRepository<WarEntity, Int> {
 
     fun findByGuildIdAndWarTime(guildId: Int, warTime: Timestamp) : Optional<WarEntity>
 
-    fun findAllByChannelIdAndArchivedAndWarTimeBefore(channelID: String, archived: Boolean, @Param("warTime") time: Timestamp) : List<WarEntity>
+    fun findAllByChannelIdAndArchivedAndWarTimeBefore(channelId: String, archived: Boolean, @Param("warTime") time: Timestamp) : List<WarEntity>
 
     fun findByGuildIdAndId(guildId: Int, id: Int) : Optional<WarEntity>
     // Get past wars by guild id
@@ -21,4 +21,6 @@ interface WarRepository : CrudRepository<WarEntity, Int> {
 
     // Get future wars by guild id
     fun findAllByGuildIdAndWarTimeAfter(guildId: Int, @Param("warTime") time: Timestamp): List<WarEntity>
+    // Get future wars
+    fun findAllByWarTimeAfter(@Param("warTime") time: Timestamp): List<WarEntity>
 }
