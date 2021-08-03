@@ -1,6 +1,7 @@
 package com.bot.commands.war
 
 import com.bot.db.entities.GuildEntity
+import com.bot.db.entities.TextChannelEntity
 import com.bot.models.WarDay
 import com.bot.service.GuildService
 import com.bot.service.TextChannelService
@@ -10,6 +11,7 @@ import com.bot.utils.FormattingUtils
 import com.bot.utils.WarUtils
 import com.jagrosh.jdautilities.command.CommandEvent
 import net.dv8tion.jda.api.entities.TextChannel
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -17,7 +19,8 @@ import java.time.temporal.ChronoUnit
 
 @Component
 class AddWarCommand(private val warService: WarService, guildService: GuildService,
-                    private val textChannelService: TextChannelService) : WarCommand(guildService) {
+                    private val textChannelService: TextChannelService,
+                    @Value("\${war.startTime}") private val warStartTime: String) : WarCommand(guildService) {
 
     init {
         this.name = "addwar"
@@ -31,7 +34,7 @@ class AddWarCommand(private val warService: WarService, guildService: GuildServi
             return
         }
 
-        val date = CommandParsingUtils.parseArgsToDate(command.args)
+        val date = CommandParsingUtils.parseArgsToDate(command.args, warStartTime)
         if (date == null) {
             command.replyWarning("Could not parse time, please make sure that you are formatting it correctly (dd-mm-yyyy)")
             return
@@ -50,15 +53,17 @@ class AddWarCommand(private val warService: WarService, guildService: GuildServi
         }
 
         val channel: TextChannel?
+        val channelEntity: TextChannelEntity
         if (command.message.mentionedChannels.isEmpty()) {
             // Create new channel
             channel = command.guild.createTextChannel("War ${FormattingUtils.formatDateToBasicString(date)}").complete()
-            textChannelService.add(channel, guild)
+            channelEntity = textChannelService.add(channel, guild)
         } else {
             channel = command.message.mentionedChannels[0]
+            channelEntity = textChannelService.getById(channel.id)
         }
 
-        WarUtils.sendNewWar(guild, date, channel, textChannelService, warService)
+        WarUtils.sendNewWar(guild, date, channel, channelEntity, warService)
         command.reactSuccess()
     }
 }

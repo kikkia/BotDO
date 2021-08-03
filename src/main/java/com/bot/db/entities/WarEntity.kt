@@ -20,7 +20,7 @@ class WarEntity(
         var messageId: String,
         @ManyToOne
         @JoinColumn(name = "text_channel")
-        var channel: TextChannel,
+        var channel: TextChannelEntity,
         @ManyToOne
         @JoinColumn(name = "guild_id")
         val guild: BDOGuildEntity) {

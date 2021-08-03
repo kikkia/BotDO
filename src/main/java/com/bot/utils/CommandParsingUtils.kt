@@ -42,13 +42,13 @@ object CommandParsingUtils {
         return scrollPairs
     }
 
-    fun parseArgsToDate(input: String) : Date? {
+    fun parseArgsToDate(input: String, warStartTime: String) : Date? {
         val args = input.split(" ")
-        val formatter: SimpleDateFormat = SimpleDateFormat("dd-M-yyyy hh:mm:ss", Locale.ENGLISH)
+        val formatter = SimpleDateFormat("dd-M-yyyy hh:mm:ss", Locale.ENGLISH)
         formatter.timeZone = TimeZone.getTimeZone("America/Chicago")
         var date: Date? = null
         for (arg in args) {
-            val timeToParse = "$arg 20:00:00"
+            val timeToParse = "$arg $warStartTime"
             try {
                 date = formatter.parse(timeToParse)
                 break

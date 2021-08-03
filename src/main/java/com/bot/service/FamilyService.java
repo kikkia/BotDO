@@ -47,6 +47,11 @@ public class FamilyService {
         if (scrapeToSync && (opt.isEmpty() || opt.get().getLastUpdated().toInstant()
                 .isBefore(Instant.now().minus(30, ChronoUnit.MINUTES)))) {
             // We dont have it, or is old entity, update the entity
+            var syncedFromSite = syncSingleFromSite(familyName, region);
+            // Fallback to db user in the case site is bugged
+            if (syncedFromSite.isEmpty() && opt.isPresent()) {
+                return opt;
+            }
             return syncSingleFromSite(familyName, region);
         }
         return opt;

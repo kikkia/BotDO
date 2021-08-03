@@ -8,10 +8,8 @@ import com.bot.tasks.InvitedMemberTask;
 import com.bot.tasks.ScanGuildsTask;
 import com.bot.tasks.SyncUserFamilyNameTask;
 import com.bot.utils.Constants;
-import com.bot.utils.FormattingUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.channel.text.TextChannelCreateEvent;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
@@ -28,7 +26,6 @@ import net.dv8tion.jda.api.events.guild.update.GuildUpdateNameEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.message.priv.react.PrivateMessageReactionAddEvent;
-import net.dv8tion.jda.api.events.message.react.GenericMessageReactionEvent;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateAvatarEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
@@ -38,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nonnull;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
@@ -165,7 +161,7 @@ public class DiscordListener extends ListenerAdapter {
 
     @Override
     public void onTextChannelUpdateName(@Nonnull TextChannelUpdateNameEvent event) {
-        TextChannel channel = textChannelService.getById(event.getChannel().getId());
+        TextChannelEntity channel = textChannelService.getById(event.getChannel().getId());
         GuildEntity guild = guildService.getById(event.getGuild().getId());
         if (guild == null) {
             guildService.addFreshGuild(event.getGuild());

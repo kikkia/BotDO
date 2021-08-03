@@ -68,8 +68,8 @@ open class WarService(private val warRepository: WarRepository,
         return save(war)
     }
 
-    open fun createWar(time: Instant, messageId: String, channel: TextChannel, guild: BDOGuildEntity) : WarEntity {
-        val newWar = WarEntity(0, Timestamp.from(time), listOf(), messageId, channel, guild)
+    open fun createWar(time: Instant, messageId: String, channelEntity: TextChannelEntity, guild: BDOGuildEntity) : WarEntity {
+        val newWar = WarEntity(0, Timestamp.from(time), listOf(), messageId, channelEntity, guild)
         return save(newWar)
     }
 
@@ -141,6 +141,10 @@ open class WarService(private val warRepository: WarRepository,
 
     open fun save(war: WarEntity) : WarEntity {
         return warRepository.save(war)
+    }
+
+    open fun getAllUpcoming() : List<WarEntity> {
+        return warRepository.findAllByWarTimeAfter(Timestamp.from(Instant.now()))
     }
 
     open fun refreshMessage(guild: Guild, war: WarEntity) {
