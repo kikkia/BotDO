@@ -1,5 +1,6 @@
 package com.bot.configuration
 
+import com.bot.batch.processors.MaybeReminderProcessor
 import com.bot.batch.readers.WarReader
 import com.bot.batch.writers.WarReminderWriter
 import com.bot.db.entities.WarEntity
@@ -13,18 +14,13 @@ import org.springframework.batch.core.configuration.annotation.DefaultBatchConfi
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory
-import org.springframework.batch.core.launch.JobLauncher
 import org.springframework.batch.core.launch.support.RunIdIncrementer
-import org.springframework.batch.core.launch.support.SimpleJobLauncher
-import org.springframework.batch.core.repository.JobRepository
-import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean
 import org.springframework.batch.item.ItemReader
 import org.springframework.batch.item.ItemWriter
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.task.SimpleAsyncTaskExecutor
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
-import java.lang.Exception
+import org.springframework.transaction.PlatformTransactionManager
 
 import java.util.*
 import javax.sql.DataSource
@@ -35,6 +31,7 @@ import javax.sql.DataSource
 @EnableBatchProcessing
 open class BatchConfig(val jobBuilderFactory: JobBuilderFactory,
                   val stepBuilderFactory: StepBuilderFactory,
+                  val transactionManagerBean: PlatformTransactionManager,
                   val discordService: DiscordService,
                   val warService: WarService) : DefaultBatchConfigurer() {
 
@@ -49,9 +46,10 @@ open class BatchConfig(val jobBuilderFactory: JobBuilderFactory,
     }
 
     fun maybeReminderStep(): Step {
-        return stepBuilderFactory.get("maybeRemindearStep")
-            .chunk<List<WarEntity>, List<WarReminder>>(100)
+        return stepBuilderFactory.get("maybeReminderStep")
+            .chunk<List<WarEntity>, List<WarReminder>>(1)
             .reader(warReader())
+            .processor(MaybeReminderProcessor())
             .writer(reminderWriter())
             .build()
     }
@@ -59,12 +57,11 @@ open class BatchConfig(val jobBuilderFactory: JobBuilderFactory,
     fun maybeReminderJob(): Job {
         return jobBuilderFactory.get("remindMaybe")
             .incrementer(runIdIncrementer)
-            .flow(maybeReminderStep())
-            .end()
+            .start(maybeReminderStep())
             .build()
     }
 
-    @Scheduled(cron = "0 * * * * ?", zone = "America/Chicago")
+    //@Scheduled(cron = "0 0 18 * * *", zone = "America/Chicago")
     fun launchMaybeReminder() {
         jobLauncher.run(maybeReminderJob(),
             JobParametersBuilder().addDate("date", Date()).toJobParameters())
@@ -74,5 +71,10 @@ open class BatchConfig(val jobBuilderFactory: JobBuilderFactory,
         // override to do not set datasource even if a datasource exist.
         // initialize will use a Map based JobRepository (instead of database)
     }
+
+    override fun getTransactionManager(): PlatformTransactionManager {
+        return transactionManagerBean
+    }
+
     // TODO: Look in to porting cleanable repo from Vinny-rss
 }
