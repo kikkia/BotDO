@@ -17,7 +17,7 @@
 
     <properties>
         <kotlin.version>1.3.61</kotlin.version>
-        <start-class>com.bot.Application</start-class>
+        <start-class>com.bot.ApplicationKt</start-class>
     </properties>
 
     <dependencies>
@@ -171,7 +171,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.bot.Application</mainClass>
+                    <mainClass>com.bot.ApplicationKt</mainClass>
                 </configuration>
             </plugin>
             <plugin>
@@ -183,7 +183,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>com.bot.Application</mainClass>
+                            <mainClass>com.bot.ApplicationKt</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
