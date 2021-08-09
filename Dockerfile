@@ -1,7 +1,7 @@
 FROM maven:3.6.3-jdk-11-slim AS build
 WORKDIR /app
 COPY . /app/
-RUN mvn -Dmaven.artifact.threads=30 clean package
+RUN mvn -B -Dmaven.artifact.threads=30 clean package
 
 FROM openjdk:latest
 WORKDIR /app
