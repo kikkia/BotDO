@@ -56,7 +56,7 @@ class ArchiveCommand(private val warService: WarService,
                 WarUtils.sendNewWar(guild,
                         Timestamp.from(newDate),
                         command.guild.getTextChannelById(command.channel.id)!!,
-                        textChannelService.getById(channel.id),
+                        textChannelService.getById(command.channel.id),
                         warService)
             }
             warService.setArchived(war)
