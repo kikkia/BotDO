@@ -156,6 +156,6 @@ open class WarService(private val warRepository: WarRepository,
                     warStatsService.getAllByWarId(war.id))
         else
             FormattingUtils.generateWarMessage(war)
-        channel.editMessageById(war.messageId, message).queue()
+        channel.editMessageEmbedsById(war.messageId, message).queue()
     }
 }

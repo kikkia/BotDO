@@ -108,7 +108,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.2.0_198</version>
+            <version>4.3.0_307</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
@@ -264,6 +264,11 @@
             <id>yoava</id>
             <name>AOL yoava</name>
             <url>http://yoava.artifactoryonline.com/yoava/repo</url>
+        </repository>
+        <repository>
+            <id>dv8tion</id>
+            <name>m2-dv8tion</name>
+            <url>https://m2.dv8tion.net/releases</url>
         </repository>
     </repositories>
     <pluginRepositories>

@@ -13,7 +13,7 @@ class WarUtils {
 
             val war = warService.createWar(date.toInstant(), warMessage.id, channelEntity, guild.bdoGuild!!);
             // TODO: War reminders
-            warMessage.editMessage(FormattingUtils.generateWarMessage(war)).complete()
+            warMessage.editMessageEmbeds(FormattingUtils.generateWarMessage(war)).complete()
             for (reaction in Constants.WAR_REACTIONS) {
                 warMessage.addReaction(reaction).complete()
             }
@@ -22,7 +22,7 @@ class WarUtils {
         fun sendArchivedWar(war: WarEntity, vods: List<WarVodEntity>, stats: List<WarStatsEntity>, channel: TextChannel) : String {
             val warMessage = channel.sendMessage("Archiving War...").complete()
 
-            warMessage.editMessage(FormattingUtils.generateArchivedWarMessage(war,
+            warMessage.editMessageEmbeds(FormattingUtils.generateArchivedWarMessage(war,
                     vods,
                     stats)).complete()
             warMessage.addReaction(Constants.WAR_REACTION_REFRESH).complete()
