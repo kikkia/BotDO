@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Guild
 import org.springframework.stereotype.Service
 import java.sql.Timestamp
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.stream.Collectors
 import javax.transaction.Transactional
@@ -45,6 +46,13 @@ open class WarService(private val warRepository: WarRepository,
 
     open fun getByGuildAndId(guild: GuildEntity, id: Int) : Optional<WarEntity> {
         return warRepository.findByGuildIdAndId(guild.bdoGuild!!.id, id)
+    }
+
+    // Gets a war that has started in the last hour or is starting in the next hour
+    open fun getByGuildInNextHour(guild: GuildEntity) : Optional<WarEntity> {
+        return warRepository.findByGuildIdAndWarTimeBetween(guild.bdoGuild!!.id,
+                Timestamp.from(Instant.now().minus(1, ChronoUnit.HOURS)),
+                Timestamp.from(Instant.now().plus(1, ChronoUnit.HOURS)));
     }
 
     open fun setArchived(war: WarEntity) : WarEntity {

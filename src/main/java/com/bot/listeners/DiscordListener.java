@@ -10,10 +10,14 @@ import com.bot.tasks.SyncUserFamilyNameTask;
 import com.bot.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.channel.text.TextChannelCreateEvent;
 import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
 import net.dv8tion.jda.api.events.channel.text.update.TextChannelUpdateNameEvent;
+import net.dv8tion.jda.api.events.channel.voice.VoiceChannelCreateEvent;
+import net.dv8tion.jda.api.events.channel.voice.VoiceChannelDeleteEvent;
+import net.dv8tion.jda.api.events.channel.voice.update.VoiceChannelUpdateNameEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.invite.GuildInviteCreateEvent;
@@ -23,6 +27,7 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateIconEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateNameEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.message.priv.react.PrivateMessageReactionAddEvent;
@@ -51,6 +56,8 @@ public class DiscordListener extends ListenerAdapter {
     private UserService userService;
     @Autowired
     private TextChannelService textChannelService;
+    @Autowired
+    private VoiceChannelService voiceChannelService;
     @Autowired
     private InviteService inviteService;
     @Autowired
@@ -278,6 +285,71 @@ public class DiscordListener extends ListenerAdapter {
     @Override
     public void onUserUpdateAvatar(@NotNull UserUpdateAvatarEvent event) {
         super.onUserUpdateAvatar(event);
+    }
+
+    @Override
+    public void onVoiceChannelUpdateName(@NotNull VoiceChannelUpdateNameEvent event) {
+        var channel = getVoiceHelper(event.getChannel());
+        channel.setName(event.getNewName());
+        voiceChannelService.save(channel);
+
+        super.onVoiceChannelUpdateName(event);
+    }
+
+    @Override
+    public void onVoiceChannelDelete(@NotNull VoiceChannelDeleteEvent event) {
+        voiceChannelService.delete(event.getChannel().getId());
+        super.onVoiceChannelDelete(event);
+    }
+
+    @Override
+    public void onVoiceChannelCreate(@NotNull VoiceChannelCreateEvent event) {
+        voiceChannelService.newChannel(event.getChannel().getId(),
+                event.getChannel().getName(),
+                event.getGuild().getId());
+        super.onVoiceChannelCreate(event);
+    }
+
+    @Override
+    public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {
+        var channel = getVoiceHelper(event.getChannelJoined());
+        if (channel.getWar()) {
+            var guild = guildService.getById(event.getGuild().getId());
+            var warOpt = warService.getByGuildInNextHour(guild);
+            if (warOpt.isPresent()) {
+                // Check that user is signed up for the war
+                var war = warOpt.get();
+                var attendanceRecordOpt = war.getAttendees()
+                        .stream()
+                        .filter(a -> a.getUser().getId().equals(event.getMember().getUser().getId()))
+                        .findFirst();
+                if (attendanceRecordOpt.isEmpty() ||
+                        attendanceRecordOpt.get().getNotAttending() ||
+                        attendanceRecordOpt.get().getMaybe()) {
+                    // Send dm to them to sign up
+                    var privateChannel = event
+                            .getMember()
+                            .getUser()
+                            .openPrivateChannel()
+                            .complete();
+                    privateChannel.sendMessage("I noticed you just joined a war voice channel for a war you haven't yet signed up for." +
+                            " We really want to encourage people to sign up for war in the bot so we can track numbers and make sure everyone that" +
+                            " wants to war can get a spot. If you are participating please yes up in the bot by reacting in the signup channel `" +
+                            war.getChannel().getName() + "` before you yes up in game. If not you can ignore this dm. Thanks!").queue();
+                }
+            }
+        }
+
+        super.onGuildVoiceJoin(event);
+    }
+
+    // Get the voice channel entity or create it if does not exist
+    private VoiceChannelEntity getVoiceHelper(VoiceChannel voiceChannel) {
+        var channelOpt = voiceChannelService.getById(voiceChannel.getId());
+        return channelOpt.orElseGet(() -> voiceChannelService.newChannel(
+                voiceChannel.getId(),
+                voiceChannel.getName(),
+                voiceChannel.getGuild().getId()));
     }
 
     private void handleWarReaction(WarEntity warEntity, GuildMessageReactionAddEvent event) {
