@@ -50,7 +50,7 @@ open class WarService(private val warRepository: WarRepository,
 
     // Gets a war that has started in the last hour or is starting in the next hour
     open fun getByGuildInNextHour(guild: GuildEntity) : Optional<WarEntity> {
-        return warRepository.findByGuildIdAndWarTimeAfterAndTimeBefore(guild.bdoGuild!!.id,
+        return warRepository.findByGuildIdAndWarTimeBetween(guild.bdoGuild!!.id,
                 Timestamp.from(Instant.now().minus(1, ChronoUnit.HOURS)),
                 Timestamp.from(Instant.now().plus(1, ChronoUnit.HOURS)));
     }
