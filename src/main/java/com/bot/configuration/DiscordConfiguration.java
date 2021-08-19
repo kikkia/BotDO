@@ -6,6 +6,7 @@ import com.bot.configuration.properties.DiscordProperties;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandClient;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
+import com.jagrosh.jdautilities.command.SlashCommand;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import net.dv8tion.jda.api.sharding.DefaultShardManagerBuilder;
 import net.dv8tion.jda.api.sharding.ShardManager;
@@ -32,10 +33,14 @@ public class DiscordConfiguration {
     @Autowired
     List<Command> commandList;
 
+    @Autowired
+    List<SlashCommand> slashCommands;
+
     @Bean
     public ShardManager shardManager(EventWaiter eventWaiter,
                                      CommandClient client,
                                      DiscordListener listenerAdapter) throws LoginException {
+        commandList.addAll(slashCommands);
         return DefaultShardManagerBuilder
                 .createDefault(
                         discordProperties.getToken(),
@@ -74,6 +79,7 @@ public class DiscordConfiguration {
         builder.setScheduleExecutor(executorService);
         builder.setListener(commandListener);
         builder.addCommands(commandList.toArray(new Command[commandList.size()]));
+        builder.addSlashCommands(slashCommands.toArray(new SlashCommand[slashCommands.size()]));
         return builder.build();
     }
 }
