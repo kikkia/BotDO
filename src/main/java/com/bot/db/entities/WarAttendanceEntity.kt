@@ -26,6 +26,8 @@ class WarAttendanceEntity(
     var notAttending: Boolean = false
     @Column(name = "created")
     val created: Timestamp = Timestamp.from(Instant.now())
+    @Column(name = "attended")
+    var attended: Boolean = false
 
     fun toMessageEntry() : String {
         val gear = user.gearset

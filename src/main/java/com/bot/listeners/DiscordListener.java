@@ -337,6 +337,10 @@ public class DiscordListener extends ListenerAdapter {
                             " wants to war can get a spot. If you are participating please yes up in the bot by reacting in the signup channel `" +
                             war.getChannel().getName() + "` before you yes up in game. If not you can ignore this dm. Thanks!").queue();
                 }
+                if (attendanceRecordOpt.isPresent()) {
+                    // Set them as attending the war
+                    warService.setAttendeeAttended(war, event.getMember().getUser().getId());
+                }
             }
         }
 
@@ -369,10 +373,12 @@ public class DiscordListener extends ListenerAdapter {
             if (warEntity.getArchived()) {
                 // Do nothing just refresh
             } else if (reactionName.equals(Constants.WAR_REACTION_YES)) {
+                var attended = false; // Used to maintain attended status
                 // If they are signed up as maybe, remove the maybe
                 var attendeeOpt = warEntity.getAttendees().stream()
                         .filter(a -> a.getUser().getId().equals(userId)).findFirst();
                 if (attendeeOpt.isPresent()) {
+                    attended = attendeeOpt.get().getAttended();
                     // Remove and re add attendee as maybe (We want to refresh their created timestamp)
                     warEntity = warService.removeAttendee(warEntity, user);
                 }
@@ -380,6 +386,8 @@ public class DiscordListener extends ListenerAdapter {
                 // If they are not signed up then add them
                 if (!warEntity.getAttendees().stream().map(a -> a.getUser().getId()).collect(Collectors.toList()).contains(userId)) {
                     warEntity = warService.addAttendee(warEntity, user, false);
+                    if (attended)
+                        warService.setAttendeeAttended(warEntity, user.getId());
                 }
             } else if (reactionName.equals(Constants.WAR_REACTION_NO)) {
                 // If no reaction remove them from the list if they are on it
