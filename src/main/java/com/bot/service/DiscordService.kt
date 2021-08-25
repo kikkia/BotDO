@@ -2,17 +2,13 @@ package com.bot.service
 
 import com.bot.db.entities.WarEntity
 import com.bot.db.mapper.GuildDiscordMapper
-import com.bot.exceptions.api.GuildNotFoundException
+import com.bot.api.exceptions.GuildNotFoundException
 import com.bot.models.GuildDiscord
 import com.bot.utils.Constants
 import net.dv8tion.jda.api.Permission
-import net.dv8tion.jda.api.entities.Guild
-import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.entities.Role
-import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.sharding.ShardManager
 import org.springframework.stereotype.Service
-import java.lang.IllegalStateException
 import java.util.*
 
 @Service
@@ -58,6 +54,18 @@ class DiscordService(private val shardManager: ShardManager,
             }
         }
         return Optional.ofNullable(retUser)
+    }
+
+    fun getChannelInGuild(channelId: String, guildId: String) : Optional<TextChannel> {
+        for (shard in shardManager.shards) {
+            val guild = shard.getGuildById(guildId)
+            if (guild == null) {
+                continue
+            } else {
+                return Optional.ofNullable(guild.getTextChannelById(channelId))
+            }
+        }
+        return Optional.empty()
     }
 
     fun canUserAdminGuild(userId: String, guildId: String) : Boolean {

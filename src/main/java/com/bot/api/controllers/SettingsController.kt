@@ -1,6 +1,6 @@
 package com.bot.api.controllers
 
-import com.bot.exceptions.api.InsufficientPermissionException
+import com.bot.api.exceptions.InsufficientPermissionException
 import com.bot.models.BdoGuild
 import com.bot.models.DiscordRole
 import com.bot.models.DiscordTextChannel
