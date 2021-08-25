@@ -1,4 +1,4 @@
-package com.bot.controllers
+package com.bot.api.controllers
 
 import com.bot.models.GuildDiscord
 import com.bot.service.DiscordService

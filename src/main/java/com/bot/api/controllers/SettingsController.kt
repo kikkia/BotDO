@@ -1,15 +1,16 @@
-package com.bot.controllers
+package com.bot.api.controllers
 
 import com.bot.exceptions.api.InsufficientPermissionException
 import com.bot.models.BdoGuild
 import com.bot.models.DiscordRole
 import com.bot.models.DiscordTextChannel
-import com.bot.models.GuildSettings
+import com.bot.api.models.GuildSettings
 import com.bot.service.DiscordService
 import com.bot.service.GuildService
 import com.bot.service.TextChannelService
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -40,7 +41,8 @@ class SettingsController(private val discordService: DiscordService,
                 DiscordTextChannel.from(archiveChannel),
                 guildEntity.recruitMessage,
                 DiscordRole.from(recruitRole)
-                )))
+                )
+        ))
     }
 
     @PostMapping("/")

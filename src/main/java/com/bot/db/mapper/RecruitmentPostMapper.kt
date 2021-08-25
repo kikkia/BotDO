@@ -1,7 +1,7 @@
 package com.bot.db.mapper
 
 import com.bot.db.entities.RecruitmentPostEntity
-import com.bot.models.RecruitmentPost
+import com.bot.api.models.RecruitmentPost
 
 class RecruitmentPostMapper {
     companion object {
