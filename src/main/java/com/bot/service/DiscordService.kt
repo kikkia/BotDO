@@ -8,6 +8,7 @@ import com.bot.utils.Constants
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.Role
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.sharding.ShardManager
 import org.springframework.stereotype.Service
@@ -38,6 +39,11 @@ class DiscordService(private val shardManager: ShardManager,
             }
         }
         return guilds
+    }
+
+    fun getRoleInGuild(guildId: String, roleId: String) : Role? {
+        val guild = getGuild(guildId)
+        return if (guild == null) guild else guild.getRoleById(roleId)
     }
 
     fun getUserById(userId: String) : Optional<User> {
@@ -81,5 +87,17 @@ class DiscordService(private val shardManager: ShardManager,
 
     private fun canManageBot(member: Member) : Boolean {
         return member.hasPermission(Permission.MANAGE_SERVER)
+    }
+
+    private fun getGuild(guildId: String) : Guild? {
+        for (shard in shardManager.shards) {
+            val guild = shard.getGuildById(guildId)
+            if (guild == null) {
+                continue
+            } else {
+                return guild
+            }
+        }
+        return null
     }
 }

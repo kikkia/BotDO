@@ -1,8 +1,8 @@
-package com.bot.controllers
+package com.bot.api.controllers
 
 import com.bot.exceptions.api.InsufficientPermissionException
 import com.bot.exceptions.api.InvalidParamException
-import com.bot.models.RecruitmentPost
+import com.bot.api.models.RecruitmentPost
 import com.bot.service.DiscordService
 import com.bot.service.GuildService
 import com.bot.service.RecruitmentPostService
