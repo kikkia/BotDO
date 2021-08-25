@@ -8,6 +8,7 @@ class WarAttendeeMapper {
         fun map(entity: WarAttendanceEntity) : WarAttendance {
             return WarAttendance(entity.war.id,
                 entity.user.id,
+                entity.user.getEffectiveName(),
                 entity.attended,
                 entity.maybe,
                 !entity.maybe && !entity.notAttending
