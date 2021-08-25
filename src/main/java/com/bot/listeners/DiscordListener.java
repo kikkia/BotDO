@@ -10,6 +10,7 @@ import com.bot.tasks.SyncUserFamilyNameTask;
 import com.bot.utils.Constants;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.channel.text.TextChannelCreateEvent;
@@ -28,6 +29,7 @@ import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameE
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateIconEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateNameEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
 import net.dv8tion.jda.api.events.message.priv.react.PrivateMessageReactionAddEvent;
@@ -311,24 +313,34 @@ public class DiscordListener extends ListenerAdapter {
     }
 
     @Override
+    public void onGuildVoiceMove(@NotNull GuildVoiceMoveEvent event) {
+        handleVoiceChannelChange(event.getChannelJoined(), event.getMember());
+        super.onGuildVoiceMove(event);
+    }
+
+    @Override
     public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {
-        var channel = getVoiceHelper(event.getChannelJoined());
-        if (channel.getWar()) {
-            var guild = guildService.getById(event.getGuild().getId());
+        handleVoiceChannelChange(event.getChannelJoined(), event.getMember());
+        super.onGuildVoiceJoin(event);
+    }
+
+    private void handleVoiceChannelChange(VoiceChannel channel, Member member) {
+        var channelEntity = getVoiceHelper(channel);
+        if (channelEntity.getWar()) {
+            var guild = guildService.getById(channel.getGuild().getId());
             var warOpt = warService.getByGuildInNextHour(guild);
             if (warOpt.isPresent()) {
                 // Check that user is signed up for the war
                 var war = warOpt.get();
                 var attendanceRecordOpt = war.getAttendees()
                         .stream()
-                        .filter(a -> a.getUser().getId().equals(event.getMember().getUser().getId()))
+                        .filter(a -> a.getUser().getId().equals(member.getUser().getId()))
                         .findFirst();
                 if (attendanceRecordOpt.isEmpty() ||
                         attendanceRecordOpt.get().getNotAttending() ||
                         attendanceRecordOpt.get().getMaybe()) {
                     // Send dm to them to sign up
-                    var privateChannel = event
-                            .getMember()
+                    var privateChannel = member
                             .getUser()
                             .openPrivateChannel()
                             .complete();
@@ -339,12 +351,10 @@ public class DiscordListener extends ListenerAdapter {
                 }
                 if (attendanceRecordOpt.isPresent()) {
                     // Set them as attending the war
-                    warService.setAttendeeAttended(war, event.getMember().getUser().getId());
+                    warService.setAttendeeAttended(war, member.getUser().getId());
                 }
             }
         }
-
-        super.onGuildVoiceJoin(event);
     }
 
     // Get the voice channel entity or create it if does not exist
