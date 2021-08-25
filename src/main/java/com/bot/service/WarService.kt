@@ -6,6 +6,7 @@ import com.bot.db.repositories.WarRepository
 import com.bot.utils.FormattingUtils
 import net.dv8tion.jda.api.entities.Guild
 import org.springframework.stereotype.Service
+import java.sql.Time
 import java.sql.Timestamp
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -53,6 +54,15 @@ open class WarService(private val warRepository: WarRepository,
         return warRepository.findByGuildIdAndWarTimeBetween(guild.bdoGuild!!.id,
                 Timestamp.from(Instant.now().minus(2, ChronoUnit.HOURS)),
                 Timestamp.from(Instant.now().plus(1, ChronoUnit.HOURS)));
+    }
+
+    open fun getPastByGuildAfter(guildId: Int, after: Instant) : List<WarEntity> {
+        return warRepository.findAllByGuildIdAndWarTimeBetween(guildId,
+            Timestamp.from(after), Timestamp.from(Instant.now()))
+    }
+
+    open fun getAllUpcomingByGuildId(guildId: Int) : List<WarEntity> {
+        return warRepository.findAllByGuildIdAndWarTimeAfter(guildId, Timestamp.from(Instant.now()))
     }
 
     open fun setArchived(war: WarEntity) : WarEntity {

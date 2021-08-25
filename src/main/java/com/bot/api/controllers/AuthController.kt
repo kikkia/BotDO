@@ -1,4 +1,4 @@
-package com.bot.controllers
+package com.bot.api.controllers
 
 import com.bot.configuration.properties.APIProperties
 import com.bot.models.DiscordUserIdentity
