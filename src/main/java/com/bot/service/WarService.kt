@@ -50,8 +50,8 @@ open class WarService(private val warRepository: WarRepository,
 
     // Gets a war that has started in the last hour or is starting in the next hour
     open fun getByGuildInNextHour(guild: GuildEntity) : Optional<WarEntity> {
-        return warRepository.findByGuildIdAndWarTimeAfterAndTimeBefore(guild.bdoGuild!!.id,
-                Timestamp.from(Instant.now().minus(1, ChronoUnit.HOURS)),
+        return warRepository.findByGuildIdAndWarTimeBetween(guild.bdoGuild!!.id,
+                Timestamp.from(Instant.now().minus(2, ChronoUnit.HOURS)),
                 Timestamp.from(Instant.now().plus(1, ChronoUnit.HOURS)));
     }
 
@@ -116,6 +116,15 @@ open class WarService(private val warRepository: WarRepository,
         attendees.add(entity)
         war.attendees = attendees
         return save(war)
+    }
+
+    open fun setAttendeeAttended(war: WarEntity, userId: String) {
+        val attendeeOpt = war.attendees.stream().filter{ it.user.id == userId}.findFirst()
+        if (attendeeOpt.isEmpty)
+            return
+        val attendee = attendeeOpt.get()
+        attendee.attended = true
+        save(war)
     }
 
     open fun notAttending(war: WarEntity, user: UserEntity) : WarEntity {
