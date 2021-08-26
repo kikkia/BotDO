@@ -57,7 +57,7 @@ open class WarService(private val warRepository: WarRepository,
     }
 
     open fun getPastByGuildAfter(guildId: Int, after: Instant) : List<WarEntity> {
-        return warRepository.findAllByGuildIdAndWarTimeBetween(guildId,
+        return warRepository.findAllByGuildIdAndWarTimeBetweenOrderByWarTimeAsc(guildId,
             Timestamp.from(after), Timestamp.from(Instant.now()))
     }
 

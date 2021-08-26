@@ -25,5 +25,5 @@ interface WarRepository : CrudRepository<WarEntity, Int> {
     fun findAllByWarTimeAfter(@Param("warTime") time: Timestamp): List<WarEntity>
     // Get wars in timeframe
     fun findByGuildIdAndWarTimeBetween(guildId: Int, after: Timestamp, before: Timestamp) : Optional<WarEntity>
-    fun findAllByGuildIdAndWarTimeBetween(guildId: Int, after: Timestamp, before: Timestamp) : List<WarEntity>
+    fun findAllByGuildIdAndWarTimeBetweenOrderByWarTimeAsc(guildId: Int, after: Timestamp, before: Timestamp) : List<WarEntity>
 }
