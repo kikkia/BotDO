@@ -244,10 +244,10 @@ public class FormattingUtils {
     // TODO: Clean this up with archived builder
     public static MessageEmbed generateWarMessage(WarEntity warEntity) {
         var limit = warEntity.getWarNode() == null ? 100: warEntity.getWarNode().getCap();
-        var notAttendingCount = warEntity.getAttendees()
+        var notAttending = warEntity.getAttendees()
                 .stream()
                 .filter(WarAttendanceEntity::getNotAttending)
-                .count();
+                .collect(Collectors.toList());
 
         var attendees = warEntity.getAttendees().stream()
                 .sorted(warSignupComparator)
@@ -261,7 +261,7 @@ public class FormattingUtils {
         embedBuilder.setAuthor(formatDateToBasicString(warEntity.getWarTime()) + " war signup.");
         embedBuilder.addField("Avg gearscore", String.valueOf(warEntity.getAverageGS()), true);
         embedBuilder.addField("Yes/Maybe", attendees.size() - maybeCount + "/" + maybeCount, true);
-        embedBuilder.addField("Not attending", String.valueOf(notAttendingCount), true);
+        embedBuilder.addField("Not attending", formatNotAttending(notAttending), true);
         if (warEntity.getWarNode() != null) {
             embedBuilder.addField("Node", warEntity.getWarNode().getDisplayName(), true);
             embedBuilder.addField("Tier", warEntity.getWarNode().getTier().getDisplay(), true);
@@ -273,6 +273,14 @@ public class FormattingUtils {
         embedBuilder.setDescription(buildAttendeeList(attendees, limit));
         embedBuilder.setFooter("To sign up react `Y` for yes, `N` for no. ? for maybe. War Id: " + warEntity.getId());
         return embedBuilder.build();
+    }
+
+    private static String formatNotAttending(List<WarAttendanceEntity> notAttending) {
+        StringBuilder sb = new StringBuilder();
+        for (WarAttendanceEntity a : notAttending) {
+            sb.append("`").append(a.getUser().getEffectiveName()).append("`");
+        }
+        return sb.toString();
     }
 
     public static MessageEmbed generateArchivedWarMessage(WarEntity warEntity,
