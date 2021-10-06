@@ -3,7 +3,7 @@ WORKDIR /app
 COPY . /app/
 RUN mvn -B -Dmaven.artifact.threads=30 clean package
 
-FROM openjdk:11.0.12-slim-buster
+FROM openjdk:11-jdk-oracle
 WORKDIR /app
 COPY --from=build /app/target/ /app
 COPY --from=build /app/res/ /app/res
