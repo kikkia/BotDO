@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 // Filter to just ensure that the jwt on the request is valid
-class AuthenticationFilter(val tokenService: TokenService) : GenericFilterBean() {
+class AuthenticationFilter(private val tokenService: TokenService) : GenericFilterBean() {
 
     @Throws(IOException::class, ServletException::class)
     override fun doFilter(

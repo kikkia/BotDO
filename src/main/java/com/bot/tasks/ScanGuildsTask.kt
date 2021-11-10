@@ -33,7 +33,7 @@ class ScanGuildsTask(private val familyService: FamilyService,
                 page = 1
                 while (true) {
                     try {
-                        val guildNames = GuildScrapeUtils.getGuildNamesOnPage(page, "${i.toChar()}${j.toChar()}")
+                        val guildNames = GuildScrapeUtils.getGuildNamesOnPage(page, "${i.toChar()}${j.toChar()}", region)
                         if (guildNames.isEmpty()) {
                             break
                         }
