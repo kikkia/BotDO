@@ -15,7 +15,7 @@ class LookupController(private val familyService: FamilyService) {
 
     @CrossOrigin(origins = ["https://toshi.kikkia.dev"], allowCredentials = "true")
     @RequestMapping("/user")
-    fun userLookup(@RequestParam familyName: String, @PathVariable("region") regionCode : String) : ResponseEntity<String> {
+    fun userLookup(@RequestParam familyName: String, @RequestParam("region") regionCode : String) : ResponseEntity<String> {
         val region = Region.getByCode(regionCode) ?: throw RegionNotFoundException("Region not found")
         val family = familyService.getFamily(familyName, region, true)
         if (family.isEmpty) {
