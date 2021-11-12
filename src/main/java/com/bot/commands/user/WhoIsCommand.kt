@@ -23,7 +23,8 @@ class WhoIsCommand(private val familyService: FamilyService,
     }
 
     override fun executeCommand(commandEvent: CommandEvent?) {
-        val region = Region.getByCode(userService.getById(commandEvent!!.member.user.id).defaultRegion)
+        commandEvent!!.channel.sendTyping().queue()
+        val region = Region.getByCode(userService.getById(commandEvent.member.user.id).defaultRegion)
         val familyOpt = familyService.getFamily(commandEvent.args, region, true)
         if (familyOpt.isEmpty) {
             // Try to search the site for a user, rather than use our cache
@@ -39,7 +40,7 @@ class WhoIsCommand(private val familyService: FamilyService,
         }
         val guilds = family.memberships.stream().filter {!it.active}.map { it.guild.name }.collect(Collectors.toList());
         val activeGuild = family.memberships.stream().filter { it.active }.map { it.guild.name }.findFirst().orElseGet{ "None" }
-        val pastGuilds = if (guilds.isEmpty()) "None that I know of (Past guilds indexed from 4/6/21)" else guilds.toString()
+        val pastGuilds = if (guilds.isEmpty()) "None that I know of." else guilds.toString()
         val embedBuilder = EmbedBuilder()
         embedBuilder.setTitle(family.name)
         embedBuilder.addField("Current Guild", activeGuild, true)
