@@ -23,15 +23,7 @@ class WhoIsCommand(private val familyService: FamilyService,
     }
 
     override fun executeCommand(commandEvent: CommandEvent?) {
-        val region = if (commandEvent!!.message.contentRaw.contains("region:")) {
-            Region.getByCode(commandEvent.message.contentRaw.split("region:")[1].split(" ")[0])
-        } else {
-            Region.getByCode(userService.getById(commandEvent.member.user.id).defaultRegion)
-        }
-        if (region == null) {
-            commandEvent.replyWarning("Invalid region supplied, valid regions are: ${Region.values()}")
-            return
-        }
+        val region = Region.getByCode(userService.getById(commandEvent!!.member.user.id).defaultRegion)
         val familyOpt = familyService.getFamily(commandEvent.args, region, true)
         if (familyOpt.isEmpty) {
             // Try to search the site for a user, rather than use our cache

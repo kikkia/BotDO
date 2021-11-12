@@ -22,17 +22,8 @@ class LinkGuildCommand(private val guildService: GuildService,
     }
 
     override fun executeCommand(commandEvent: CommandEvent?) {
-        val region = if (commandEvent!!.message.contentRaw.contains("region:")) {
-            Region.getByCode(commandEvent.message.contentRaw.split("region:")[1].split(" ")[0])
-        } else {
-            Region.getByCode(userService.getById(commandEvent.member.user.id).defaultRegion)
-        }
-        if (region == null) {
-            commandEvent.replyWarning("Invalid region supplied, valid regions are: ${Region.values()}")
-            return
-        }
-
-        val guildOpt = bdoGuildService.getByNameAndRegion(commandEvent.args, region)
+        val guildOpt = bdoGuildService.getByNameAndRegion(commandEvent!!.args, Region.getByCode(
+            userService.getById(commandEvent.member.user.id).defaultRegion))
         if (guildOpt.isEmpty) {
             commandEvent.replyWarning("Guild not found. Double check your guild name. Contact Kikkia if this issue persists. (Only NA Supported so far)")
             return

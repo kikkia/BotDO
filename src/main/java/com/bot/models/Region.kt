@@ -6,7 +6,7 @@ enum class Region(val code: String) {
     EUROPE("EU"),
     KOREA("KR"),
     RUSSIA("RU"),
-    OCEANA("OC"),
+    OCEANA("OCE"),
     TURKEY("TR"),
     JAPAN("JP"),
     SOUTHEAST_ASIA("SEA"),
@@ -14,7 +14,7 @@ enum class Region(val code: String) {
 
     companion object {
         fun getByCode(code: String): Region? {
-            return values().find { it.code.equals(code, false) }
+            return values().find { it.code.equals(code, true) }
         }
     }
 }

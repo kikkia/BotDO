@@ -84,12 +84,10 @@ public class DiscordListener extends ListenerAdapter {
         // Schedule the NA scan
         // TODO: This runs once for every shard, be careful if sharding is ever needed
         if (discordProperties.getScanFamilies()) {
-            var backoff = 0; // Stagger each search by 1 hr
-            for(Region r : Region.values()) {
-                executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, metricsService, r),
-                        backoff, 24, TimeUnit.HOURS);
-                backoff++;
-            }
+                executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, metricsService, Region.NORTH_AMERICA),
+                        12, 24, TimeUnit.HOURS);
+                executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, metricsService, Region.EUROPE),
+                        0, 24, TimeUnit.HOURS);
         }
 
         // Open dm channels with users with active dm signups to listen for updates

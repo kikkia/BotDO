@@ -32,7 +32,7 @@ class GuildScrapeUtils {
         private val CHARACTER_CLASS_LEVEL_REGEX = Regex("<em>(.+)</em>")
         private val CHARACTER_MAIN_REGEX = Regex("<span class=\"selected_label\">Main Character</span>")
 
-        private val GUILD_SEARCH_URL = "https://www.%s.playblackdesert.com/en-US/Adventure/Guild?Page="
+        private val GUILD_SEARCH_URL = "https://www.%s.playblackdesert.com/en-US/Adventure/Guild?region=%s&Page="
         private val GUILD_PAGE_URL = "https://www.%s.playblackdesert.com/en-US/Adventure/Guild/GuildProfile?guildName="
         private val FAMILY_PAGE_URL = "https://www.%s.playblackdesert.com/en-US/Adventure/Profile?profileTarget="
         private val FAMILY_SEARCH_URL = "https://www.%s.playblackdesert.com/en-US/Adventure?searchType=2&region="
@@ -42,22 +42,19 @@ class GuildScrapeUtils {
         }
 
         private fun getGuildSearchBaseUrl(region: Region) : String {
-            if (region == Region.NORTH_AMERICA || region == Region.EUROPE) {
-                return GUILD_SEARCH_URL.format("naeu")
-            }
-            return GUILD_SEARCH_URL.format(region.code)
+            return GUILD_SEARCH_URL.format(getSubDomain(region), region.code)
         }
 
         private fun getGuildPageUrl(name: String, region: Region) : String {
-            return "${GUILD_PAGE_URL.format(region.code)}$name&region=${region.code}"
+            return "${GUILD_PAGE_URL.format(getSubDomain(region))}$name&region=${region.code}"
         }
 
         private fun getFamilySearchUrl(name: String, region: Region) : String {
-            return "${FAMILY_SEARCH_URL.format(region.code)}${region.code}&searchKeyword=$name"
+            return "${FAMILY_SEARCH_URL.format(getSubDomain(region))}${region.code}&searchKeyword=$name"
         }
 
         private fun getFamilyPageUrl(id: String, region: Region) : String {
-            return "${FAMILY_PAGE_URL.format(region.code)}$id"
+            return "${FAMILY_PAGE_URL.format(getSubDomain(region))}$id"
         }
 
         fun getGuildNamesOnPage(page: Int, search: String, region: Region) : List<String> {
@@ -123,6 +120,10 @@ class GuildScrapeUtils {
             val combatClass = classLevel.iterator().next().groupValues[1]
             val level = classLevel.iterator().next().groupValues[1].toInt()
             return BdoCharacter(name, combatClass, level, main)
+        }
+
+        private fun getSubDomain(region: Region) : String {
+            return if (region == Region.NORTH_AMERICA || region == Region.EUROPE) "naeu" else region.code
         }
     }
 }

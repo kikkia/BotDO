@@ -5,6 +5,7 @@ import com.bot.models.Region
 import com.bot.service.UserService
 import com.jagrosh.jdautilities.command.CommandEvent
 import org.springframework.stereotype.Component
+import java.util.*
 
 @Component
 class SetDefaultRegionCommand(private val userService: UserService) : RequiredArgsCommand() {
@@ -20,7 +21,9 @@ class SetDefaultRegionCommand(private val userService: UserService) : RequiredAr
         val user = userService.getById(commandEvent!!.member.user.id)
         val region = Region.getByCode(commandEvent.args)
         if (region == null) {
-            commandEvent.replyWarning("Region not found, please use one of the valid region codes: ${Region.values()}")
+            commandEvent.replyWarning("Region not found, please use one of the valid region codes: ${
+                Region.values().map { it.code }.toList().joinToString(",")
+            }")
             return
         }
 
