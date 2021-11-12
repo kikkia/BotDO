@@ -3,6 +3,7 @@ package com.bot.commands.user
 import com.bot.commands.RequiredArgsCommand
 import com.bot.models.Region
 import com.bot.service.FamilyService
+import com.bot.service.UserService
 import com.bot.utils.GuildScrapeUtils
 import com.jagrosh.jdautilities.command.CommandEvent
 import net.dv8tion.jda.api.EmbedBuilder
@@ -12,16 +13,18 @@ import java.time.temporal.ChronoUnit
 import java.util.stream.Collectors
 
 @Component
-class WhoIsCommand(private val familyService: FamilyService) : RequiredArgsCommand() {
+class WhoIsCommand(private val familyService: FamilyService,
+                   private val userService: UserService) : RequiredArgsCommand() {
 
     init {
         name = "whois"
-        help = "Gets info about a family in game (Only NA atm)";
-        arguments = "<family name>"
+        help = "Gets info about a family in game, add region:(region code) for a region other than your default";
+        arguments = "<family name> region:(region code, optional)"
     }
 
     override fun executeCommand(commandEvent: CommandEvent?) {
-        var familyOpt = familyService.getFamily(commandEvent!!.args, Region.NORTH_AMERICA, true)
+        val region = Region.getByCode(userService.getById(commandEvent!!.member.user.id).defaultRegion)
+        val familyOpt = familyService.getFamily(commandEvent.args, region, true)
         if (familyOpt.isEmpty) {
             // Try to search the site for a user, rather than use our cache
             if (familyOpt.isEmpty) {

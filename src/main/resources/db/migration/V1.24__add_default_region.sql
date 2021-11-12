@@ -1,0 +1,2 @@
+ALTER TABLE `users`
+ADD default_region VARCHAR(255) NOT NULL DEFAULT "NA";

@@ -4,22 +4,26 @@ import com.bot.commands.RequiredArgsCommand
 import com.bot.models.Region
 import com.bot.service.BdoGuildService
 import com.bot.service.GuildService
+import com.bot.service.UserService
 import com.jagrosh.jdautilities.command.CommandEvent
 import net.dv8tion.jda.api.Permission
 import org.springframework.stereotype.Component
 
 @Component
-class LinkGuildCommand(val guildService: GuildService, private val bdoGuildService: BdoGuildService) : RequiredArgsCommand() {
+class LinkGuildCommand(private val guildService: GuildService,
+                       private val bdoGuildService: BdoGuildService,
+                       private val userService: UserService) : RequiredArgsCommand() {
 
     init {
         this.name = "linkguild"
         this.userPermissions = listOf(Permission.MANAGE_SERVER).toTypedArray()
         this.help = "Sets up the discord server to represent a guild in BDO"
-        this.arguments = "<guild name (same way as in game)>"
+        this.arguments = "<guild name (same way as in game)> region:(region code, optional)"
     }
 
     override fun executeCommand(commandEvent: CommandEvent?) {
-        val guildOpt = bdoGuildService.getByNameAndRegion(commandEvent!!.args, Region.NORTH_AMERICA)
+        val guildOpt = bdoGuildService.getByNameAndRegion(commandEvent!!.args, Region.getByCode(
+            userService.getById(commandEvent.member.user.id).defaultRegion))
         if (guildOpt.isEmpty) {
             commandEvent.replyWarning("Guild not found. Double check your guild name. Contact Kikkia if this issue persists. (Only NA Supported so far)")
             return
