@@ -44,6 +44,7 @@ class WhoIsCommand(private val familyService: FamilyService,
         embedBuilder.setTitle(family.name)
         embedBuilder.addField("Current Guild", activeGuild, true)
         embedBuilder.addField("Past Guilds", pastGuilds, false)
+        embedBuilder.setFooter("Guild history only indexed since ${region!!.indexDate}")
         commandEvent.reply(embedBuilder.build())
     }
 }
