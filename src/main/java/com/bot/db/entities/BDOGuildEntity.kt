@@ -1,6 +1,7 @@
 package com.bot.db.entities
 
 import com.bot.models.WarDay
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.sql.Timestamp
 import javax.persistence.*
 
@@ -16,8 +17,10 @@ class BDOGuildEntity(
     val region: String,
     @Column(name = "last_scan")
     var last_scan: Timestamp) {
+    @JsonIgnore
     @OneToOne(mappedBy = "bdoGuild")
     var discordGuild: GuildEntity? = null
+    @JsonIgnore
     @Column(name = "war_days")
     var warDays: Int? = null
     @Column(name = "master_family")

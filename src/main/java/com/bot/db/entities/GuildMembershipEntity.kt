@@ -1,5 +1,6 @@
 package com.bot.db.entities
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.sql.Timestamp
 import javax.persistence.*
 
@@ -11,6 +12,7 @@ class GuildMembershipEntity(
     val id: Int,
     @ManyToOne
     @JoinColumn(name = "family")
+    @JsonIgnore
     val family: FamilyEntity,
     @ManyToOne
     @JoinColumn(name = "guild")
