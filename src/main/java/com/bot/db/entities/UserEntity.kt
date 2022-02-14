@@ -37,4 +37,14 @@ data class UserEntity(
                         return UserEntity(user.id, user.name)
                 }
         }
+
+        fun toMessageEntry() : String {
+                val gear = gearset
+                val gs = gear?.getGearScore() ?: "?"
+                val ap = gear?.ap?.toString() ?: "?"
+                val dp = gear?.dp?.toString() ?: "?"
+                val aap = gear?.awkAp?.toString() ?: "?"
+                val cl: String = gear?.getClassName() ?: "?"
+                return "($gs) $ap/$aap/$dp - ${getEffectiveName()} - $cl"
+        }
 }
