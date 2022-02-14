@@ -46,5 +46,6 @@ class GearLeaderboardCommand(val userService: UserService, waiter: EventWaiter) 
         }
 
         paginatorBuilder.build().paginate(command.channel, 1)
+        paginatorBuilder.clearItems()
     }
 }
