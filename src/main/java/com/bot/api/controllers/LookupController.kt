@@ -9,14 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
-import io.github.bucket4j.ConsumptionProbe
 import org.springframework.http.HttpStatus
-
-
-
-
-
-
 
 @RestController
 @RequestMapping("/api/lookup")
