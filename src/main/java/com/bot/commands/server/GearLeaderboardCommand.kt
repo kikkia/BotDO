@@ -35,7 +35,7 @@ class GearLeaderboardCommand(val userService: UserService, waiter: EventWaiter) 
                 .filter { it.gearset != null }.toMutableList()
         // Sort users by total gearscore
         users.sortWith(Comparator{
-            x, y -> x.gearset!!.getGearScore().compareTo(y.gearset!!.getGearScore())})
+            x, y -> y.gearset!!.getGearScore().compareTo(x.gearset!!.getGearScore())})
 
         paginatorBuilder.setText("Gear leaderboard for users in: ${command.channel.name}")
                 .setUsers(command.author)
