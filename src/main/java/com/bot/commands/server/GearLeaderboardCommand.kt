@@ -9,15 +9,16 @@ import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
 
 @Component
-class GearLeaderboardCommand(val userService: UserService, waiter: EventWaiter) : Command() {
+class GearLeaderboardCommand(val userService: UserService, val waiter: EventWaiter) : Command() {
 
-    private val paginatorBuilder: Paginator.Builder
     init {
         this.name = "gearboard"
         this.help = "Lists a leaderboard of everyone in the discord channels gear."
         this.guildOnly = true
+    }
 
-        this.paginatorBuilder = Paginator.Builder()
+    override fun execute(command: CommandEvent?) {
+        val paginatorBuilder = Paginator.Builder()
                 .setColumns(1)
                 .setItemsPerPage(15)
                 .useNumberedItems(true)
@@ -26,9 +27,7 @@ class GearLeaderboardCommand(val userService: UserService, waiter: EventWaiter) 
                 .setTimeout(60, TimeUnit.SECONDS)
                 .waitOnSinglePage(false)
                 .setFinalAction{message -> message.clearReactions().queue()}
-    }
 
-    override fun execute(command: CommandEvent?) {
         // Get all user entities in channel if they have gear set
         val users = userService.getByIds(
                 command!!.textChannel.members.map { it.user.id }.toMutableList())
@@ -38,7 +37,7 @@ class GearLeaderboardCommand(val userService: UserService, waiter: EventWaiter) 
             x, y -> y.gearset!!.getGearScore().compareTo(x.gearset!!.getGearScore())})
 
         paginatorBuilder.setText("Gear leaderboard for users in: ${command.channel.name}")
-                .setUsers(command.author)
+                .addUsers(command.author)
                 .setColor(command.selfMember.color)
 
         for (u in users) {
