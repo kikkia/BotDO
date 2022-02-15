@@ -7,7 +7,7 @@ enum class BdoClass(val display: String, val aliases: List<String>, val stateful
     WARRIOR("Warrior", listOf("zoomy boi", "fps monkey"), true),
     RANGER("Ranger", emptyList(), true),
     SORCERESS("Sorc", listOf("sorceress"), true),
-    BERSERKER("Berzerker", listOf("zerker"), true),
+    BERSERKER("Berserker", listOf("zerker"), true),
     TAMER("Tamer", emptyList(), true),
     MUSA("Musa", emptyList(), true),
     MAEHWA("Maehwa", emptyList(), true),
