@@ -6,6 +6,9 @@ import com.bot.db.entities.FamilyEntity;
 import com.bot.db.entities.GuildMembershipEntity;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
+
 public interface GuildMembershipRepository extends CrudRepository<GuildMembershipEntity, Integer> {
     public boolean existsByFamilyAndGuildAndActive(FamilyEntity family, BDOGuildEntity guild, boolean active);
+    public List<GuildMembershipEntity> getByGuildAndActive(BDOGuildEntity guild, boolean active);
 }

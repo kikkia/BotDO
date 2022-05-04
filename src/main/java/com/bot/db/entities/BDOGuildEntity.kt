@@ -25,6 +25,8 @@ class BDOGuildEntity(
     var warDays: Int? = null
     @Column(name = "master_family")
     var master: Int? = null
+    @Column(name = "active")
+    var active = true
 
     fun getWarDays() : List<WarDay> {
         return if (warDays == null) {

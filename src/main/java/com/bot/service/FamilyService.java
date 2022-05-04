@@ -39,7 +39,8 @@ public class FamilyService {
                 List.of(),
                 familyName,
                 region.getCode(),
-                Timestamp.from(Instant.now())));
+                Timestamp.from(Instant.now()),
+                false));
     }
 
     public Optional<FamilyEntity> getFamily(String familyName, Region region, boolean scrapeToSync) {

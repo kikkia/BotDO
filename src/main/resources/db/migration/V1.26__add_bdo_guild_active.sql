@@ -1,0 +1,2 @@
+ALTER TABLE `bdo_guild`
+ADD active TINYINT(1) NOT NULL DEFAULT 1;

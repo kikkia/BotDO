@@ -18,4 +18,6 @@ class FamilyEntity(
     @Column(name = "region")
     val region: String,
     @Column(name = "last_updated")
-    var lastUpdated: Timestamp)
+    var lastUpdated: Timestamp,
+    @Column(name = "private")
+    var private: Boolean)
