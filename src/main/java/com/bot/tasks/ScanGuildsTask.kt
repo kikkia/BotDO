@@ -50,7 +50,7 @@ class ScanGuildsTask(private val familyService: FamilyService,
                 var familiesFromDB = bdoGuildService.getAllFamilyNamesInGuild(guild)
 
                 for (fam in families) {
-                    val famOpt = familyService.getFamily(fam.name, region, true)
+                    val famOpt = familyService.getFamily(fam.name, region, false)
                     val family = if (famOpt.isEmpty) {
                         familyService.createMinimal(fam.name, fam.id, region)
                     } else {
@@ -71,7 +71,7 @@ class ScanGuildsTask(private val familyService: FamilyService,
                 familiesFromDB.removeAll(familyNamesFromPage)
                 for (toRemove in familiesFromDB) {
                     try {
-                        familyService.removeFromGuild(familyService.getFamily(toRemove, region, false).get())
+                        familyService.removeFromGuild(familyService.getFamily(toRemove, region, true).get())
                     } catch (e: Exception) {
                         log.warn("failed to remove member $toRemove from guild ${guild.name}")
                     }
