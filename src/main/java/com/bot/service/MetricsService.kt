@@ -15,7 +15,8 @@ open class MetricsService(private val client: StatsDClient) {
 
     private fun markCommandExecution(commandName: String, outcome:String) {
         val commandNameTag = "command:$commandName"
-        client.incrementCounter("bdo.command")
+        val outcomeTag = "outcome:$outcome"
+        client.incrementCounter("bdo.command", commandNameTag, outcomeTag)
     }
 
     open fun markCommandSuccess(commandName: String) {

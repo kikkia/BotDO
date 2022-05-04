@@ -2,6 +2,7 @@ package com.bot.db.entities
 
 import com.bot.models.ClassState
 import javax.persistence.*
+import kotlin.math.max
 
 @Entity
 @Table(name = "gearset")
@@ -36,18 +37,9 @@ class GearsetEntity(
         if (dp == null) {
             return 0
         }
-        var totalAp = 0
-        var apCount = 0
-        if (ap != null) {
-            totalAp += ap!!
-            apCount++
-        }
-        if (awkAp != null) {
-            totalAp += awkAp!!
-            apCount++
-        }
-
-        return (totalAp / apCount) + dp!!
+        val mainAp = if (ap != null) ap else 0
+        val awakeningAp = if (awkAp != null) awkAp else 0
+        return max(mainAp!!, awakeningAp!!) + dp!!
     }
 
     fun getClassName() : String {

@@ -4,7 +4,7 @@ You can manage attendance/signups, stats, vods and war history with the bot.
 ## Linking guild
 To link your discord server to an in game guild user the command `linkguild <in game guild name>`
 This will tie your server to that in game guild. By default it looks at NA guilds. To do other regions you just need
-to set your default region to the region you play on. [Guide here](regions.md)
+to set your default region to the region you play on. [Guide here](https://github.com/kikkia/BotDO/blob/master/docs/regions.md)
 
 ## How do war signups work
 War signups are discord messages with a set of reactions available for people to react with.

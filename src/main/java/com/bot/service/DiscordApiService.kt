@@ -32,7 +32,7 @@ open class DiscordApiService(val discordProperties: DiscordProperties, val apiPr
                 .build()
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
-                print("Request to discord failed ${response.code} ${response.body.toString()}")
+                print("Request to discord failed ${response.code} ${response.body!!.string()}")
                 throw RuntimeException("REEEEEE")
             }
             val jsonRepsonse = JSONObject(response.body!!.string())
@@ -51,10 +51,15 @@ open class DiscordApiService(val discordProperties: DiscordProperties, val apiPr
                 throw RuntimeException("REEEEEE")
             }
             val jsonResponse = JSONObject(response.body!!.string())
+            // Avatar is nullable so handle that here
+            var avatar = "None"
+            if (!jsonResponse.isNull("avatar")) {
+                avatar = jsonResponse.getString("avatar")
+            }
             return DiscordUserIdentity(jsonResponse.getString("id"),
                     jsonResponse.getString("username"),
                     jsonResponse.getInt("discriminator"),
-                    jsonResponse.getString("avatar"))
+                    avatar)
         }
     }
 }
