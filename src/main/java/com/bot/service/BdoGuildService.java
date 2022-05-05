@@ -42,8 +42,8 @@ public class BdoGuildService {
         return repository.findById(id);
     }
 
-    public Page<BDOGuildEntity> getAllByRegion(Region region, int limit, int offset) {
-        return repository.findAllByRegion(region.getCode(), PageRequest.of((offset / limit), limit));
+    public Page<BDOGuildEntity> getAllByRegion(Region region, Pageable pageable) {
+        return repository.findAllByRegion(region.getCode(), pageable);
     }
 
     public List<String> getAllFamilyNamesInGuild(BDOGuildEntity guildEntity) {
