@@ -36,8 +36,8 @@ class GuildScrapeUtils(private val props: BdoSiteProperties) {
 
     private var GUILD_SEARCH_URL = "${props.bdoSiteBaseUrl}/Adventure/Guild?region=%s&Page="
     private var GUILD_PAGE_URL = "${props.bdoSiteBaseUrl}/Adventure/Guild/GuildProfile?guildName="
-    private var FAMILY_PAGE_URL = "${props.bdoSiteBaseUrl}/prod/Adventure/Profile?profileTarget="
-    private var FAMILY_SEARCH_URL = "${props.bdoSiteBaseUrl}/prod/Adventure?searchType=2&region="
+    private var FAMILY_PAGE_URL = "${props.bdoSiteBaseUrl}/Adventure/Profile?profileTarget="
+    private var FAMILY_SEARCH_URL = "${props.bdoSiteBaseUrl}/Adventure?searchType=2&region="
 
     private fun getGuildSearchUrl(page: Int, search: String, region: Region) : String {
         return "${getGuildSearchBaseUrl(region)}${page}&searchText=$search"
