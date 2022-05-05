@@ -8,6 +8,7 @@ import com.bot.tasks.InvitedMemberTask;
 import com.bot.tasks.ScanGuildsTask;
 import com.bot.tasks.SyncUserFamilyNameTask;
 import com.bot.utils.Constants;
+import com.bot.utils.GuildScrapeUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -78,15 +79,17 @@ public class DiscordListener extends ListenerAdapter {
     private DiscordProperties discordProperties;
     @Autowired
     private MetricsService metricsService;
+    @Autowired
+    private GuildScrapeUtils guildScrapeUtils;
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         // Schedule the NA scan
         // TODO: This runs once for every shard, be careful if sharding is ever needed
         if (discordProperties.getScanFamilies()) {
-                executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, metricsService, Region.NORTH_AMERICA),
+                executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, metricsService, guildScrapeUtils, Region.NORTH_AMERICA),
                         12, 24, TimeUnit.HOURS);
-                executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, metricsService, Region.EUROPE),
+                executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, metricsService, guildScrapeUtils, Region.EUROPE),
                         0, 24, TimeUnit.HOURS);
         }
 

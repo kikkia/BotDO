@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 import java.util.stream.Collectors
 
 @Component
-class TestCommand2(val guildService: GuildService) : Command() {
+class TestCommand2(val guildService: GuildService, val guildScrapeUtils: GuildScrapeUtils) : Command() {
 
     init {
         name = "test2"
@@ -17,7 +17,7 @@ class TestCommand2(val guildService: GuildService) : Command() {
     }
 
     override fun execute(p0: CommandEvent?) {
-        p0!!.reply(GuildScrapeUtils.getGuildFamilies("CacklingCasket", Region.NORTH_AMERICA).stream().map { it.name }.collect(Collectors.toList()).toString())
+        p0!!.reply(guildScrapeUtils.getGuildFamilies("CacklingCasket", Region.NORTH_AMERICA).stream().map { it.name }.collect(Collectors.toList()).toString())
     }
 
 }

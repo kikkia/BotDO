@@ -31,6 +31,8 @@ public class FamilyService {
     private GuildMembershipRepository membershipRepository;
     @Autowired
     private BdoGuildService guildService;
+    @Autowired
+    private GuildScrapeUtils guildScrapeUtils;
 
     // Create a minimal family, no guild memberships or characters saved
     public FamilyEntity createMinimal(String familyName, String externalId, Region region) {
@@ -108,7 +110,7 @@ public class FamilyService {
     }
 
     private Optional<FamilyEntity> syncSingleFromSite(String familyName, Region region) {
-        var scrapedMemberOpt = GuildScrapeUtils.Companion.getUserInfoForSearch(familyName, region);
+        var scrapedMemberOpt = guildScrapeUtils.getUserInfoForSearch(familyName, region);
         if (scrapedMemberOpt.isEmpty()) {
             return Optional.empty();
         }

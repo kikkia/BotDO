@@ -16,6 +16,7 @@ import java.util.stream.IntStream
 class ScanGuildsTask(private val familyService: FamilyService,
                      private val bdoGuildService: BdoGuildService,
                      private val metricsService: MetricsService,
+                     private val guildScrapeUtils: GuildScrapeUtils,
                      val region: Region) : Thread() {
 
     override fun run() {
@@ -40,7 +41,7 @@ class ScanGuildsTask(private val familyService: FamilyService,
                 bdoGuildService.setScan(guild)
                 var families: Set<BdoFamily>
                 try {
-                    families = GuildScrapeUtils.getGuildFamilies(guild.name, region)
+                    families = guildScrapeUtils.getGuildFamilies(guild.name, region)
                 } catch (e: Exception) {
                     log.warn("Hit unexpected error when getting guild members", e)
                     continue
