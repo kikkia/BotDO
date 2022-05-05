@@ -1,5 +1,6 @@
 package com.bot.tasks
 
+import com.bot.db.entities.BDOGuildEntity
 import com.bot.models.BdoFamily
 import com.bot.models.Region
 import com.bot.service.BdoGuildService
@@ -32,8 +33,7 @@ class ScanGuildsTask(private val familyService: FamilyService,
         var pageSize = 100
         var offset = 0
         var guildPage = bdoGuildService.getAllByRegion(region, pageSize, offset)
-        val total = guildPage.totalElements
-        while (offset < total) {
+        while (guildPage.hasNext()) {
             for (guild in guildPage.content) {
                 if (guild.last_scan.toInstant().isAfter(Instant.now().minusSeconds(3600 * 18))) {
                     continue
@@ -78,9 +78,11 @@ class ScanGuildsTask(private val familyService: FamilyService,
                     }
                 }
                 guildCount++
+                sleep(400) // Slow us down a little to try avoiding a ban
             }
             offset += pageSize
-            guildPage = bdoGuildService.getAllByRegion(region, pageSize, offset)
+            page++
+            guildPage = guildPage.nextOrLastPageable() as Page<BDOGuildEntity>
         }
 
         log.info("Scan complete. Pages: $page | Guilds: $guildCount | Families: $familyCount")
