@@ -20,4 +20,8 @@ class FamilyEntity(
     @Column(name = "last_updated")
     var lastUpdated: Timestamp,
     @Column(name = "private")
-    var private: Boolean)
+    var private: Boolean,
+    @Column(name = "missing_from_site_count")
+    var missingCount: Int,
+    @Column(name = "missing")
+    var missing: Boolean)

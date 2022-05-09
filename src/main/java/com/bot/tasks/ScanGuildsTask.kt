@@ -1,6 +1,5 @@
 package com.bot.tasks
 
-import com.bot.db.entities.BDOGuildEntity
 import com.bot.models.BdoFamily
 import com.bot.models.Region
 import com.bot.service.BdoGuildService
@@ -8,12 +7,10 @@ import com.bot.service.FamilyService
 import com.bot.service.MetricsService
 import com.bot.utils.GuildScrapeUtils
 import org.slf4j.LoggerFactory
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import java.time.Duration
 import java.time.Instant
 import java.util.stream.Collectors
-import java.util.stream.IntStream
 
 class ScanGuildsTask(private val familyService: FamilyService,
                      private val bdoGuildService: BdoGuildService,
@@ -31,7 +28,7 @@ class ScanGuildsTask(private val familyService: FamilyService,
         var guildCount = 0
         var familyCount = 0
         // Website now requires exact name to search, so we go through those we have seen.
-        var pageSize = 100
+        val pageSize = 100
         var offset = 0
         try {
             var guildPage = bdoGuildService.getAllByRegion(region, PageRequest.of(0, pageSize))

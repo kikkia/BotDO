@@ -9,6 +9,14 @@ open class MetricsService(private val client: StatsDClient) {
         client.incrementCounter("bdo.family.update")
     }
 
+    open fun markFamilyUpdatePrivate() {
+        client.incrementCounter("bdo.family.privated")
+    }
+
+    open fun markFamilyUpdateMissing() {
+        client.incrementCounter("bdo.family.missing")
+    }
+
     open fun markGuildUpdateExcecution() {
         client.incrementCounter("bdo.guild.update")
     }

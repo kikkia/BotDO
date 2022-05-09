@@ -9,8 +9,9 @@ import com.bot.models.Region;
 import com.bot.utils.GuildScrapeUtils;
 import com.bot.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.requests.restaction.GuildAction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -42,6 +43,8 @@ public class FamilyService {
                 familyName,
                 region.getCode(),
                 Timestamp.from(Instant.now()),
+                false,
+                0,
                 false));
     }
 
@@ -58,6 +61,12 @@ public class FamilyService {
             return syncSingleFromSite(familyName, region);
         }
         return opt;
+    }
+
+    // For a given pageable return the page of family entities that are not private.
+    // TODO: See if we can easily do a filter for "not in a guild" in the ORM layer
+    public Page<FamilyEntity> getFamiliesNotPrivateAndPresentInRegion(String region, Pageable pageable) {
+        return repository.findByPrivateAndMissingAndRegion(false, false, region, pageable);
     }
 
     public FamilyEntity save(FamilyEntity familyEntity) {
@@ -109,7 +118,7 @@ public class FamilyService {
         return save(entity);
     }
 
-    private Optional<FamilyEntity> syncSingleFromSite(String familyName, Region region) {
+    public Optional<FamilyEntity> syncSingleFromSite(String familyName, Region region) {
         var scrapedMemberOpt = guildScrapeUtils.getUserInfoForSearch(familyName, region);
         if (scrapedMemberOpt.isEmpty()) {
             return Optional.empty();
@@ -140,6 +149,7 @@ public class FamilyService {
                 existing = addToGuild(existing, guildOpt.get());
             }
         }
+        existing.setPrivate(scrapedMember.getPrivate());
         existing.setLastUpdated(Timestamp.from(Instant.now()));
         return Optional.of(save(existing));
     }

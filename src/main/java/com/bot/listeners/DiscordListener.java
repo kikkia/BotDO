@@ -6,6 +6,7 @@ import com.bot.models.Region;
 import com.bot.service.*;
 import com.bot.tasks.InvitedMemberTask;
 import com.bot.tasks.ScanGuildsTask;
+import com.bot.tasks.ScanNoGuildFamiliesTask;
 import com.bot.tasks.SyncUserFamilyNameTask;
 import com.bot.utils.Constants;
 import com.bot.utils.GuildScrapeUtils;
@@ -84,13 +85,17 @@ public class DiscordListener extends ListenerAdapter {
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
-        // Schedule the NA scan
+        // Schedule the scans to grab guild history data for regions
         // TODO: This runs once for every shard, be careful if sharding is ever needed
         if (discordProperties.getScanFamilies()) {
                 executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, metricsService, guildScrapeUtils, Region.NORTH_AMERICA),
                         12, 24, TimeUnit.HOURS);
                 executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, metricsService, guildScrapeUtils, Region.EUROPE),
                         0, 24, TimeUnit.HOURS);
+                executorService.scheduleAtFixedRate(new ScanNoGuildFamiliesTask(familyService, metricsService, Region.NORTH_AMERICA),
+                        6, 48, TimeUnit.HOURS);
+                executorService.scheduleAtFixedRate(new ScanNoGuildFamiliesTask(familyService, metricsService, Region.EUROPE),
+                        18, 48, TimeUnit.HOURS);
         }
 
         // Open dm channels with users with active dm signups to listen for updates
