@@ -8,7 +8,7 @@ enum class BdoClass(val display: String, val aliases: List<String>, val stateful
     RANGER("Ranger", emptyList(), true),
     SORCERESS("Sorc", listOf("sorceress"), true),
     BERSERKER("Berserker", listOf("zerker"), true),
-    TAMER("Tamer", emptyList(), true),
+    TAMER("Tamer", listOf("trash"), true),
     MUSA("Musa", emptyList(), true),
     MAEHWA("Maehwa", emptyList(), true),
     VALKYRIE("Valk", listOf("valkyrie"), true),
@@ -26,7 +26,8 @@ enum class BdoClass(val display: String, val aliases: List<String>, val stateful
     HASHASHIN("Hash", listOf("hashashin"), true),
     NOVA("Nova", emptyList(), true),
     SAGE("Sage", listOf("sadge"), true),
-    CORSAIR("Corsair", listOf("mermaid"), true);
+    CORSAIR("Corsair", listOf("mermaid"), true),
+    DRAK("Drak", listOf("Drak"), false); // TODO: New class name
 
     companion object {
         fun getClassFromName(name: String) : BdoClass? {

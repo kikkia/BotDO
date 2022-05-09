@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*
 import java.net.URI
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletResponse
+import kotlin.math.max
 
 // This controller is responsible for getting a discord oauth2 callback and minting a signed jwt with user info
 @RestController
@@ -82,7 +83,7 @@ class AuthController(private val tokenService: TokenService,
 
     private fun setAuthCookies(cookies: List<Cookie>, response: HttpServletResponse, maxAge: Int) {
         for (cookie in cookies) {
-            cookie.maxAge = tokenService.JWT_TOKEN_VALIDITY.toInt()
+            cookie.maxAge = maxAge
             cookie.path = "/"
             response.addCookie(cookie)
         }

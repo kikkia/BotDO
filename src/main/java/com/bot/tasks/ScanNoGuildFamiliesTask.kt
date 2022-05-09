@@ -1,6 +1,5 @@
 package com.bot.tasks
 
-import com.bot.db.entities.FamilyEntity
 import com.bot.models.Region
 import com.bot.service.FamilyService
 import com.bot.service.MetricsService

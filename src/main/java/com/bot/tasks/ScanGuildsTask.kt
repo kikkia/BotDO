@@ -46,8 +46,8 @@ class ScanGuildsTask(private val familyService: FamilyService,
                         continue
                     }
 
-                    var familyNamesFromPage = families.stream().map { it.name }.collect(Collectors.toList())
-                    var familiesFromDB = bdoGuildService.getAllFamilyNamesInGuild(guild)
+                    val familyNamesFromPage = families.stream().map { it.name }.collect(Collectors.toList())
+                    val familiesFromDB = bdoGuildService.getAllFamilyNamesInGuild(guild)
 
                     for (fam in families) {
                         val famOpt = familyService.getFamily(fam.name, region, false)
