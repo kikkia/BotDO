@@ -92,10 +92,11 @@ public class DiscordListener extends ListenerAdapter {
                         12, 24, TimeUnit.HOURS);
                 executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, metricsService, guildScrapeUtils, Region.EUROPE),
                         0, 24, TimeUnit.HOURS);
-                executorService.scheduleAtFixedRate(new ScanNoGuildFamiliesTask(familyService, metricsService, Region.NORTH_AMERICA),
-                        6, 48, TimeUnit.HOURS);
-                executorService.scheduleAtFixedRate(new ScanNoGuildFamiliesTask(familyService, metricsService, Region.EUROPE),
-                        18, 48, TimeUnit.HOURS);
+                // TODO: Enable when more proxies
+//                executorService.scheduleAtFixedRate(new ScanNoGuildFamiliesTask(familyService, metricsService, Region.NORTH_AMERICA),
+//                        6, 48, TimeUnit.HOURS);
+//                executorService.scheduleAtFixedRate(new ScanNoGuildFamiliesTask(familyService, metricsService, Region.EUROPE),
+//                        18, 48, TimeUnit.HOURS);
         }
 
         // Open dm channels with users with active dm signups to listen for updates

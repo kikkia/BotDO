@@ -27,7 +27,7 @@ enum class BdoClass(val display: String, val aliases: List<String>, val stateful
     NOVA("Nova", emptyList(), true),
     SAGE("Sage", listOf("sadge"), true),
     CORSAIR("Corsair", listOf("mermaid"), true),
-    DRAK("Drak", listOf("Drak"), false); // TODO: New class name
+    DRAK("Drakania", listOf("Drak"), false);
 
     companion object {
         fun getClassFromName(name: String) : BdoClass? {
