@@ -7,5 +7,5 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 @ConfigurationProperties(prefix = "bdo")
 open class BdoSiteProperties {
-    var bdoSiteBaseUrl = "https://www.naeu.playblackdesert.com/en-US/"
+    var bdoSiteBaseUrl = listOf("https://www.naeu.playblackdesert.com/en-US/")
 }

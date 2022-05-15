@@ -34,29 +34,33 @@ class GuildScrapeUtils(private val props: BdoSiteProperties) {
     private val CHARACTER_CLASS_LEVEL_REGEX = Regex("<em>(.+)</em>")
     private val CHARACTER_MAIN_REGEX = Regex("<span class=\"selected_label\">Main Character</span>")
 
-    private var GUILD_SEARCH_URL = "${props.bdoSiteBaseUrl}/Adventure/Guild?region=%s&Page="
-    private var GUILD_PAGE_URL = "${props.bdoSiteBaseUrl}/Adventure/Guild/GuildProfile?guildName="
-    private var FAMILY_PAGE_URL = "${props.bdoSiteBaseUrl}/Adventure/Profile?profileTarget="
-    private var FAMILY_SEARCH_URL = "${props.bdoSiteBaseUrl}/Adventure?searchType=2&region="
+    private var GUILD_SEARCH_URL = "/Adventure/Guild?region=%s&Page="
+    private var GUILD_PAGE_URL = "/Adventure/Guild/GuildProfile?guildName="
+    private var FAMILY_PAGE_URL = "/Adventure/Profile?profileTarget="
+    private var FAMILY_SEARCH_URL = "/Adventure?searchType=2&region="
 
     private fun getGuildSearchUrl(page: Int, search: String, region: Region) : String {
         return "${getGuildSearchBaseUrl(region)}${page}&searchText=$search"
     }
 
     private fun getGuildSearchBaseUrl(region: Region) : String {
-        return GUILD_SEARCH_URL.format(getSubDomain(region), region.code)
+        return getBaseUrl() + GUILD_SEARCH_URL.format(getSubDomain(region), region.code)
     }
 
     private fun getGuildPageUrl(name: String, region: Region) : String {
-        return "${GUILD_PAGE_URL.format(getSubDomain(region))}$name&region=${region.code}"
+        return getBaseUrl() + "${GUILD_PAGE_URL.format(getSubDomain(region))}$name&region=${region.code}"
     }
 
     private fun getFamilySearchUrl(name: String, region: Region) : String {
-        return "${FAMILY_SEARCH_URL.format(getSubDomain(region))}${region.code}&searchKeyword=$name"
+        return getBaseUrl() + "${FAMILY_SEARCH_URL.format(getSubDomain(region))}${region.code}&searchKeyword=$name"
     }
 
     private fun getFamilyPageUrl(id: String, region: Region) : String {
-        return "${FAMILY_PAGE_URL.format(getSubDomain(region))}$id"
+        return getBaseUrl() + "${FAMILY_PAGE_URL.format(getSubDomain(region))}$id"
+    }
+
+    private fun getBaseUrl() : String {
+        return props.bdoSiteBaseUrl.random()
     }
 
     fun getGuildNamesOnPage(page: Int, search: String, region: Region) : List<String> {
