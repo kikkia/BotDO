@@ -24,7 +24,7 @@ class GuildScrapeUtils(private val props: BdoSiteProperties) {
     private val GUILD_NAME_REGEX = Regex("(guildName=)(.+)&region=",
             setOf(RegexOption.MULTILINE))
     private val USER_PROFILE_REGEX = Regex("profileTarget=(.+)\">(.+)</a>")
-    private val USER_PRIVATE_REGEX = Regex("<a href=\"javascript:void\\(0\\)\">Private</a>")
+    private val USER_PRIVATE_REGEX = Regex("<span>Private<\\/span>")
 
     private val CHARACTER_INFO_REGEX = Regex("<div class=\"character_txt\">(.+)</div>",
             setOf(RegexOption.MULTILINE, RegexOption.DOT_MATCHES_ALL))

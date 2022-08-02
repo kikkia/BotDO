@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 class LeaveServerCommand(val guildService: GuildService) : Command() {
 
     init {
-        name = "test"
+        name = "leave"
         help = "test help"
         ownerCommand = true
     }

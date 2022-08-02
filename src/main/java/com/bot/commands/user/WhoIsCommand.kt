@@ -34,12 +34,12 @@ class WhoIsCommand(private val familyService: FamilyService,
                 return
             }
         }
-        val family = familyOpt.get()
+        var family = familyOpt.get()
         if (family.lastUpdated.toInstant().isBefore(Instant.now().minus(1, ChronoUnit.DAYS))) {
-            // TODO: refresh user info
+            family = familyService.syncSingleFromSite(family.name, region).get()
         }
         val guilds = family.memberships.stream().filter {!it.active}.map { it.guild.name }.collect(Collectors.toList());
-        val activeGuild = family.memberships.stream().filter { it.active }.map { it.guild.name }.findFirst().orElseGet{ "None" }
+        val activeGuild = if (family.private) "Private" else family.memberships.stream().filter { it.active }.map { it.guild.name }.findFirst().orElseGet{ "None" }
         val pastGuilds = if (guilds.isEmpty()) "None that I know of." else guilds.toString()
         val embedBuilder = EmbedBuilder()
         embedBuilder.setTitle(family.name)
