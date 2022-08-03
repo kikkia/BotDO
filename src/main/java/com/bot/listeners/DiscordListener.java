@@ -89,9 +89,9 @@ public class DiscordListener extends ListenerAdapter {
         // TODO: This runs once for every shard, be careful if sharding is ever needed
         if (discordProperties.getScanFamilies()) {
                 executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, metricsService, guildScrapeUtils, Region.NORTH_AMERICA),
-                        12, 24, TimeUnit.HOURS);
-                executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, metricsService, guildScrapeUtils, Region.EUROPE),
                         0, 24, TimeUnit.HOURS);
+                executorService.scheduleAtFixedRate(new ScanGuildsTask(familyService, bdoGuildService, metricsService, guildScrapeUtils, Region.EUROPE),
+                        12, 24, TimeUnit.HOURS);
                 // TODO: Enable when more proxies
 //                executorService.scheduleAtFixedRate(new ScanNoGuildFamiliesTask(familyService, metricsService, Region.NORTH_AMERICA),
 //                        6, 48, TimeUnit.HOURS);
