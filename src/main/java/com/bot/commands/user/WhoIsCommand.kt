@@ -35,8 +35,14 @@ class WhoIsCommand(private val familyService: FamilyService,
             }
         }
         var family = familyOpt.get()
+        var missingFromSite = false
         if (family.lastUpdated.toInstant().isBefore(Instant.now().minus(1, ChronoUnit.DAYS))) {
-            family = familyService.syncSingleFromSite(family.name, region).get()
+            val opt = familyService.syncSingleFromSite(family.name, region)
+            missingFromSite = opt.isEmpty
+
+            if (opt.isPresent) {
+                family = opt.get()
+            }
         }
         val guilds = family.memberships.stream().filter {!it.active}.map { it.guild.name }.collect(Collectors.toList());
         val activeGuildOpt = family.memberships.stream().filter { it.active }.map { it.guild.name }.findFirst()
@@ -44,6 +50,9 @@ class WhoIsCommand(private val familyService: FamilyService,
         val pastGuilds = if (guilds.isEmpty()) "None that I know of." else guilds.toString()
         val embedBuilder = EmbedBuilder()
         embedBuilder.setTitle(family.name)
+        if (missingFromSite) {
+            embedBuilder.setDescription("This user was not found on the BDO website. Either the BDO site is down, or this family renamed or was banned.")
+        }
         embedBuilder.addField("Current Guild", activeGuild, true)
         embedBuilder.addField("Past Guilds", pastGuilds, false)
         embedBuilder.setFooter("Guild history only indexed since ${region!!.indexDate}")
