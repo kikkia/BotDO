@@ -22,7 +22,7 @@ class RateLimitService {
 
     private fun newBucket(apiKey: String): Bucket {
         return Bucket4j.builder()
-                .addLimit(Bandwidth.classic(10, Refill.greedy(100, Duration.ofDays(1))))
+                .addLimit(Bandwidth.classic(100, Refill.greedy(100, Duration.ofDays(1))))
                 .build()
     }
 }
