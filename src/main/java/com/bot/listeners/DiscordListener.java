@@ -123,7 +123,7 @@ public class DiscordListener extends ListenerAdapter {
 
     @Override
     public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
-        log.info("Member joined: " + event.getMember().getEffectiveName());
+        //log.info("Member joined: " + event.getMember().getEffectiveName());
         try {
             var guild = guildService.getById(event.getGuild().getId());
             if (guild == null) {
