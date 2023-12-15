@@ -82,7 +82,8 @@ class ScanGuildsTask(private val familyService: FamilyService,
                 log.info("Scan Page $page finished")
                 val duration = Duration.between(start, Instant.now())
                 log.info("Total elapsed time: ${duration.toHoursPart()} Hours, ${duration.toMinutesPart()} Mins, ${duration.toSecondsPart()} Secs")
-                log.info("rate = ${guildCount/duration.toSeconds()} guilds/sec and ${familyCount/duration.toSeconds()} fams/sec")
+                val secsRoundUp = duration.toSeconds().coerceAtLeast(1)
+                log.info("rate = ${guildCount/secsRoundUp} guilds/sec and ${familyCount/secsRoundUp} fams/sec")
                 page++
                 guildPage = bdoGuildService.getAllByRegion(region, guildPage.nextOrLastPageable())
             }
