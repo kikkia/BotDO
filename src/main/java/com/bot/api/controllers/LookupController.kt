@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.springframework.http.HttpStatus
+import java.sql.Timestamp
+import java.time.Instant
 
 @RestController
 @RequestMapping("/api/lookup")
@@ -29,14 +31,19 @@ class LookupController(private val familyService: FamilyService, private val rat
         val probe = bucket.tryConsumeAndReturnRemaining(1)
         if (probe.isConsumed) {
             val region = Region.getByCode(regionCode) ?: throw RegionNotFoundException("Region not found")
-            val family = familyService.getFamily(familyName, region, true)
-            if (family.isEmpty) {
+            val familyOpt = familyService.getFamily(familyName, region, true)
+            if (familyOpt.isEmpty) {
                 throw FamilyNotFoundException("Family not found on region")
             }
+            // Do not return fields of no use to consumers
+            val family = familyOpt.get()
+            family.externalId = ""
+            family.lastUpdated = Timestamp.from(Instant.now())
+
             return ResponseEntity
                     .ok()
                     .header("X-Rate-Limit-Remaining", probe.remainingTokens.toString())
-                    .body(objectMapper.writeValueAsString(family.get()))
+                    .body(objectMapper.writeValueAsString(family))
         } else {
             val waitForRefill = probe.nanosToWaitForRefill / 1000000000
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
