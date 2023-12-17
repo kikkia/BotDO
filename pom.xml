@@ -157,6 +157,11 @@
             <artifactId>json</artifactId>
             <version>20201115</version>
         </dependency>
+        <dependency>
+            <groupId>club.minnced</groupId>
+            <artifactId>discord-webhooks</artifactId>
+            <version>0.8.4</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -259,6 +264,10 @@
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
+        </repository>
+        <repository>
+            <id>maven-central</id>
+            <url>https://repo1.maven.org/maven2</url>
         </repository>
         <repository>
             <id>jcenter</id>
