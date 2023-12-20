@@ -9,6 +9,7 @@ import com.bot.models.Region;
 import com.bot.utils.GuildScrapeUtils;
 import com.bot.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+<<<<<<< Updated upstream
+=======
+import java.util.Random;
+import java.util.logging.Logger;
+>>>>>>> Stashed changes
 
 @Transactional
 @Service
@@ -52,13 +58,17 @@ public class FamilyService {
         var opt = repository.findByNameAndRegion(familyName, region.getCode());
         if (scrapeToSync && (opt.isEmpty() || opt.get().getLastUpdated().toInstant()
                 .isBefore(Instant.now().minus(30, ChronoUnit.MINUTES)))) {
-            // We dont have it, or is old entity, update the entity
-            var syncedFromSite = syncSingleFromSite(familyName, region);
-            // Fallback to db user in the case site is bugged
-            if (syncedFromSite.isEmpty() && opt.isPresent()) {
-                return opt;
+            try {
+                // We dont have it, or is old entity, update the entity
+                var syncedFromSite = syncSingleFromSite(familyName, region);
+                // Fallback to db user in the case site is bugged
+                if (syncedFromSite.isEmpty() && opt.isPresent()) {
+                    return opt;
+                }
+                return syncSingleFromSite(familyName, region);
+            } catch (Exception e) {
+                log.warn("Hit error syncing from site, using db cached", e);
             }
-            return syncSingleFromSite(familyName, region);
         }
         return opt;
     }
