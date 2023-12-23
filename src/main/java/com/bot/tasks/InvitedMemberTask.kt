@@ -61,7 +61,6 @@ class InvitedMemberTask(private val event: GuildMemberJoinEvent,
             }
         } else {
             try {
-                log.info("Member joined received for: $event and guild: $guild")
                 val entity = possibleInvites[0]
                 // Its only 1 invite possible
                 // Add role if one exists to add
