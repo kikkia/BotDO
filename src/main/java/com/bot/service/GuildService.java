@@ -3,21 +3,15 @@ package com.bot.service;
 import com.bot.db.entities.BDOGuildEntity;
 import com.bot.db.entities.GuildEntity;
 import com.bot.db.entities.UserEntity;
-import com.bot.db.mapper.UserMapper;
 import com.bot.db.repositories.GuildRepository;
-import com.bot.models.WarDay;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Transactional
 @Service

@@ -22,11 +22,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-<<<<<<< Updated upstream
-=======
-import java.util.Random;
-import java.util.logging.Logger;
->>>>>>> Stashed changes
 
 @Transactional
 @Service

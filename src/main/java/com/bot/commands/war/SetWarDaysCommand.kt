@@ -9,7 +9,7 @@ import com.bot.service.WarService
 import com.bot.utils.DateUtils
 import com.bot.utils.WarUtils
 import com.jagrosh.jdautilities.command.CommandEvent
-import net.dv8tion.jda.api.entities.TextChannel
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import org.springframework.stereotype.Component
 import java.time.format.TextStyle
 import java.util.*

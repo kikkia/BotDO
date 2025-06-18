@@ -19,10 +19,10 @@ data class TextChannelEntity(
         var warChannel: Int? = null
 
         fun getWarDay() : WarDay? {
-                return if (warChannel == null) {
-                        warChannel
+                if (warChannel == null) {
+                        return null
                 } else {
-                        WarDay.getDayFromBitwise(warChannel!!)
+                        return WarDay.getDayFromBitwise(warChannel!!)
                 }
         }
 

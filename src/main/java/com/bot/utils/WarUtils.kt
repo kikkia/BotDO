@@ -2,7 +2,8 @@ package com.bot.utils
 
 import com.bot.db.entities.*
 import com.bot.service.WarService
-import net.dv8tion.jda.api.entities.TextChannel
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
+import net.dv8tion.jda.api.entities.emoji.Emoji
 import java.util.*
 
 class WarUtils {
@@ -15,7 +16,7 @@ class WarUtils {
             // TODO: War reminders
             warMessage.editMessageEmbeds(FormattingUtils.generateWarMessage(war)).complete()
             for (reaction in Constants.WAR_REACTIONS) {
-                warMessage.addReaction(reaction).complete()
+                warMessage.addReaction(Emoji.fromUnicode(reaction)).complete()
             }
         }
 
@@ -25,7 +26,7 @@ class WarUtils {
             warMessage.editMessageEmbeds(FormattingUtils.generateArchivedWarMessage(war,
                     vods,
                     stats)).complete()
-            warMessage.addReaction(Constants.WAR_REACTION_REFRESH).complete()
+            warMessage.addReaction(Emoji.fromUnicode(Constants.WAR_REACTION_REFRESH)).complete()
             return warMessage.id
         }
     }

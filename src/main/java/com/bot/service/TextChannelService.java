@@ -3,6 +3,7 @@ package com.bot.service;
 import com.bot.db.entities.GuildEntity;
 import com.bot.db.entities.TextChannelEntity;
 import com.bot.db.repositories.TextChannelRepository;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,7 @@ public class TextChannelService {
         return channelOptional.orElse(null);
     }
 
-    public TextChannelEntity add(net.dv8tion.jda.api.entities.TextChannel channel,
+    public TextChannelEntity add(TextChannel channel,
                                  GuildEntity guild) {
         TextChannelEntity textChannelEntity = new TextChannelEntity(channel.getId(),
                 guild.getId(),

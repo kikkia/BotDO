@@ -6,21 +6,18 @@ import com.bot.models.Region;
 import com.bot.service.*;
 import com.bot.tasks.InvitedMemberTask;
 import com.bot.tasks.ScanGuildsTask;
-import com.bot.tasks.ScanNoGuildFamiliesTask;
 import com.bot.tasks.SyncUserFamilyNameTask;
 import com.bot.utils.Constants;
 import com.bot.utils.GuildScrapeUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.VoiceChannel;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.events.channel.text.TextChannelCreateEvent;
-import net.dv8tion.jda.api.events.channel.text.TextChannelDeleteEvent;
-import net.dv8tion.jda.api.events.channel.text.update.TextChannelUpdateNameEvent;
-import net.dv8tion.jda.api.events.channel.voice.VoiceChannelCreateEvent;
-import net.dv8tion.jda.api.events.channel.voice.VoiceChannelDeleteEvent;
-import net.dv8tion.jda.api.events.channel.voice.update.VoiceChannelUpdateNameEvent;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
+import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
+import net.dv8tion.jda.api.events.channel.update.ChannelUpdateNameEvent;
+import net.dv8tion.jda.api.events.channel.update.GenericChannelUpdateEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.invite.GuildInviteCreateEvent;
@@ -30,12 +27,9 @@ import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateIconEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateNameEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionRemoveEvent;
-import net.dv8tion.jda.api.events.message.priv.react.PrivateMessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.role.RoleDeleteEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateAvatarEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -43,7 +37,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
@@ -115,14 +108,14 @@ public class DiscordListener extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildJoin(@Nonnull GuildJoinEvent event) {
+    public void onGuildJoin(@NotNull GuildJoinEvent event) {
         // Add users to guild and user tables
         guildService.addFreshGuild(event.getGuild());
         super.onGuildJoin(event);
     }
 
     @Override
-    public void onGuildMemberJoin(@Nonnull GuildMemberJoinEvent event) {
+    public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
         //log.info("Member joined: " + event.getMember().getEffectiveName());
         try {
             var guild = guildService.getById(event.getGuild().getId());
@@ -146,7 +139,7 @@ public class DiscordListener extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildMemberRemove(@Nonnull GuildMemberRemoveEvent event) {
+    public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent event) {
         var guild = guildService.getById(event.getGuild().getId());
         if (guild == null) {
             guild = guildService.addFreshGuild(event.getGuild());
@@ -164,7 +157,10 @@ public class DiscordListener extends ListenerAdapter {
     }
 
     @Override
-    public void onTextChannelDelete(@Nonnull TextChannelDeleteEvent event) {
+    public void onChannelDelete(@NotNull ChannelDeleteEvent event) {
+        if (!event.isFromGuild() || event.getChannel().getType() != ChannelType.TEXT) {
+            return;
+        }
         textChannelService.removeById(event.getChannel().getId());
 
         // Check for default channels removed
@@ -176,45 +172,59 @@ public class DiscordListener extends ListenerAdapter {
             guildService.setWelcomeChannel(guild, null);
         }
 
-        super.onTextChannelDelete(event);
+        super.onChannelDelete(event);
     }
 
     @Override
-    public void onTextChannelUpdateName(@Nonnull TextChannelUpdateNameEvent event) {
+    public void onChannelUpdateName(@NotNull ChannelUpdateNameEvent event) {
+        if (event.getChannel().getType() == ChannelType.VOICE) {
+            var channel = getVoiceHelper(event.getChannel().asVoiceChannel());
+            channel.setName(event.getNewValue());
+            voiceChannelService.save(channel);
+            return;
+        }
+
+        if (!event.isFromGuild() || event.getChannel().getType() != ChannelType.TEXT) {
+            return;
+        }
+
         TextChannelEntity channel = textChannelService.getById(event.getChannel().getId());
         GuildEntity guild = guildService.getById(event.getGuild().getId());
         if (guild == null) {
             guildService.addFreshGuild(event.getGuild());
             return;
         } else if (channel == null) {
-            channel = textChannelService.add(event.getChannel(), guild);
+            channel = textChannelService.add(event.getChannel().asTextChannel(), guild);
         }
-        textChannelService.rename(channel, event.getNewName());
-        super.onTextChannelUpdateName(event);
+        textChannelService.rename(channel, event.getNewValue());
+        super.onChannelUpdateName(event);
     }
 
     @Override
-    public void onTextChannelCreate(@Nonnull TextChannelCreateEvent event) {
+    public void onChannelCreate(@NotNull ChannelCreateEvent event) {
+        if (!event.isFromGuild() || event.getChannel().getType() != ChannelType.TEXT) {
+            return;
+        }
         GuildEntity guild = guildService.getById(event.getGuild().getId());
         if (guild == null) {
             guildService.addFreshGuild(event.getGuild());
             return;
         }
 
-        textChannelService.add(event.getChannel(), guild);
+        textChannelService.add(event.getChannel().asTextChannel(), guild);
 
-        super.onTextChannelCreate(event);
+        super.onChannelCreate(event);
     }
 
     @Override
-    public void onGuildLeave(@Nonnull GuildLeaveEvent event) {
+    public void onGuildLeave(@NotNull GuildLeaveEvent event) {
         // TODO: Cleanup all stuff
 
         super.onGuildLeave(event);
     }
 
     @Override
-    public void onGuildUpdateName(@Nonnull GuildUpdateNameEvent event) {
+    public void onGuildUpdateName(@NotNull GuildUpdateNameEvent event) {
         GuildEntity guild = guildService.getById(event.getGuild().getId());
         if (guild == null) {
             guildService.addFreshGuild(event.getGuild());
@@ -226,30 +236,15 @@ public class DiscordListener extends ListenerAdapter {
     }
 
     @Override
-    public void onGuildMessageReactionAdd(@Nonnull GuildMessageReactionAddEvent event) {
-        if (event.getUser().isBot()) {
+    public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
+        if (event.getUser().isBot() || !(event.isFromType(ChannelType.PRIVATE) || event.isFromType(ChannelType.TEXT))) {
             return;
         }
         // TODO: For use in reaction roles
         // Check if this message is a war attendance message
         Optional<WarEntity> warOpt = warService.getWarByMessageId(event.getMessageId());
         warOpt.ifPresent(warEntity -> handleWarReaction(warEntity, event));
-        super.onGuildMessageReactionAdd(event);
-    }
-
-    @Override
-    public void onPrivateMessageReactionAdd(@NotNull PrivateMessageReactionAddEvent event) {
-        if (!event.getUser().isBot()) {
-            Optional<WarEntity> warOpt = warService.getWarByDmMessageId(event.getMessageId());
-            warOpt.ifPresent(warEntity -> handleDmWarReaction(warEntity, event));
-            super.onPrivateMessageReactionAdd(event);
-        }
-    }
-
-    @Override
-    public void onGuildMessageReactionRemove(@Nonnull GuildMessageReactionRemoveEvent event) {
-        // TODO: For use in reaction roles
-        super.onGuildMessageReactionRemove(event);
+        super.onMessageReactionAdd(event);
     }
 
     @Override
@@ -301,10 +296,8 @@ public class DiscordListener extends ListenerAdapter {
     }
 
     @Override
-    public void onVoiceChannelUpdateName(@NotNull VoiceChannelUpdateNameEvent event) {
-        var channel = getVoiceHelper(event.getChannel());
-        channel.setName(event.getNewName());
-        voiceChannelService.save(channel);
+    public void onVoiceChannelUpdateName(@NotNull ChannelUpdateNameEvent event) {
+
 
         super.onVoiceChannelUpdateName(event);
     }
@@ -369,7 +362,7 @@ public class DiscordListener extends ListenerAdapter {
     }
 
     // Get the voice channel entity or create it if does not exist
-    private VoiceChannelEntity getVoiceHelper(VoiceChannel voiceChannel) {
+    private VoiceChannelEntity getVoiceHelper(net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel voiceChannel) {
         var channelOpt = voiceChannelService.getById(voiceChannel.getId());
         return channelOpt.orElseGet(() -> voiceChannelService.newChannel(
                 voiceChannel.getId(),
@@ -377,8 +370,8 @@ public class DiscordListener extends ListenerAdapter {
                 voiceChannel.getGuild().getId()));
     }
 
-    private void handleWarReaction(WarEntity warEntity, GuildMessageReactionAddEvent event) {
-        warEntity = handleWarAttendanceUpdate(warEntity, event.getUserId(), event.getReactionEmote().getName());
+    private void handleWarReaction(WarEntity warEntity, MessageReactionAddEvent event) {
+        warEntity = handleWarAttendanceUpdate(warEntity, event.getUserId(), event.getEmoji().getAsReactionCode());
         warService.refreshMessage(event.getGuild(), warEntity);
         event.getReaction().removeReaction(event.getUser()).queue();
     }

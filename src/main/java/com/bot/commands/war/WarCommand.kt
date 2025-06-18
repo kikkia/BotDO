@@ -11,7 +11,7 @@ abstract class WarCommand(val guildService: GuildService) : Command() {
 
     init {
         this.userPermissions = listOf(Permission.MANAGE_SERVER).toTypedArray()
-        this.botPermissions = listOf(Permission.MANAGE_SERVER, Permission.MANAGE_CHANNEL, Permission.MANAGE_EMOTES).toTypedArray()
+        this.botPermissions = listOf(Permission.MANAGE_SERVER, Permission.MANAGE_CHANNEL, Permission.MESSAGE_MANAGE).toTypedArray()
         this.guildOnly = true
     }
 

@@ -7,6 +7,8 @@ import com.bot.models.GuildDiscord
 import com.bot.utils.Constants
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
+import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.sharding.ShardManager
 import org.springframework.stereotype.Service
 import java.util.*
@@ -86,7 +88,7 @@ class DiscordService(private val shardManager: ShardManager,
         val privateChannel = user.openPrivateChannel().complete()
         val discMessage = privateChannel.sendMessage(message).complete()
         for (reaction in Constants.WAR_REACTIONS) {
-            discMessage.addReaction(reaction).queue()
+            discMessage.addReaction(Emoji.fromUnicode(reaction)).queue()
         }
         warService.addDmSignupMessage(war, discMessage.id, user.id)
         return user.id

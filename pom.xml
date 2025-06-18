@@ -16,7 +16,7 @@
     <version>0.1</version>
 
     <properties>
-        <kotlin.version>1.3.61</kotlin.version>
+        <kotlin.version>1.9.20</kotlin.version>
         <start-class>com.bot.ApplicationKt</start-class>
     </properties>
 
@@ -105,7 +105,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.3.0_307</version>
+            <version>5.6.1</version>
         </dependency>
         <dependency>
             <groupId>com.github.vladimir-bukhtoyarov</groupId>
@@ -145,7 +145,7 @@
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId> <!-- or jjwt-gson if Gson is preferred -->
+            <artifactId>jjwt-jackson</artifactId>
             <version>0.11.2</version>
             <scope>runtime</scope>
         </dependency>
@@ -250,8 +250,8 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>16</source>
+                    <target>16</target>
                 </configuration>
             </plugin>
         </plugins>

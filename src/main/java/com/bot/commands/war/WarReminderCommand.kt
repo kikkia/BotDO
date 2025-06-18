@@ -8,6 +8,7 @@ import com.bot.utils.Constants
 import com.bot.utils.FormattingUtils
 import com.jagrosh.jdautilities.command.CommandEvent
 import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.entities.emoji.Emoji
 import org.springframework.stereotype.Component
 import java.lang.NumberFormatException
 
@@ -73,7 +74,7 @@ class WarReminderCommand(val warService: WarService,
         val privateChannel = user.openPrivateChannel().complete()
         val message = privateChannel.sendMessage(FormattingUtils.generateDmWarReminder(war)).complete()
         for (reaction in Constants.WAR_REACTIONS) {
-            message.addReaction(reaction).queue()
+            message.addReaction(Emoji.fromUnicode(reaction)).queue()
         }
         warService.addDmSignupMessage(war, message.id, user.id)
         return user.id

@@ -5,6 +5,7 @@ import com.bot.service.*
 import com.bot.utils.WarUtils
 import com.jagrosh.jdautilities.command.CommandEvent
 import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import org.springframework.stereotype.Component
 import java.sql.Timestamp
 import java.time.temporal.ChronoUnit
@@ -30,12 +31,12 @@ class ArchiveCommand(private val warService: WarService,
             return
         }
 
-        var archiveChannel : net.dv8tion.jda.api.entities.TextChannel? = null
+        var archiveChannel : TextChannel? = null
         if (guild.archiveChannel == null) {
             val message = command.channel.sendMessage("No archive channel set, this war will stay in this channel.").complete()
             message.delete().queueAfter(10, TimeUnit.SECONDS) // Delete warning message
         } else {
-            archiveChannel = command.guild.getTextChannelById(guild.archiveChannel!!)
+            archiveChannel = command.guild.getTextChannelById(guild.archiveChannel!!) as TextChannel
             if (archiveChannel == null) {
                 command.replyWarning("Archive channel not found! Please make sure your archive channel is correctly setup and try again.")
                 return

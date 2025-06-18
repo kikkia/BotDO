@@ -22,10 +22,10 @@ class GearCommand(val userService: UserService): Command() {
     override fun execute(p0: CommandEvent?) {
         val user: UserEntity
         // This will display gear for author or mentioned user
-        if (p0!!.message.mentionedUsers.isNotEmpty() ||
+        if (p0!!.message.mentions.users.isNotEmpty() ||
                 (p0.args.isEmpty() && p0.message.attachments.isEmpty())) {
             // Get gear for mentioned users
-            val userId = if (p0.args.isBlank()) p0.author.id else p0.message.mentionedUsers[0].id
+            val userId = if (p0.args.isBlank()) p0.author.id else p0.message.mentions.users[0].id
             user = userService.getById(userId)
             val gear = user.gearset
             if (gear == null) {

@@ -10,7 +10,7 @@ import com.bot.utils.CommandParsingUtils
 import com.bot.utils.FormattingUtils
 import com.bot.utils.WarUtils
 import com.jagrosh.jdautilities.command.CommandEvent
-import net.dv8tion.jda.api.entities.TextChannel
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.time.Instant
@@ -54,12 +54,12 @@ class AddWarCommand(private val warService: WarService, guildService: GuildServi
 
         val channel: TextChannel?
         val channelEntity: TextChannelEntity
-        if (command.message.mentionedChannels.isEmpty()) {
+        if (command.message.mentions.channels.isEmpty()) {
             // Create new channel
-            channel = command.guild.createTextChannel("War ${FormattingUtils.formatDateToBasicString(date)}").complete()
+            channel = command.guild.createTextChannel("War ${FormattingUtils.formatDateToBasicString(date)}").complete() as TextChannel
             channelEntity = textChannelService.add(channel, guild)
         } else {
-            channel = command.message.mentionedChannels[0]
+            channel = command.message.mentions.channels[0] as TextChannel
             channelEntity = textChannelService.getById(channel.id)
         }
 

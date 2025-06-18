@@ -16,7 +16,7 @@ class AddWarVoiceChannelCommand(private val voiceChannelService: VoiceChannelSer
     }
 
     override fun execute(commandEvent: CommandEvent?) {
-        if (!commandEvent!!.member.voiceState!!.inVoiceChannel()) {
+        if (!commandEvent!!.member.voiceState!!.inAudioChannel()) {
             commandEvent.replyWarning("You need to join a voice channel and use this command to mark that channel as a war channel.")
             return
         }

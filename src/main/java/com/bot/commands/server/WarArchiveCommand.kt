@@ -17,12 +17,12 @@ class WarArchiveCommand(val guildService: GuildService) : RequiredArgsCommand() 
     }
 
     override fun executeCommand(commandEvent: CommandEvent?) {
-        if (commandEvent!!.message.mentionedChannels.isEmpty()) {
+        if (commandEvent!!.message.mentions.channels.isEmpty()) {
             commandEvent.replyWarning("You need to link a channel when using this command. (#channel-name)")
             return
         }
         val guild = guildService.getById(commandEvent.guild.id)
-        guildService.setArchiveChannel(guild, commandEvent.message.mentionedChannels[0].id)
+        guildService.setArchiveChannel(guild, commandEvent.message.mentions.channels[0].id)
         commandEvent.reactSuccess()
     }
 }

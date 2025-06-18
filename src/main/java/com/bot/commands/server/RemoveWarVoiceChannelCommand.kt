@@ -15,7 +15,7 @@ class RemoveWarVoiceChannelCommand(private val voiceChannelService: VoiceChannel
     }
 
     override fun execute(command: CommandEvent?) {
-        if (!command!!.member.voiceState!!.inVoiceChannel()) {
+        if (!command!!.member.voiceState!!.inAudioChannel()) {
             command.replyWarning("You need to join a voice channel and use this command to mark that channel as a non-war channel.")
             return
         }

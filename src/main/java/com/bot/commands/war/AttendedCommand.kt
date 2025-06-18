@@ -45,7 +45,7 @@ class AttendedCommand(val warService: WarService, guildService: GuildService, va
             }
 
             // Mentions in args (Check existing and non existing)
-            for (mention in command.message.mentionedMembers) {
+            for (mention in command.message.mentions.members) {
                 val attendOpt = war.attendees.stream().filter { it.user.id == mention.user.id}.findAny()
                 if (attendOpt.isEmpty) {
                     val user = userService.getById(mention.user.id)
