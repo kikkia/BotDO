@@ -5,8 +5,10 @@ import com.bot.models.InviteArgumentTag;
 import com.bot.service.GuildService;
 import com.bot.service.InviteService;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.command.CooldownScope;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Invite;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,14 +40,14 @@ public class CreateInviteCommand extends RequiredArgsCommand {
     protected void executeCommand(CommandEvent commandEvent) {
         var guild = guildService.getById(commandEvent.getGuild().getId());
         var args = commandEvent.getArgs();
-        if (commandEvent.getMessage().getMentionedChannels().size() == 0
+        if (commandEvent.getMessage().getMentions().getChannels().size() == 0
                 && guild.getEntryChannel() == null) {
             commandEvent.replyWarning("No channel specified, please specify a channel with the -c arg or set a default " +
                     "with the `setruleschannel` command.");
             return;
         }
-        var channel = commandEvent.getMessage().getMentionedChannels().size() != 0
-                ? commandEvent.getMessage().getMentionedChannels().get(0)
+        var channel = commandEvent.getMessage().getMentions().getChannels().size() != 0
+                ? (TextChannel) commandEvent.getMessage().getMentions().getChannels().get(0)
                 : commandEvent.getGuild().getTextChannelById(guild.getEntryChannel());
 
         if (channel == null) {

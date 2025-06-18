@@ -62,7 +62,7 @@ public class FamilyService {
                 }
                 return syncSingleFromSite(familyName, region);
             } catch (Exception e) {
-                log.warn("Hit error syncing from site, using db cached", e);
+                System.out.println("Hit error syncing from site, using db cached: " + e.getMessage());
             }
         }
         return opt;
@@ -146,7 +146,7 @@ public class FamilyService {
             } else {
                 var guildOpt = guildService.getByNameAndRegion(scrapedMember.getGuild(), region);
                 if (guildOpt.isEmpty()) {
-                    log.warn("Could not find guild " + scrapedMember.getGuild() +
+                    System.out.println("Could not find guild " + scrapedMember.getGuild() +
                             " when syncing individual family " + scrapedMember.getName());
                     // Create the guild to add them to
                     guildOpt = Optional.of(guildService.createNewGuild(scrapedMember.getGuild(), region));

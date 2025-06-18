@@ -23,13 +23,13 @@ public class SetWelcomeChannelCommand extends RequiredArgsCommand {
 
     @Override
     protected void executeCommand(CommandEvent commandEvent) {
-        if (commandEvent.getMessage().getMentionedChannels().size() < 1) {
+        if (commandEvent.getMessage().getMentions().getChannels().isEmpty()) {
             commandEvent.replyWarning("You need to specify a channel to use for welcome messages.");
             return;
         }
         GuildEntity guild = guildService.getById(commandEvent.getGuild().getId());
         guildService.setWelcomeChannel(guild,
-                commandEvent.getMessage().getMentionedChannels().get(0).getId());
+                commandEvent.getMessage().getMentions().getChannels().get(0).getId());
         commandEvent.reactSuccess();
     }
 }

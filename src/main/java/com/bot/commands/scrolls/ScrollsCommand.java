@@ -3,6 +3,7 @@ package com.bot.commands.scrolls;
 import com.bot.service.ScrollInventoryService;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.command.CooldownScope;
 import net.dv8tion.jda.api.entities.User;
 import org.springframework.stereotype.Component;
 
@@ -28,9 +29,9 @@ public class ScrollsCommand extends Command {
     protected void execute(CommandEvent commandEvent) {
         var userIds = new ArrayList<String>();
 
-        if (!commandEvent.getMessage().getMentionedUsers().isEmpty()) {
+        if (!commandEvent.getMessage().getMentions().getUsers().isEmpty()) {
             // Parse mentioned users
-            userIds.addAll(commandEvent.getMessage().getMentionedUsers()
+            userIds.addAll(commandEvent.getMessage().getMentions().getUsers()
                     .stream()
                     .map(User::getId)
                     .collect(Collectors.toList()));

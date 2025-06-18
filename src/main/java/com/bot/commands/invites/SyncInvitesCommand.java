@@ -4,6 +4,7 @@ import com.bot.db.entities.GuildInviteEntity;
 import com.bot.service.InviteService;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.command.CooldownScope;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Invite;
 import org.springframework.beans.factory.annotation.Autowired;

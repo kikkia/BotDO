@@ -4,7 +4,9 @@ import com.bot.service.GuildService;
 import com.bot.service.InviteService;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
+import com.jagrosh.jdautilities.command.CooldownScope;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,8 +38,8 @@ public class RecruitInviteCommand extends Command {
     protected void execute(CommandEvent commandEvent) {
         var guild = guildService.getById(commandEvent.getGuild().getId());
 
-        var channels = commandEvent.getMessage().getMentionedChannels();
-        if (channels.size() == 0) {
+        var channels = commandEvent.getMessage().getMentions().getChannels();
+        if (channels.isEmpty()) {
             if (!guild.hasDefaultInviteChannel()) {
                 commandEvent.replyWarning("You need to mention a channel or set a rules channel for the guild to send the " +
                         "invited user to.");
@@ -47,7 +49,7 @@ public class RecruitInviteCommand extends Command {
             channels = Collections.singletonList(commandEvent.getGuild().getTextChannelById(guild.getEntryChannel()));
         }
 
-        var channel = channels.get(0);
+        var channel = (TextChannel) channels.get(0);
         if (channel == null) {
             commandEvent.replyWarning("Channel not found, please check that the specified or rules channel are correct.");
             return;
@@ -55,6 +57,7 @@ public class RecruitInviteCommand extends Command {
         List<String> roles = guild.hasDefaultRecruitRole() ?
                 Collections.singletonList(guild.getRecruitRole())
                 : Collections.emptyList();
+
         var invite = channel.createInvite().setUnique(true).setMaxAge(12L, TimeUnit.HOURS).setMaxUses(1).complete();
         inviteService.add(commandEvent.getGuild(), invite, roles, commandEvent.getAuthor().getId(), true);
         commandEvent.replySuccess("Generated invite: " + invite.getUrl());

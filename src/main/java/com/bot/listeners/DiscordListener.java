@@ -295,39 +295,6 @@ public class DiscordListener extends ListenerAdapter {
         super.onUserUpdateAvatar(event);
     }
 
-    @Override
-    public void onVoiceChannelUpdateName(@NotNull ChannelUpdateNameEvent event) {
-
-
-        super.onVoiceChannelUpdateName(event);
-    }
-
-    @Override
-    public void onVoiceChannelDelete(@NotNull VoiceChannelDeleteEvent event) {
-        voiceChannelService.delete(event.getChannel().getId());
-        super.onVoiceChannelDelete(event);
-    }
-
-    @Override
-    public void onVoiceChannelCreate(@NotNull VoiceChannelCreateEvent event) {
-        voiceChannelService.newChannel(event.getChannel().getId(),
-                event.getChannel().getName(),
-                event.getGuild().getId());
-        super.onVoiceChannelCreate(event);
-    }
-
-    @Override
-    public void onGuildVoiceMove(@NotNull GuildVoiceMoveEvent event) {
-        handleVoiceChannelChange(event.getChannelJoined(), event.getMember());
-        super.onGuildVoiceMove(event);
-    }
-
-    @Override
-    public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {
-        handleVoiceChannelChange(event.getChannelJoined(), event.getMember());
-        super.onGuildVoiceJoin(event);
-    }
-
     private void handleVoiceChannelChange(VoiceChannel channel, Member member) {
         var channelEntity = getVoiceHelper(channel);
         if (channelEntity.getWar()) {
@@ -421,15 +388,5 @@ public class DiscordListener extends ListenerAdapter {
             warService.deactivateDmSignup(warEntity, userId);
         }
         return warEntity;
-    }
-
-    private void handleDmWarReaction(WarEntity warEntity, PrivateMessageReactionAddEvent event) {
-        warEntity = handleWarAttendanceUpdate(warEntity, event.getUserId(), event.getReactionEmote().getName());
-        Guild guild = event.getJDA().getGuildById(warEntity.getGuild().getDiscordGuild().getId());
-        if (guild != null) {
-            warService.refreshMessage(guild, warEntity);
-        }
-        event.getChannel().sendMessage("Thank you for responding, if you want to change your answer please do it in the "
-                + warEntity.getChannel().getName() + " channel.").queue();
     }
 }

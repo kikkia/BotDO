@@ -41,7 +41,7 @@ public class DiscordConfiguration {
                         discordProperties.getToken(),
                         GUILD_MEMBERS,
                         GUILD_MESSAGES,
-                        GUILD_EMOJIS,
+                        GUILD_EMOJIS_AND_STICKERS,
                         GUILD_INVITES,
                         GUILD_MESSAGE_REACTIONS,
                         GUILD_VOICE_STATES,
