@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.4.8</version>
+        <version>2.5.15</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -16,6 +16,7 @@
     <version>0.1</version>
 
     <properties>
+        <java.version>17</java.version>
         <kotlin.version>1.9.20</kotlin.version>
         <start-class>com.bot.ApplicationKt</start-class>
     </properties>
@@ -68,7 +69,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.10</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -79,12 +79,11 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-reflect</artifactId>
-            <version>1.1.51</version>
+            <version>${kotlin.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
-            <version>2.2.2.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -210,7 +209,7 @@
                         <plugin>all-open</plugin>
                         <plugin>jpa</plugin>
                     </compilerPlugins>
-                    <jvmTarget>11</jvmTarget>
+                    <jvmTarget>${java.version}</jvmTarget>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -250,8 +249,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <source>16</source>
-                    <target>16</target>
+                    <release>${java.version}</release>
                 </configuration>
             </plugin>
         </plugins>

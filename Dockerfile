@@ -1,9 +1,9 @@
-FROM maven:3.6.3-jdk-11-slim AS build
+FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY . /app/
 RUN mvn -B -Dmaven.artifact.threads=30 clean package
 
-FROM openjdk:11-jdk-oracle
+FROM eclipse-temurin:17-jdk-noble
 WORKDIR /app
 COPY --from=build /app/target/ /app
 COPY --from=build /app/res/ /app/res
