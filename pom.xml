@@ -261,27 +261,8 @@
             <url>https://jitpack.io</url>
         </repository>
         <repository>
-            <id>maven-central</id>
-            <url>https://repo1.maven.org/maven2</url>
-        </repository>
-        <repository>
-            <id>maven_central</id>
-            <name>Maven Central</name>
-            <url>https://repo.maven.apache.org/maven2/</url>
-        </repository>
-        <repository>
             <id>velocity</id>
             <url>https://nexus.velocitypowered.com/repository/maven-public/</url>
-        </repository>
-        <repository>
-            <id>jcenter</id>
-            <name>jcenter-bintray</name>
-            <url>https://jcenter.bintray.com</url>
-        </repository>
-        <repository>
-            <id>yoava</id>
-            <name>AOL yoava</name>
-            <url>http://yoava.artifactoryonline.com/yoava/repo</url>
         </repository>
         <repository>
             <id>dv8tion</id>
@@ -294,17 +275,4 @@
             <url>https://m2.chew.pro/releases</url>
         </repository>
     </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>kotlin-bintray</id>
-            <name>Kotlin Bintray</name>
-            <url>http://dl.bintray.com/kotlin/kotlin-dev</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 </project>
