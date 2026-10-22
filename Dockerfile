@@ -3,7 +3,7 @@ WORKDIR /app
 COPY . /app/
 RUN mvn -B -Dmaven.artifact.threads=30 clean package
 
-FROM eclipse-temurin:17-jdk-noble
+FROM eclipse-temurin:17-jre-focal
 WORKDIR /app
 COPY --from=build /app/target/ /app
 COPY --from=build /app/res/ /app/res
