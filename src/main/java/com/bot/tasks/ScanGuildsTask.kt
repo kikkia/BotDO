@@ -8,6 +8,7 @@ import com.bot.service.MetricsService
 import com.bot.utils.GuildScrapeUtils
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import java.time.Duration
 import java.time.Instant
 import java.util.stream.Collectors
@@ -24,21 +25,19 @@ class ScanGuildsTask(private val familyService: FamilyService,
         log.info("Starting guild scan for: ${region.code}")
 
         // Scan entire list of guilds and sync them
-        var page = 1
+        var page = 0
         var guildCount = 0
         var familyCount = 0
         // Website now requires exact name to search, so we go through those we have seen.
         val pageSize = 100
-        var offset = 0
         try {
-            var guildPage = bdoGuildService.getAllByRegion(region, PageRequest.of(0, pageSize))
-            while (guildPage.hasNext()) {
+            var guildPage = bdoGuildService.getAllByRegion(region, PageRequest.of(0, pageSize, Sort.by("id")))
+            while (guildPage.hasContent()) {
                 for (guild in guildPage.content) {
                     if (guild.last_scan.toInstant().isAfter(Instant.now().minusSeconds(3600 * 18))) {
                         continue
                     }
-                    bdoGuildService.setScan(guild)
-                    var families: Set<BdoFamily>
+                    val families: Set<BdoFamily>
                     try {
                         families = guildScrapeUtils.getGuildFamilies(guild.name, region)
                     } catch (e: Exception) {
@@ -65,27 +64,32 @@ class ScanGuildsTask(private val familyService: FamilyService,
                         metricsService.markFamilyUpdateExectution()
                         familyCount++
                     }
-                    metricsService.markGuildUpdateExcecution()
-
                     // Find people to remove from guild
                     familiesFromDB.removeAll(familyNamesFromPage)
+                    var reconciled = true
                     for (toRemove in familiesFromDB) {
                         try {
-                            familyService.removeFromGuild(familyService.getFamily(toRemove, region, true).get())
+                            // A profile refresh can move the family to another guild; preserve that membership.
+                            familyService.removeFromGuild(familyService.getFamily(toRemove, region, true).get(), guild)
                         } catch (e: Exception) {
-                            log.warn("failed to remove member $toRemove from guild ${guild.name}")
+                            log.warn("failed to remove member $toRemove from guild ${guild.name}", e)
+                            reconciled = false
                         }
                     }
-                    guildCount++
+                    if (reconciled) {
+                        bdoGuildService.setScan(guild)
+                        metricsService.markGuildUpdateExcecution()
+                        guildCount++
+                    }
                 }
-                offset += pageSize
+                page++
                 log.info("Scan Page $page finished")
                 val duration = Duration.between(start, Instant.now())
                 log.info("Total elapsed time: ${duration.toHoursPart()} Hours, ${duration.toMinutesPart()} Mins, ${duration.toSecondsPart()} Secs")
                 val secsRoundUp = duration.toSeconds().coerceAtLeast(1)
                 log.info("rate = ${guildCount/secsRoundUp} guilds/sec and ${familyCount/secsRoundUp} fams/sec")
-                page++
-                guildPage = bdoGuildService.getAllByRegion(region, guildPage.nextOrLastPageable())
+                if (!guildPage.hasNext()) break
+                guildPage = bdoGuildService.getAllByRegion(region, guildPage.nextPageable())
             }
         } catch( e: Exception) {
             log.error("Failed to scan guilds", e)
@@ -93,7 +97,8 @@ class ScanGuildsTask(private val familyService: FamilyService,
             log.info("Scan complete. Pages: $page | Guilds: $guildCount | Families: $familyCount")
             val duration = Duration.between(start, Instant.now())
             log.info("Total elapsed time: ${duration.toHoursPart()} Hours, ${duration.toMinutesPart()} Mins, ${duration.toSecondsPart()} Secs")
-            log.info("rate = ${guildCount/duration.toSeconds()} guilds/sec and ${familyCount/duration.toSeconds()} fams/sec")
+            val secsRoundUp = duration.toSeconds().coerceAtLeast(1)
+            log.info("rate = ${guildCount/secsRoundUp} guilds/sec and ${familyCount/secsRoundUp} fams/sec")
         }
     }
 }

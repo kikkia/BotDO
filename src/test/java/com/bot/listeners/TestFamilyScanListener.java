@@ -24,7 +24,7 @@ class TestFamilyScanListener {
     private final DiscordProperties properties = new DiscordProperties();
     private final FamilyScanListener listener = new FamilyScanListener(properties, executor,
             mock(FamilyService.class), mock(BdoGuildService.class), mock(MetricsService.class),
-            new GuildScrapeUtils(new BdoSiteProperties()));
+            new GuildScrapeUtils(new BdoSiteProperties(), mock(MetricsService.class)));
 
     @Test
     void schedulesNaAndEuIndexingOnlyOnceAcrossShards() {

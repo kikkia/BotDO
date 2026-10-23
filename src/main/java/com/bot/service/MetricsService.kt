@@ -21,6 +21,10 @@ open class MetricsService(private val client: StatsDClient) {
         client.incrementCounter("bdo.guild.update")
     }
 
+    open fun markScrapeRequest(endpoint: String, statusCode: Int?) {
+        client.incrementCounter("bdo.scrape.request", "endpoint:$endpoint", "status_code:${statusCode ?: "none"}")
+    }
+
     private fun markCommandExecution(commandName: String, outcome:String) {
         val commandNameTag = "command:$commandName"
         val outcomeTag = "outcome:$outcome"

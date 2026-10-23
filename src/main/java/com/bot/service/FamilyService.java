@@ -22,6 +22,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @Transactional
 @Service
@@ -60,7 +61,7 @@ public class FamilyService {
                 if (syncedFromSite.isEmpty() && opt.isPresent()) {
                     return opt;
                 }
-                return syncSingleFromSite(familyName, region);
+                return syncedFromSite;
             } catch (Exception e) {
                 System.out.println("Hit error syncing from site, using db cached: " + e.getMessage());
             }
@@ -106,9 +107,16 @@ public class FamilyService {
     }
 
     public FamilyEntity removeFromGuild(FamilyEntity familyEntity) {
-        // Un-active all new memberships
+        return deactivateMemberships(familyEntity, membership -> true);
+    }
+
+    public FamilyEntity removeFromGuild(FamilyEntity familyEntity, BDOGuildEntity guildEntity) {
+        return deactivateMemberships(familyEntity, membership -> membership.getGuild().getId() == guildEntity.getId());
+    }
+
+    private FamilyEntity deactivateMemberships(FamilyEntity familyEntity, Predicate<GuildMembershipEntity> matches) {
         for (GuildMembershipEntity membershipEntity : familyEntity.getMemberships()) {
-            if (membershipEntity.getActive()) {
+            if (membershipEntity.getActive() && matches.test(membershipEntity)) {
                 membershipEntity.setActive(false);
                 membershipRepository.save(membershipEntity);
             }

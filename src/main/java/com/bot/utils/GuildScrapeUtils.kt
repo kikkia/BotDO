@@ -4,8 +4,10 @@ import com.bot.configuration.properties.BdoSiteProperties
 import com.bot.models.BdoCharacter
 import com.bot.models.BdoFamily
 import com.bot.models.Region
+import com.bot.service.MetricsService
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
 import org.springframework.stereotype.Component
 import java.io.IOException
 import java.util.*
@@ -17,7 +19,7 @@ import kotlin.streams.asStream
  * Utility class to help with webscraping the bdo guild directory
  */
 @Component
-class GuildScrapeUtils(private val props: BdoSiteProperties) {
+class GuildScrapeUtils(private val props: BdoSiteProperties, private val metricsService: MetricsService) {
 
     private val client = OkHttpClient()
     //(guildName=)(.+)&region=
@@ -63,10 +65,22 @@ class GuildScrapeUtils(private val props: BdoSiteProperties) {
         return props.bdoSiteBaseUrl.random()
     }
 
+    private fun executeRequest(request: Request, endpoint: String) : Response {
+        val response = try {
+            client.newCall(request).execute()
+        } catch (e: IOException) {
+            metricsService.markScrapeRequest(endpoint, null)
+            throw e
+        }
+        // Count the HTTP result even when status validation or parsing subsequently fails.
+        metricsService.markScrapeRequest(endpoint, response.code)
+        return response
+    }
+
     fun getGuildNamesOnPage(page: Int, search: String, region: Region) : List<String> {
         val request = Request.Builder().url(getGuildSearchUrl(page, search, region)).build()
 
-        client.newCall(request).execute().use { response ->
+        executeRequest(request, "guild_search").use { response ->
             if (!response.isSuccessful) throw IOException("Unexpected Http Code $response")
 
             val body = response.body!!.string()
@@ -78,7 +92,7 @@ class GuildScrapeUtils(private val props: BdoSiteProperties) {
 
     fun getGuildFamilies(guildName: String, region: Region) : Set<BdoFamily> {
         val request = Request.Builder().url(getGuildPageUrl(guildName, region)).build()
-        client.newCall(request).execute().use { response ->
+        executeRequest(request, "guild_profile").use { response ->
             if (!response.isSuccessful) throw IOException("Unexpected Http Code $response")
 
             val body = response.body!!.string()
@@ -91,7 +105,7 @@ class GuildScrapeUtils(private val props: BdoSiteProperties) {
 
     fun getUserInfoForSearch(familyName: String, region: Region) : Optional<BdoFamily> {
         val request = Request.Builder().url(getFamilySearchUrl(familyName, region)).build()
-        client.newCall(request).execute().use { response ->
+        executeRequest(request, "family_search").use { response ->
             if (!response.isSuccessful) throw IOException("Unexpected http code $response")
 
             val body = response.body!!.string()
@@ -110,7 +124,7 @@ class GuildScrapeUtils(private val props: BdoSiteProperties) {
 
     private fun getCharactersForFamily(familyTarget: String, region: Region) : List<BdoCharacter> {
         val request = Request.Builder().url(getFamilyPageUrl(familyTarget, region)).build()
-        client.newCall(request).execute().use { response ->
+        executeRequest(request, "family_profile").use { response ->
             if (!response.isSuccessful) throw IOException("Unexpected http code $response")
 
             val body = response.body!!.string()
