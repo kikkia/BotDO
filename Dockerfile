@@ -3,8 +3,8 @@ WORKDIR /app
 COPY . /app/
 RUN mvn -B -Dmaven.artifact.threads=30 clean package
 
-FROM eclipse-temurin:17-jre-focal
+FROM eclipse-temurin:17-jre-noble
 WORKDIR /app
 COPY --from=build /app/target/ /app
 COPY --from=build /app/res/ /app/res
-CMD java -javaagent:"/app/res/dd-java-agent.jar" -Ddd.profiling.enabled=true -Ddd.logs.injection=true -Ddd.trace.sample.rate=1 -Ddd.trace.analytics.enabled=true -Ddd.service=bdo-bot -Ddd.env=prod -jar bdo-bot-0.1.jar
+CMD java -XX:-UseBASE64Intrinsics -javaagent:"/app/res/dd-java-agent.jar" -Ddd.profiling.enabled=true -Ddd.logs.injection=true -Ddd.trace.sample.rate=1 -Ddd.trace.analytics.enabled=true -Ddd.service=bdo-bot -Ddd.env=prod -jar bdo-bot-0.1.jar
